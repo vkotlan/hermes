@@ -57,3 +57,5 @@ add_subdirectory(52-eigenvalue-h2p)
 # DG
 add_subdirectory(60-linear-advection-dg)
 
+#own
+add_subdirectory(XX-laser)
