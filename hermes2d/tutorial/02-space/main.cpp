@@ -13,7 +13,7 @@
 // just load the corresponding mesh at the beginning of the
 // main.cpp file.
 
-const int P_INIT = 3;
+const int P_INIT = 2;
 
 static char text[] = "\
 Click into the image window and:\n\
@@ -36,22 +36,24 @@ int main(int argc, char* argv[])
   // Load the mesh.
   Mesh mesh;
   H2DReader mloader;
-  mloader.load("domain.mesh", &mesh);            // original L-shape domain
+  //mloader.load("domain.mesh", &mesh);            // original L-shape domain
 
   // The following can be used to view higher-order shape functions
   // on reference domains (disable uniform mesh refinememts for that).
   //mloader.load("ref_square.mesh", &mesh);      // reference square
-  //mloader.load("ref_triangle.mesh", &mesh);    // reference triangle
+  mloader.load("ref_triangle.mesh", &mesh);    // reference triangle
 
   // Refine all elements (optional).
-  mesh.refine_all_elements();
+  //mesh.refine_all_elements();
 
   // Enter boundary markers.
   // (If no markers are entered, default is a natural BC).
   BCTypes bc_types;
+  //bc_types.add_bc_dirichlet(Hermes::vector<int>(1));
 
   // Enter Dirichlet boundary values (default is zero).
   BCValues bc_values;
+  //bc_values.add_const(1,2);
 
   // Create an H1 space with default shapeset and natural BC.
   H1Space space(&mesh, &bc_types, &bc_values, P_INIT);

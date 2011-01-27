@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
   mesh.refine_towards_vertex(3, 4);    // Four refinements towards vertex no. 3.
 
   // Refine towards boundary (optional).
-  mesh.refine_towards_boundary(BDY_OUTER, 4);  // Four refinements towards boundary with marker 2.
+  mesh.refine_towards_boundary(BDY_OUTER, 5);  // Four refinements towards boundary with marker 2.
 
   // Refine individual elements (optional).
   mesh.refine_element(86, 0);          // 0... isotropic refinement.
