@@ -38,7 +38,7 @@ const double TIME_TOL_LOWER = 0.5;                 // If rel. temporal error is 
 const double TIME_STEP_INC_RATIO = 1.1;            // Time step increase ratio (applied when rel. temporal error is too small).
 const double TIME_STEP_DEC_RATIO = 0.8;            // Time step decrease ratio (applied when rel. temporal error is too large).
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;   // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                   // SOLVER_PARDISO, SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+                                                   // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
 // Choose one of the following time-integration methods, or define your own Butcher's table. The last number 
 // in the name of each method is its order. The one before last, if present, is the number of stages.
@@ -71,9 +71,6 @@ int main(int argc, char* argv[])
   if (bt.is_explicit()) info("Using a %d-stage explicit R-K method.", bt.get_size());
   if (bt.is_diagonally_implicit()) info("Using a %d-stage diagonally implicit R-K method.", bt.get_size());
   if (bt.is_fully_implicit()) info("Using a %d-stage fully implicit R-K method.", bt.get_size());
-
-  // This is for experimental purposes.
-  //bt.switch_B_rows();
 
   // Load the mesh.
   Mesh mesh;
@@ -137,7 +134,6 @@ int main(int argc, char* argv[])
     }
 
     // Plot error function.
-    // Show the new time level solution.
     char title[100];
     sprintf(title, "Temporal error, t = %g", current_time);
     eview.set_title(title);

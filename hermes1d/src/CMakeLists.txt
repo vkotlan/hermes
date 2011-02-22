@@ -24,7 +24,6 @@ set(SRC
   ${HERMES_COMMON_DIR}/solver/aztecoo.cpp 
   ${HERMES_COMMON_DIR}/solver/amesos.cpp
   ${HERMES_COMMON_DIR}/solver/mumps.cpp 
-  ${HERMES_COMMON_DIR}/solver/pardiso.cpp 
   ${HERMES_COMMON_DIR}/solver/petsc.cpp 
   ${HERMES_COMMON_DIR}/solver/umfpack_solver.cpp
   ${HERMES_COMMON_DIR}/solver/superlu.cpp
@@ -43,6 +42,7 @@ configure_file(
 	${CMAKE_CURRENT_SOURCE_DIR}/config.h
 )
 # Sets linker settings.
+include(PickRealOrCplxLibs)
 macro(LIBRARY_SETTINGS BIN)
 #    target_link_libraries(${BIN} hermes_common)
 
@@ -58,6 +58,7 @@ macro(LIBRARY_SETTINGS BIN)
   
   # Link with all third party libraries corresponding to selected configuration options.
   # The respective variables will be empty for unselected TPL's.
+  PICK_REAL_OR_CPLX_LIBS(${BIN} ${BIN})
   target_link_libraries(  ${BIN}
       ${GLUT_LIBRARY} ${GLEW_LIBRARY}
       ${EXODUSII_LIBRARIES}
@@ -66,7 +67,6 @@ macro(LIBRARY_SETTINGS BIN)
       ${UMFPACK_LIBRARY}
       ${SUPERLU_LIBRARY}
       ${AMD_LIBRARY}
-      ${PARDISO_LIBRARY}
       ${TRILINOS_LIBRARIES}
       ${PETSC_LIBRARIES}
       ${MUMPS_REAL_LIBRARIES}

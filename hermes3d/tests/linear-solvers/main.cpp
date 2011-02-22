@@ -178,13 +178,6 @@ void solve(Solver &solver, int n) {
 int main(int argc, char *argv[]) {
   int ret = ERR_SUCCESS;
 
-#ifdef WITH_PETSC
-  // do NOT forget to call this when using PETSc solver
-  PetscInitialize(NULL, NULL, PETSC_NULL, PETSC_NULL);
-  // disable PETSc error handler
-  PetscPushErrorHandler(PetscIgnoreErrorHandler, PETSC_NULL);
-#endif
-
 #ifndef H3D_COMPLEX
   if (argc < 3) error("Not enough parameters.");
 #else
@@ -235,26 +228,6 @@ int main(int argc, char *argv[]) {
     build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
 
     UMFPackLinearSolver solver(&mat, &rhs);
-    solve(solver, n);
-#endif
-  }
-  else if (strcasecmp(argv[1], "pardiso") == 0) {
-#ifdef WITH_PARDISO
-    PardisoMatrix mat;
-    PardisoVector rhs;
-    build_matrix(n, ar_mat, ar_rhs, &mat, &rhs);
-
-    PardisoLinearSolver solver(&mat, &rhs);
-    solve(solver, n);
-#endif
-  }
-  else if (strcasecmp(argv[1], "pardiso-block") == 0) {
-#ifdef WITH_PARDISO
-    PardisoMatrix mat;
-    PardisoVector rhs;
-    build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
-
-    PardisoLinearSolver solver(&mat, &rhs);
     solve(solver, n);
 #endif
   }
@@ -324,11 +297,6 @@ int main(int argc, char *argv[]) {
   }  
   else
     ret = ERR_FAILURE;
-
-#ifdef WITH_PETSC
-  // do NOT forget to call this when using PETSc solver
-  PetscFinalize();
-#endif
 
   return ret;
 }

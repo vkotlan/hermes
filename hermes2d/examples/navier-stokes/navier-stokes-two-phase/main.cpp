@@ -27,7 +27,7 @@ const double THRESHOLD = 0.3;
 const bool MULTI = true; 
 const int STRATEGY = 1; 
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                  // SOLVER_PARDISO, SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+                                                  // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
 const int P_INIT_XVEL = 2;
 const int P_INIT_YVEL = 2;
@@ -126,7 +126,7 @@ bool adapt_velocity(Mesh* mesh,  Mesh* rmesh, MeshFunction* sln, MeshFunction* r
     err = elist[i].error;
 
     e = mesh->get_element(elist[i].id);
-    mesh->refine_element(elist[i].id);
+    mesh->refine_element_id(elist[i].id);
     for (j = 0; j < 4; j++)
       space->set_element_order(e->sons[j]->id, space->get_element_order(elist[i].id));
 

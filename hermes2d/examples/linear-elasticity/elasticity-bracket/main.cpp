@@ -55,7 +55,7 @@ const double ERR_STOP = 0.5;                      // Stopping criterion for adap
 const int NDOF_STOP = 60000;                      // Adaptivity process stops when the number of degrees of freedom grows over
                                                   // this limit. This is mainly to prevent h-adaptivity to go on forever.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                  // SOLVER_PARDISO, SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+                                                  // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
 // Problem parameters.
 const double E  = 200e9;                          // Young modulus for steel: 200 GPa.
@@ -84,8 +84,8 @@ int main(int argc, char* argv[])
   mloader.load("bracket.mesh", &u_mesh);
 
   // Initial mesh refinements.
-  u_mesh.refine_element(1);
-  u_mesh.refine_element(4);
+  u_mesh.refine_element_id(1);
+  u_mesh.refine_element_id(4);
 
   // Create initial mesh for the vertical displacement component.
   // This also initializes the multimesh hp-FEM.

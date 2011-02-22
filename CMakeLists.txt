@@ -67,7 +67,7 @@ set(REPORT_WITH_LOGO        YES)
 
 #### Solvers ###
 # Standard UMFPACK.
-set(WITH_UMFPACK			YES)
+set(WITH_UMFPACK            YES)
 
 # First option enables sequential SuperLU, which should reside in SUPERLU_ROOT/lib
 # and SUPERLU_ROOT/include. If SUPERLU_ROOT is not provided, the library will be searched
@@ -86,14 +86,8 @@ set(SUPERLU_MT              NO)
 # if PETSc is disabled, PETSC_ROOT and PETSC_ARCH will be ignored.
 #
 set(WITH_PETSC              NO)
-set(PETSC_ROOT              /opt/petsc/petsc-3.1-p4)
+set(PETSC_ROOT              /opt/petsc/petsc-3.1-p7)
 set(PETSC_ARCH              petsc-arch-without-scalar-type)
-
-# If PARDISO is enabled, WITH_OPENMP must be set as well (and perhaps some other libraries
-# added to ADDITIONAL_LIBS according to PARDISO user guide).
-#
-set(WITH_PARDISO            NO)
-set(PARDISO_LIB             /opt/pardiso/libpardiso400_GNU430_AMD_IA64.so)
 
 # Sequential version of MUMPS may be enabled by setting YES on the following line
 # and pointing to the package installation directory with MUMPS_ROOT. To enable the 
@@ -107,18 +101,17 @@ set(WITH_MUMPS              NO)
 # set(SCALAPACK_LIBRARIES   -lscalapack -lblacs)
 
 # Enable support for Trilinos solvers.
-set(WITH_TRILINOS			NO)
+set(WITH_TRILINOS           NO)
 
 
 ### Mesh format ###
 option(WITH_EXODUSII "Enable support for EXODUSII mesh format" NO)
 option(WITH_HDF5     "Enable support for HDF5" NO)
 
-
 ### Others ###
 # Parallel execution (tells the linker to use parallel versions of the selected solvers, if available):
 #
-# Enable OpenMP for shared memory processing. Note that this is required when PARDISO is enabled.
+# Enable OpenMP for shared memory processing.
 #  
 set(WITH_OPENMP             NO)
 
@@ -143,18 +136,18 @@ find_package(PTHREAD REQUIRED)
 
 # Solvers.
 if(MSVC)
-	if(WITH_PETSC OR WITH_PARDISO OR WITH_MUMPS OR WITH_TRILINOS OR WITH_SUPERLU)
+	if(WITH_PETSC OR WITH_MUMPS OR WITH_TRILINOS OR WITH_SUPERLU)
 		find_package(CLAPACK REQUIRED)
 		include_directories(${CLAPACK_INCLUDE_DIRS})
-	endif(WITH_PETSC OR WITH_PARDISO OR WITH_MUMPS OR WITH_TRILINOS OR WITH_SUPERLU)
+	endif(WITH_PETSC OR WITH_MUMPS OR WITH_TRILINOS OR WITH_SUPERLU)
 else(MSVC)
   # All third party solvers require BLAS and LAPACK (both found in the package LAPACK).
   # FindLAPACK is Fortran-only so Fortran must be enabled as well.
-  if(WITH_UMFPACK OR WITH_PETSC OR WITH_PARDISO OR WITH_MUMPS OR WITH_TRILINOS OR WITH_SUPERLU)
+  if(WITH_UMFPACK OR WITH_PETSC OR WITH_MUMPS OR WITH_TRILINOS OR WITH_SUPERLU)
     enable_language(Fortran)
     find_package(LAPACK REQUIRED)
     add_definitions(-DWITH_BLAS)
-  endif(WITH_UMFPACK OR WITH_PETSC OR WITH_PARDISO OR WITH_MUMPS OR WITH_TRILINOS OR WITH_SUPERLU)
+  endif(WITH_UMFPACK OR WITH_PETSC OR WITH_MUMPS OR WITH_TRILINOS OR WITH_SUPERLU)
 endif(MSVC)  
 
 if(WITH_PETSC)
@@ -169,10 +162,6 @@ if(WITH_UMFPACK)
 	find_package(UMFPACK REQUIRED)
 	include_directories(${UMFPACK_INCLUDE_DIRS})
 endif(WITH_UMFPACK)
-
-if(WITH_PARDISO)
-	find_package(PARDISO REQUIRED)
-endif(WITH_PARDISO)
 
 if(WITH_MUMPS)
 	find_package(MUMPS REQUIRED)
@@ -251,7 +240,6 @@ message("---------------------")
 message("Build with Python: ${WITH_PYTHON}")
 message("Build with UMFPACK: ${WITH_UMFPACK}")
 message("Build with PETSC: ${WITH_PETSC}")
-message("Build with PARDISO: ${WITH_PARDISO}")
 message("Build with MUMPS: ${WITH_MUMPS}")
 message("Build with SUPERLU${MT}: ${WITH_SUPERLU}")
 message("Build with TRILINOS: ${WITH_TRILINOS}")

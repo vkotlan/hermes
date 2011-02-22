@@ -321,6 +321,8 @@ void Solution::copy(const Solution* sln)
     cnst[0] = sln->cnst[0];
     cnst[1] = sln->cnst[1];
   }
+
+  element = NULL;
 }
 
 
@@ -569,6 +571,7 @@ void Solution::set_coeff_vector(Space* space, PrecalcShapeset* pss, scalar* coef
 
   if(mesh == NULL) error("mesh == NULL.\n");
   init_dxdy_buffer();
+  element = NULL;
 }
 
 

@@ -27,8 +27,11 @@ add_subdirectory(P09-trilinos)
 
 # Miscellaneous techniques
 add_subdirectory(P10-miscellaneous)
+<<<<<<< HEAD
 
 # own tutorials
 add_subdirectory(PXX-own)
 
 
+=======
+>>>>>>> 569d0cdc5aa43ddaa231f4728b6000e68e6d20fe

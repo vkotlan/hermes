@@ -34,11 +34,13 @@
 
 static int find_position(int *Ai, int Alen, int idx) {
   _F_
+  assert (Ai != NULL);
+  assert (Alen > 0);
   assert (idx >= 0);
   
   register int lo = 0, hi = Alen - 1, mid;
   
-  while (1) 
+  while (true) 
   {
     mid = (lo + hi) >> 1;
     
@@ -95,8 +97,6 @@ void CSCMatrix::multiply_with_scalar(scalar value)
 void CSCMatrix::alloc() {
   _F_
   assert(pages != NULL);
-  if (size <= 0)
-      error("UMFPack failed, matrix size must be greater than 0.");
 
   // initialize the arrays Ap and Ai
   Ap = new int [size + 1];
@@ -270,6 +270,21 @@ bool CSCMatrix::dump(FILE *file, const char *var_name, EMatrixDumpFormat fmt) {
       fprintf(file, "];\n%s = spconvert(temp);\n", var_name);
 
       return true;
+
+    case DF_MATRIX_MARKET:
+    {
+      fprintf(file,"%%%%MatrixMarket matrix coordinate real symmetric\n");
+      int nnz_sym=0;
+      for (int j = 0; j < (int)size; j++)
+        for (int i = Ap[j]; i < Ap[j + 1]; i++)
+          if (j <= Ai[i]) nnz_sym++;
+      fprintf(file,"%d %d %d\n", size, size, nnz_sym);
+      for (int j = 0; j < (int)size; j++)
+        for (int i = Ap[j]; i < Ap[j + 1]; i++)
+          if (j <= Ai[i]) fprintf(file, "%d %d %24.15e\n", Ai[i]+1, j+1, Ax[i]);
+
+      return true;
+    }
 
     case DF_HERMES_BIN: 
     {

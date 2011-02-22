@@ -64,7 +64,7 @@ const double SPACE_ERR_TOL = 1.0;                 // Stopping criterion for adap
 const int NDOF_STOP = 60000;                      // Adaptivity process stops when the number of degrees of freedom grows
                                                   // over this limit. This is to prevent h-adaptivity to go on forever.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                  // SOLVER_PARDISO, SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+                                                  // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
 // Temporal adaptivity.
 bool ADAPTIVE_TIME_STEP_ON = true;                // This flag decides whether adaptive time stepping will be done.
@@ -97,7 +97,6 @@ const int NEWTON_MAX_ITER = 20;                   // Maximum allowed number of N
 //   Implicit_SDIRK_CASH_3_23_embedded, Implicit_ESDIRK_TRBDF2_3_23_embedded, Implicit_ESDIRK_TRX2_3_23_embedded, 
 //   Implicit_SDIRK_BILLINGTON_3_23_embedded, Implicit_SDIRK_CASH_5_24_embedded, Implicit_SDIRK_CASH_5_34_embedded, 
 //   Implicit_DIRK_ISMAIL_7_45_embedded. 
-
 ButcherTableType butcher_table_type = Implicit_SDIRK_CASH_3_23_embedded;
 
 // Model parameters.
@@ -119,6 +118,7 @@ int main(int argc, char* argv[])
     warn("R-K method not embedded, turning off adaptive time stepping.");
     ADAPTIVE_TIME_STEP_ON = false;
   }
+
   // Load the mesh.
   Mesh mesh, basemesh;
   H2DReader mloader;
@@ -238,12 +238,8 @@ int main(int argc, char* argv[])
         }
         else if (rel_err_time < TIME_ERR_TOL_LOWER) {
           info("rel_err_time = %g%% is below lower limit %g%%", rel_err_time, TIME_ERR_TOL_UPPER);
-          info("Increasing tau from %g to %g s and restarting time step.", 
-               time_step, time_step * TIME_STEP_INC_RATIO);
+          info("Increasing tau from %g to %g s.", time_step, time_step * TIME_STEP_INC_RATIO);
           time_step *= TIME_STEP_INC_RATIO;
-          delete ref_space;
-          delete ref_dp;
-          continue;
         }
         else {
           info("rel_err_time = %g%% is in acceptable interval (%g%%, %g%%)", 
