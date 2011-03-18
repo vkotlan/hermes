@@ -16,9 +16,9 @@ set(HERMES_COMMON_DIR ${PROJECT_SOURCE_DIR}/hermes_common)
 set(WITH_TESTS                YES)
 
 # Optional parts of the library:
-set(WITH_H1D                  YES)
+set(WITH_H1D                  NO)
 	# Release and debug versions.
-	set(H1D_DEBUG             YES)
+        set(H1D_DEBUG             YES)
 	set(H1D_RELEASE           NO)
 	# Optional parts of the library.
 	set(H1D_WITH_EXAMPLES     YES)
@@ -33,8 +33,8 @@ set(WITH_H2D                  YES)
 	set(H2D_DEBUG             YES)
 	set(H2D_RELEASE           YES)
 	# Optional parts of the library.
-	set(H2D_WITH_EXAMPLES     YES)
-	set(H2D_WITH_BENCHMARKS   YES)
+        set(H2D_WITH_EXAMPLES     NO)
+        set(H2D_WITH_BENCHMARKS   NO)
 	set(H2D_WITH_TESTS        YES)
 	set(H2D_WITH_MODULES      YES)
 	set(H2D_WITH_TUTORIAL     YES)
@@ -42,7 +42,7 @@ set(WITH_H2D                  YES)
 	set(H2D_WITH_VIEWER_GUI   NO)
 	set(H2D_WITH_UTIL         YES)
 		
-set(WITH_H3D                  YES)
+set(WITH_H3D                  NO)
 	# Real/complex version of the library.
 	set(H3D_REAL              YES)
 	set(H3D_COMPLEX           YES)
