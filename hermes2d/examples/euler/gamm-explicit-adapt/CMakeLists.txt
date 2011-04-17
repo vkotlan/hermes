@@ -1,7 +1,8 @@
 if(NOT H2D_REAL)
     return()
 endif(NOT H2D_REAL)
-project(euler-gamm-advection-diffusion-implicit)
+
+project(gamm-explicit-adapt)
 
 add_executable(${PROJECT_NAME} main.cpp ../euler_util.cpp ../numerical_flux.cpp)
 include (${hermes2d_SOURCE_DIR}/CMake.common)
