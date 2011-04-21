@@ -35,7 +35,7 @@ set(WITH_H2D                  YES)
 	# Optional parts of the library.
         set(H2D_WITH_EXAMPLES     NO)
         set(H2D_WITH_BENCHMARKS   NO)
-	set(H2D_WITH_TESTS        YES)
+        set(H2D_WITH_TESTS        NO)
 	set(H2D_WITH_MODULES      YES)
 	set(H2D_WITH_TUTORIAL     YES)
 	set(H2D_WITH_GLUT         YES)

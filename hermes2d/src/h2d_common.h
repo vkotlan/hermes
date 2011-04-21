@@ -46,7 +46,7 @@ extern HERMES_API int h2d_make_edge_order(int edge, int encoded_order, int mode)
 
 /* Uncomment this line to disable internal mesh compatibility
    tests in Traverse:begin(). */
-//#define H2D_DISABLE_MULTIMESH_TESTS
+#define H2D_DISABLE_MULTIMESH_TESTS
 
 #endif
 

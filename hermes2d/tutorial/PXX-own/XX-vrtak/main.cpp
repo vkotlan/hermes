@@ -269,66 +269,71 @@ int main(int argc, char* argv[])
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[6]), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
     // heat
-    heatEdge = new HeatEdge[42];
-    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[0]), PhysicFieldBC_None, 0.0, 0.0, 0.0, 0.0);
-    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[3], &heatEdge[2]), PhysicFieldBC_Heat_Temperature, 20.0, 0.0, 0.0, 0.0);
-    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[10], &heatEdge[12], &heatEdge[13], &heatEdge[14], &heatEdge[15], &heatEdge[1]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 10.0, 20.0);
-    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[4], &heatEdge[5], &heatEdge[6], &heatEdge[7], &heatEdge[8], &heatEdge[9]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 20.0, 20.0);
-    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[35], &heatEdge[36], &heatEdge[37], &heatEdge[38]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 0.0, 0.0);
-    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[40]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 0.0, 0.0);
-    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[11]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 10.0, 20.0);
+//    heatEdge = new HeatEdge[42];
+//    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[0]), PhysicFieldBC_None, 0.0, 0.0, 0.0, 0.0);
+//    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[3], &heatEdge[2]), PhysicFieldBC_Heat_Temperature, 20.0, 0.0, 0.0, 0.0);
+//    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[10], &heatEdge[12], &heatEdge[13], &heatEdge[14], &heatEdge[15], &heatEdge[1]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 10.0, 20.0);
+//    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[4], &heatEdge[5], &heatEdge[6], &heatEdge[7], &heatEdge[8], &heatEdge[9]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 20.0, 20.0);
+//    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[35], &heatEdge[36], &heatEdge[37], &heatEdge[38]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 0.0, 0.0);
+//    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[40]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 0.0, 0.0);
+//    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[11]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 10.0, 20.0);
 
-    heatLabel = new HeatLabel[7];
-    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[0]), 19.9, 1.0, 8670.0, 450);
-    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[6]), 1e-6, 0.0, 0.0, 0.0);
+//    heatLabel = new HeatLabel[7];
+//    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[0]), 19.9, 1.0, 8670.0, 450);
+//    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[6]), 1e-6, 0.0, 0.0, 0.0);
 
     // thermoelasticity
-    elasticityEdge = new ElasticityEdge[42];
-    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[0]), PhysicFieldBC_None, PhysicFieldBC_None, 0.0, 0.0);
-    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[2], &elasticityEdge[3]), PhysicFieldBC_Elasticity_Fixed, PhysicFieldBC_Elasticity_Fixed, 0.0, 0.0);
-    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[11], &elasticityEdge[12], &elasticityEdge[13], &elasticityEdge[14], &elasticityEdge[15], &elasticityEdge[1]), PhysicFieldBC_Elasticity_Free, PhysicFieldBC_Elasticity_Free, 0.0, 0.0);
-    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[4], &elasticityEdge[5], &elasticityEdge[6], &elasticityEdge[7], &elasticityEdge[8], &elasticityEdge[9], &elasticityEdge[10]), PhysicFieldBC_Elasticity_Free, PhysicFieldBC_Elasticity_Free, 0.0, 0.0);
-    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[35], &elasticityEdge[36], &elasticityEdge[37]), PhysicFieldBC_Elasticity_Free, PhysicFieldBC_Elasticity_Free, 0.0, 0.0);
-    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[38]), PhysicFieldBC_Elasticity_Fixed, PhysicFieldBC_Elasticity_Fixed, 0.0, 0.0);
-    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[40]), PhysicFieldBC_Elasticity_Fixed, PhysicFieldBC_Elasticity_Free, 0.0, 0.0);
+//    elasticityEdge = new ElasticityEdge[42];
+//    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[0]), PhysicFieldBC_None, PhysicFieldBC_None, 0.0, 0.0);
+//    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[2], &elasticityEdge[3]), PhysicFieldBC_Elasticity_Fixed, PhysicFieldBC_Elasticity_Fixed, 0.0, 0.0);
+//    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[11], &elasticityEdge[12], &elasticityEdge[13], &elasticityEdge[14], &elasticityEdge[15], &elasticityEdge[1]), PhysicFieldBC_Elasticity_Free, PhysicFieldBC_Elasticity_Free, 0.0, 0.0);
+//    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[4], &elasticityEdge[5], &elasticityEdge[6], &elasticityEdge[7], &elasticityEdge[8], &elasticityEdge[9], &elasticityEdge[10]), PhysicFieldBC_Elasticity_Free, PhysicFieldBC_Elasticity_Free, 0.0, 0.0);
+//    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[35], &elasticityEdge[36], &elasticityEdge[37]), PhysicFieldBC_Elasticity_Free, PhysicFieldBC_Elasticity_Free, 0.0, 0.0);
+//    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[38]), PhysicFieldBC_Elasticity_Fixed, PhysicFieldBC_Elasticity_Fixed, 0.0, 0.0);
+//    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[40]), PhysicFieldBC_Elasticity_Fixed, PhysicFieldBC_Elasticity_Free, 0.0, 0.0);
 
-    elasticityLabel = new ElasticityLabel[7];
-    set_elasticity_label(Hermes::vector<ElasticityLabel *>(&elasticityLabel[0]), 200e9, 0.28, 0.0, 0.0, 9.7e-6);
-    set_elasticity_label(Hermes::vector<ElasticityLabel *>(&elasticityLabel[6]), 200e9, 0.25, 0.0, 0.0, 13e-6);
+//    elasticityLabel = new ElasticityLabel[7];
+//    set_elasticity_label(Hermes::vector<ElasticityLabel *>(&elasticityLabel[0]), 200e9, 0.28, 0.0, 0.0, 9.7e-6);
+//    set_elasticity_label(Hermes::vector<ElasticityLabel *>(&elasticityLabel[6]), 200e9, 0.25, 0.0, 0.0, 13e-6);
 
     // Time measurement.
     TimePeriod cpu_time;
     cpu_time.tick();
 
     // Load the mesh.
-    Mesh mesh_mag, mesh_temp, mesh_elastDrzak, mesh_elastStopka;
+//    Mesh mesh_mag, mesh_temp, mesh_elastDrzak, mesh_elastStopka;
+    Mesh mesh_mag;
     H2DReader mloader;
     mloader.load("mesh_mag.mesh", &mesh_mag);
-    mloader.load("mesh_temp.mesh", &mesh_temp);
-    mloader.load("mesh_elast_drzak.mesh", &mesh_elastDrzak);
-    mloader.load("mesh_elast_stopka.mesh", &mesh_elastStopka);
-    mesh_temp.refine_all_elements(0);
-    // mesh_mag.refine_all_elements(0);
-    mesh_elastDrzak.refine_all_elements(0);
-    mesh_elastStopka.refine_all_elements(0);
+
+//    mloader.load("mesh_temp.mesh", &mesh_temp);
+//    mloader.load("mesh_elast_drzak.mesh", &mesh_elastDrzak);
+//    mloader.load("mesh_elast_stopka.mesh", &mesh_elastStopka);
+//    mesh_temp.refine_all_elements(0);
+    mesh_mag.refine_all_elements();
+//    mesh_elastDrzak.refine_all_elements(0);
+//    mesh_elastStopka.refine_all_elements(0);
 
     // Create H1 spaces with default shapesets.
     H1Space space_mag_real(&mesh_mag, magnetic_bc_types, magnetic_bc_values_real, P_INIT_MAG);
     H1Space space_mag_imag(&mesh_mag, magnetic_bc_types, magnetic_bc_values_imag, P_INIT_MAG);
-    H1Space space_temp(&mesh_temp, heat_bc_types, heat_bc_values, P_INIT_TEMP);
-    H1Space space_elast_drzak_r(&mesh_elastDrzak, elasticity_bc_types_r, elasticity_bc_values_r, P_INIT_ELAST);
-    H1Space space_elast_drzak_z(&mesh_elastDrzak, elasticity_bc_types_z, elasticity_bc_values_z, P_INIT_ELAST);
-    H1Space space_elast_stopka_r(&mesh_elastStopka, elasticity_bc_types_r, elasticity_bc_values_r, P_INIT_ELAST);
-    H1Space space_elast_stopka_z(&mesh_elastStopka, elasticity_bc_types_z, elasticity_bc_values_z, P_INIT_ELAST);
+//    H1Space space_temp(&mesh_temp, heat_bc_types, heat_bc_values, P_INIT_TEMP);
+//    H1Space space_elast_drzak_r(&mesh_elastDrzak, elasticity_bc_types_r, elasticity_bc_values_r, P_INIT_ELAST);
+//    H1Space space_elast_drzak_z(&mesh_elastDrzak, elasticity_bc_types_z, elasticity_bc_values_z, P_INIT_ELAST);
+//    H1Space space_elast_stopka_r(&mesh_elastStopka, elasticity_bc_types_r, elasticity_bc_values_r, P_INIT_ELAST);
+//    H1Space space_elast_stopka_z(&mesh_elastStopka, elasticity_bc_types_z, elasticity_bc_values_z, P_INIT_ELAST);
 
     // ndof
+//    int ndof = Space::get_num_dofs(Hermes::vector<Space *>(&space_mag_real,
+//                                                  &space_mag_imag,
+//                                                  &space_temp,
+//                                                  &space_elast_drzak_r,
+//                                                  &space_elast_drzak_z,
+//                                                  &space_elast_stopka_r,
+//                                                  &space_elast_stopka_z));
+
     int ndof = Space::get_num_dofs(Hermes::vector<Space *>(&space_mag_real,
-                                                  &space_mag_imag,
-                                                  &space_temp,
-                                                  &space_elast_drzak_r,
-                                                  &space_elast_drzak_z,
-                                                  &space_elast_stopka_r,
-                                                  &space_elast_stopka_z));
+                                                      &space_mag_imag));
 
     std::cout << "ndofs: " << ndof << std::endl;
 
@@ -337,34 +342,35 @@ int main(int argc, char* argv[])
     sln_mag_real->set_const(&mesh_mag, A_INIT);
     Solution *sln_mag_imag = new Solution();
     sln_mag_imag->set_const(&mesh_mag, A_INIT);
-    Solution *sln_temp = new Solution();
-    sln_temp->set_const(&mesh_temp, T_INIT);
-    Solution *sln_elast_drzak_r = new Solution();
-    sln_elast_drzak_r->set_const(&mesh_elastDrzak, DK_INIT);
-    Solution *sln_elast_drzak_z = new Solution();
-    sln_elast_drzak_z->set_const(&mesh_elastDrzak, DK_INIT);
-    Solution *sln_elast_stopka_r = new Solution();
-    sln_elast_stopka_r->set_const(&mesh_elastStopka, DK_INIT);
-    Solution *sln_elast_stopka_z = new Solution();
-    sln_elast_stopka_z->set_const(&mesh_elastStopka, DK_INIT);
+//    Solution *sln_temp = new Solution();
+//    sln_temp->set_const(&mesh_temp, T_INIT);
+//    Solution *sln_elast_drzak_r = new Solution();
+//    sln_elast_drzak_r->set_const(&mesh_elastDrzak, DK_INIT);
+//    Solution *sln_elast_drzak_z = new Solution();
+//    sln_elast_drzak_z->set_const(&mesh_elastDrzak, DK_INIT);
+//    Solution *sln_elast_stopka_r = new Solution();
+//    sln_elast_stopka_r->set_const(&mesh_elastStopka, DK_INIT);
+//    Solution *sln_elast_stopka_z = new Solution();
+//    sln_elast_stopka_z->set_const(&mesh_elastStopka, DK_INIT);
 
     WjFilter wjfilter(sln_mag_real, sln_mag_imag);
 
     // Initialize views.
     char title[100];
-    ScalarView TView("Temperature", new WinGeom(450, 0, 300, 900));
-    sprintf(title, "Time %3.5f", TIME);
-    // Tview.set_min_max_range(16.0348, 16.0698);
-    TView.set_title(title);
+//    ScalarView TView("Temperature", new WinGeom(450, 0, 300, 900));
+    ScalarView TView("Magnetic field", new WinGeom(450, 0, 300, 900));
+//    sprintf(title, "Time %3.5f", TIME);
+//    // Tview.set_min_max_range(16.0348, 16.0698);
+//    TView.set_title(title);
 
-    ScalarView WjView("Joule losses", new WinGeom(800, 0, 400, 900));
-    ScalarView DisplacementDrzakView("Von Mises Stress", new WinGeom(1250, 0, 300, 900));
-    DisplacementDrzakView.set_min_max_range(-1e-6, 30e-6);
-    ScalarView DisplacementStopkaView("Von Mises Stress", new WinGeom(1650, 0, 200, 900));
-    DisplacementStopkaView.set_min_max_range(-1e-6, 5e-6);
-    ScalarView DispRView("Displacement r", new WinGeom(1250, 0, 300, 900));
-    ScalarView DispZView("Displacement z", new WinGeom(1600, 0, 300, 900));
-    // Tview.set_min_max_range(16.0348, 16.0698);
+//    ScalarView WjView("Joule losses", new WinGeom(800, 0, 400, 900));
+//    ScalarView DisplacementDrzakView("Von Mises Stress", new WinGeom(1250, 0, 300, 900));
+//    DisplacementDrzakView.set_min_max_range(-1e-6, 30e-6);
+//    ScalarView DisplacementStopkaView("Von Mises Stress", new WinGeom(1650, 0, 200, 900));
+//    DisplacementStopkaView.set_min_max_range(-1e-6, 5e-6);
+//    ScalarView DispRView("Displacement r", new WinGeom(1250, 0, 300, 900));
+//    ScalarView DispZView("Displacement z", new WinGeom(1600, 0, 300, 900));
+//    // Tview.set_min_max_range(16.0348, 16.0698);
 
     int N = 20;
     double yy_total[N], yy2_total[N];
@@ -389,26 +395,26 @@ int main(int argc, char* argv[])
                 double xx = 0.004;
                 double yy = 0.0 + k * 0.0135/(double) N;
 
-                tempBreak.add(yy, sln_temp->get_pt_value(xx, yy));
+                //tempBreak.add(yy, sln_temp->get_pt_value(xx, yy));
             }
 
-            set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[11], &heatEdge[35], &heatEdge[36], &heatEdge[37], &heatEdge[38]), PhysicFieldBC_Heat_Temperature, 20.0, 0.0, 0.0, 0.0);
+//            set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[11], &heatEdge[35], &heatEdge[36], &heatEdge[37], &heatEdge[38]), PhysicFieldBC_Heat_Temperature, 20.0, 0.0, 0.0, 0.0);
 
-            set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[0]), 19.9, 0.0, 1000.0, 1e6);
-            set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[6]), 1e-6, 0.0, 0.0, 0.0);
+//            set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[0]), 19.9, 0.0, 1000.0, 1e6);
+//            set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[6]), 1e-6, 0.0, 0.0, 0.0);
         }
         if (ts == 30)
         {
-            set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[35], &heatEdge[36], &heatEdge[37]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 10.0, 20.0);
-            set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[8], &heatEdge[9], &heatEdge[10], &heatEdge[37], &heatEdge[38]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 150.0, 10.0);
-            set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[11]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 0.0, 0.0);
+//            set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[35], &heatEdge[36], &heatEdge[37]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 10.0, 20.0);
+//            set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[8], &heatEdge[9], &heatEdge[10], &heatEdge[37], &heatEdge[38]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 150.0, 10.0);
+//            set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[11]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 0.0, 0.0);
 
-            set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[0]), 19.9, 0.0, 8670.0, 450);
-            set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[6]), 60, 0.0, 7800.0, 450.0);
+//            set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[0]), 19.9, 0.0, 8670.0, 450);
+//            set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[6]), 60, 0.0, 7800.0, 450.0);
         }
 
         // Initialize the weak formulation.
-        WeakForm wf(7);
+        WeakForm wf(2);
         // Magnetic field
         wf.add_matrix_form(0, 0, magnetic_matrix_form_linear_real_real, magnetic_matrix_form_linear_ord, HERMES_NONSYM, HERMES_ANY); //, Hermes::vector<MeshFunction *>(sln_temp));
         wf.add_matrix_form(0, 1, callback(magnetic_matrix_form_linear_real_imag));
@@ -419,29 +425,29 @@ int main(int argc, char* argv[])
         wf.add_vector_form_surf(0, callback(magnetic_vector_form_linear_surf_real));
         wf.add_vector_form_surf(1, callback(magnetic_vector_form_linear_surf_imag));
 
-        // Temperature field
-        wf.add_matrix_form(2, 2, heat_matrix_form_linear, heat_matrix_form_linear_ord, HERMES_SYM, HERMES_ANY);
-        wf.add_vector_form(2, heat_vector_form_linear, heat_vector_form_linear_ord, HERMES_ANY, Hermes::vector<MeshFunction *>(&wjfilter, sln_temp));
-        wf.add_matrix_form_surf(2, 2, callback(heat_matrix_form_linear_surf));
-        wf.add_vector_form_surf(2, callback(heat_vector_form_linear_surf));
+//        // Temperature field
+//        wf.add_matrix_form(2, 2, heat_matrix_form_linear, heat_matrix_form_linear_ord, HERMES_SYM, HERMES_ANY);
+//        wf.add_vector_form(2, heat_vector_form_linear, heat_vector_form_linear_ord, HERMES_ANY, Hermes::vector<MeshFunction *>(&wjfilter, sln_temp));
+//        wf.add_matrix_form_surf(2, 2, callback(heat_matrix_form_linear_surf));
+//        wf.add_vector_form_surf(2, callback(heat_vector_form_linear_surf));
 
-        // Thermoelasticity - drzak
-        wf.add_matrix_form(3, 3, callback(elasticity_matrix_form_r_r));
-        wf.add_matrix_form(3, 4, callback(elasticity_matrix_form_r_z), HERMES_SYM);
-        wf.add_matrix_form(4, 4, callback(elasticity_matrix_form_z_z));
-        wf.add_matrix_form(3, 2, callback(elasticity_matrix_form_r_T));
-        wf.add_matrix_form(4, 2, callback(elasticity_matrix_form_z_T));
-        wf.add_vector_form(3, elasticity_vector_form_r, heat_vector_form_linear_ord, HERMES_ANY, Hermes::vector<MeshFunction *>(sln_temp));
-        wf.add_vector_form(4, elasticity_vector_form_z, heat_vector_form_linear_ord, HERMES_ANY, Hermes::vector<MeshFunction *>(sln_temp));
+//        // Thermoelasticity - drzak
+//        wf.add_matrix_form(3, 3, callback(elasticity_matrix_form_r_r));
+//        wf.add_matrix_form(3, 4, callback(elasticity_matrix_form_r_z), HERMES_SYM);
+//        wf.add_matrix_form(4, 4, callback(elasticity_matrix_form_z_z));
+//        wf.add_matrix_form(3, 2, callback(elasticity_matrix_form_r_T));
+//        wf.add_matrix_form(4, 2, callback(elasticity_matrix_form_z_T));
+//        wf.add_vector_form(3, elasticity_vector_form_r, heat_vector_form_linear_ord, HERMES_ANY, Hermes::vector<MeshFunction *>(sln_temp));
+//        wf.add_vector_form(4, elasticity_vector_form_z, heat_vector_form_linear_ord, HERMES_ANY, Hermes::vector<MeshFunction *>(sln_temp));
 
-        // Thermoelasticity - stopka
-        wf.add_matrix_form(5, 5, callback(elasticity_matrix_form_r_r));
-        wf.add_matrix_form(5, 6, callback(elasticity_matrix_form_r_z), HERMES_SYM);
-        wf.add_matrix_form(6, 6, callback(elasticity_matrix_form_z_z));
-        wf.add_matrix_form(5, 2, callback(elasticity_matrix_form_r_T));
-        wf.add_matrix_form(6, 2, callback(elasticity_matrix_form_z_T));
-        wf.add_vector_form(5, elasticity_vector_form_r, heat_vector_form_linear_ord, HERMES_ANY, Hermes::vector<MeshFunction *>(sln_temp));
-        wf.add_vector_form(6, elasticity_vector_form_z, heat_vector_form_linear_ord, HERMES_ANY, Hermes::vector<MeshFunction *>(sln_temp));
+//        // Thermoelasticity - stopka
+//        wf.add_matrix_form(5, 5, callback(elasticity_matrix_form_r_r));
+//        wf.add_matrix_form(5, 6, callback(elasticity_matrix_form_r_z), HERMES_SYM);
+//        wf.add_matrix_form(6, 6, callback(elasticity_matrix_form_z_z));
+//        wf.add_matrix_form(5, 2, callback(elasticity_matrix_form_r_T));
+//        wf.add_matrix_form(6, 2, callback(elasticity_matrix_form_z_T));
+//        wf.add_vector_form(5, elasticity_vector_form_r, heat_vector_form_linear_ord, HERMES_ANY, Hermes::vector<MeshFunction *>(sln_temp));
+//        wf.add_vector_form(6, elasticity_vector_form_z, heat_vector_form_linear_ord, HERMES_ANY, Hermes::vector<MeshFunction *>(sln_temp));
 
         // Set up the solver, matrix, and rhs according to the solver selection.
         SparseMatrix* matrix = create_matrix(SOLVER_UMFPACK);
@@ -450,13 +456,17 @@ int main(int argc, char* argv[])
 
         // Initialize the reference FE problem.
         bool is_linear = true;
+//        DiscreteProblem fep(&wf, Hermes::vector<Space *>(&space_mag_real,
+//                                                &space_mag_imag,
+//                                                &space_temp,
+//                                                &space_elast_drzak_r,
+//                                                &space_elast_drzak_z,
+//                                                &space_elast_stopka_r,
+//                                                &space_elast_stopka_z), is_linear);
+
         DiscreteProblem fep(&wf, Hermes::vector<Space *>(&space_mag_real,
-                                                &space_mag_imag,
-                                                &space_temp,
-                                                &space_elast_drzak_r,
-                                                &space_elast_drzak_z,
-                                                &space_elast_stopka_r,
-                                                &space_elast_stopka_z), is_linear);
+                                                &space_mag_imag), is_linear);
+
 
         // Assemble stiffness matrix and rhs.
         fep.assemble(matrix, rhs, rhsonly);
@@ -464,21 +474,28 @@ int main(int argc, char* argv[])
 
         // Solve the matrix problem.
         if (!solver->solve()) error ("Matrix solver failed.\n");
+//        Solution::vector_to_solutions(solver->get_solution(),
+//                                      Hermes::vector<Space *>(&space_mag_real,
+//                                                     &space_mag_imag,
+//                                                     &space_temp,
+//                                                     &space_elast_drzak_r,
+//                                                     &space_elast_drzak_z,
+//                                                     &space_elast_stopka_r,
+//                                                     &space_elast_stopka_z),
+//                                      Hermes::vector<Solution *>(sln_mag_real,
+//                                                        sln_mag_imag,
+//                                                        sln_temp,
+//                                                        sln_elast_drzak_r,
+//                                                        sln_elast_drzak_z,
+//                                                        sln_elast_stopka_r,
+//                                                        sln_elast_stopka_z));
+
         Solution::vector_to_solutions(solver->get_solution(),
                                       Hermes::vector<Space *>(&space_mag_real,
-                                                     &space_mag_imag,
-                                                     &space_temp,
-                                                     &space_elast_drzak_r,
-                                                     &space_elast_drzak_z,
-                                                     &space_elast_stopka_r,
-                                                     &space_elast_stopka_z),
+                                                     &space_mag_imag),
                                       Hermes::vector<Solution *>(sln_mag_real,
-                                                        sln_mag_imag,
-                                                        sln_temp,
-                                                        sln_elast_drzak_r,
-                                                        sln_elast_drzak_z,
-                                                        sln_elast_stopka_r,
-                                                        sln_elast_stopka_z));
+                                                        sln_mag_imag));
+
 
         delete matrix;
         delete rhs;
@@ -604,22 +621,26 @@ int main(int argc, char* argv[])
         */
 
         WjFilter wjfilter(sln_mag_real, sln_mag_imag);
-        DisplacementFilter dispDrzak(Hermes::vector<MeshFunction *>(sln_elast_drzak_r, sln_elast_drzak_z));
-        DisplacementFilter dispStopka(Hermes::vector<MeshFunction *>(sln_elast_stopka_r, sln_elast_stopka_z));
+//        DisplacementFilter dispDrzak(Hermes::vector<MeshFunction *>(sln_elast_drzak_r, sln_elast_drzak_z));
+//        DisplacementFilter dispStopka(Hermes::vector<MeshFunction *>(sln_elast_stopka_r, sln_elast_stopka_z));
 
         // Update the time variable.
         TIME += timeStep;
 
         // Visualize the solution.
-        sprintf(title, "Time %3.2f", TIME);
+//        sprintf(title, "Time %3.2f", TIME);
+        sprintf(title, "Mag_real", TIME);
+
         TView.set_title(title);
-        TView.show(sln_temp);
+//        TView.show(sln_temp);
+        TView.show(sln_mag_real);
+
         TView.set_min_max_range(20, 300);
 
         // WjView.show(&wjfilter);
 
-        DisplacementDrzakView.show(&dispDrzak, HERMES_EPS_HIGH, H2D_FN_VAL_0, sln_elast_drzak_r, sln_elast_drzak_z, 5e1);
-        DisplacementStopkaView.show(&dispStopka, HERMES_EPS_HIGH, H2D_FN_VAL_0, sln_elast_stopka_r, sln_elast_stopka_z, 3e1);
+        //DisplacementDrzakView.show(&dispDrzak, HERMES_EPS_HIGH, H2D_FN_VAL_0, sln_elast_drzak_r, sln_elast_drzak_z, 5e1);
+        //DisplacementStopkaView.show(&dispStopka, HERMES_EPS_HIGH, H2D_FN_VAL_0, sln_elast_stopka_r, sln_elast_stopka_z, 3e1);
         // VonMisesKView.show(&stress, HERMES_EPS_HIGH);
         // VonMisesUchytView.show(&stressUchyt, HERMES_EPS_HIGH);
         // DispRView.show(sln_elast_kotva_r);
