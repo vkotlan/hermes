@@ -59,7 +59,7 @@ ENDIF (APPLE)
 # if you want to override them, set them in CMake.vars
 
 # H1D:
-set(WITH_H1D                  YES)
+set(WITH_H1D                 NO)
 	# For use in the common code.
 	set(H1D_REAL              YES)
 	# Release and debug versions.
@@ -88,7 +88,7 @@ set(WITH_H2D                  YES)
 	set(H2D_WITH_UTIL         YES)
 
 # H3D:		
-set(WITH_H3D                  YES)
+set(WITH_H3D                  NO)
 	# Real/complex version of the library.
 	set(H3D_REAL              YES)
 	set(H3D_COMPLEX           YES)
