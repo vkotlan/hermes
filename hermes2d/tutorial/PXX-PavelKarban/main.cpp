@@ -25,15 +25,21 @@
 
 const bool HERMES_VISUALIZATION = true;           // Set to "false" to suppress Hermes OpenGL visualization. 
 const bool VTK_VISUALIZATION = true;              // Set to "true" to enable VTK output.
-const int P_MAG_INIT = 5;                             // Uniform polynomial degree of mesh elements.
+const int P_MAG_INIT = 1;                             // Uniform polynomial degree of mesh elements.
+const int P_TEMP_INIT = 1;
 const int INIT_REF_NUM = 0;                       // Number of initial uniform mesh refinements.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
 // Problem parameters.
 const double A_INIT = 0.0;
-const double T_INIT = 20.0;
+const double TEMP_INIT = 0.0;
 const double DK_INIT = 0.0;
+
+const double TIME_STEP = 0.1;
+const double TIME_FINAL = 10.;
+
+#include "tables.cpp"
 
 // Weak forms.
 #include "definitions.cpp"
@@ -43,10 +49,17 @@ int main(int argc, char* argv[])
     // Instantiate a class with global functions.
     Hermes2D hermes2d;
 
+    // Initialize tables from the file tables.cpp
+    initTables();
+
     // Load the mesh.
-    Mesh mesh_mag;
+    Mesh mesh_mag, mesh_temp;
     H2DReader mloader;
     mloader.load("mesh_mag.mesh", &mesh_mag);
+    mloader.load("mesh_mag.mesh", &mesh_temp);
+
+    //MeshView mv;
+    //mv.show(&mesh_mag);
 
     // Perform initial mesh refinements (optional).
     // for (int i=0; i < INIT_REF_NUM; i++) mesh_mag.refine_all_elements();
@@ -87,13 +100,84 @@ int main(int argc, char* argv[])
     else
         error ("Matrix solver failed.\n");
 
-    // WjFilter wjfilter(sln_mag_real, sln_mag_imag);
+    WjFilter wjfilter(sln_mag_real, sln_mag_imag);
     MagneticVectorPotentialFilter afilter(sln_mag_real);
 
     // Visualize the solution.
-    ScalarView view("Solution", new WinGeom(0, 0, 440, 350));
-    view.show(&afilter, HERMES_EPS_NORMAL);
-    View::wait();
+    ScalarView view_a("Ar - real", new WinGeom(0, 0, 440, 350));
+    view_a.show(&afilter, HERMES_EPS_NORMAL);
+    ScalarView view_wj("wj", new WinGeom(450, 0, 440, 350));
+    view_wj.show(&wjfilter, HERMES_EPS_NORMAL);
+ //   View::wait();
+
+
+//****************** TEMPERATURE **********************************************
+
+    printf("mesh address %p\n", &mesh_temp);
+    Solution sln_temp(&mesh_temp, TEMP_INIT);
+    WeakFormTemp wf_temp(TIME_STEP);
+    wf_temp.registerForms(&sln_temp);
+
+    double current_time = 0;
+
+    // Initialize temperature boundary conditions.
+    DefaultEssentialBCConst bc_essential_temp(Hermes::vector<std::string>("16", "17", "18", "39", "40", "41"), TEMP_INIT);
+    EssentialBCs bcs_temp(&bc_essential_temp);
+
+    // Create an H1 space with default shapeset.
+    H1Space space_temp(&mesh_temp, &bcs_temp, P_TEMP_INIT);
+    int ndof_temp = space_temp.get_num_dofs();
+    info("temperature ndof = %d", ndof_temp);
+
+    // Initialize the FE problem.
+    bool is_linear = true;
+    DiscreteProblem dp_temp(&wf_temp, &space_temp, is_linear);
+
+    // Set up the solver, matrix, and rhs according to the solver selection.
+    SparseMatrix* matrix_temp = create_matrix(matrix_solver);
+    Vector* rhs_temp = create_vector(matrix_solver);
+    Solver* solver_temp = create_linear_solver(matrix_solver, matrix_temp, rhs_temp);
+    solver_temp->set_factorization_scheme(HERMES_REUSE_FACTORIZATION_COMPLETELY);
+
+    // Initialize views.
+    ScalarView Tview("Temperature", new WinGeom(0, 0, 450, 600));
+    //Tview.set_min_max_range(0,30);
+    //Tview.fix_scale_width(30);
+
+    // Time stepping:
+    int ts = 1;
+    do
+    {
+      info("---- Time step %d, time %3.5f s", ts, current_time);
+
+      // First time assemble both the stiffness matrix and right-hand side vector,
+      // then just the right-hand side vector.
+      //wf.set_current_time(current_time);
+      info("Assembling the stiffness matrix and right-hand side vector.");
+      dp_temp.assemble(matrix_temp, rhs_temp);
+      FILE *matfile;
+      matfile = fopen("matice.txt", "w");
+      matrix_temp->dump(matfile, "matrix");
+
+      // Solve the linear system and if successful, obtain the solution.
+      info("Solving the temperature matrix problem.");
+      if(solver_temp->solve())
+          Solution::vector_to_solution(solver_temp->get_solution(), &space_temp, &sln_temp);
+      else error ("Matrix solver failed.\n");
+
+      // Visualize the solution.
+      char title[100];
+      sprintf(title, "Time %3.2f s", current_time);
+      Tview.set_title(title);
+      Tview.show(&sln_temp);
+
+      // Increase current time and time step counter.
+      current_time += TIME_STEP;
+      ts++;
+    }
+    while (current_time < TIME_FINAL);
+
+    Tview.wait();
 
     // Clean up.
     delete solver;

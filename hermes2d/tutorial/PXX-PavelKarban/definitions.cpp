@@ -14,6 +14,9 @@
 
 const double frequency = 500;
 
+using namespace WeakFormsH1;
+using namespace WeakFormsH1::SurfaceMatrixForms;
+using namespace WeakFormsH1::SurfaceVectorForms;
 using namespace WeakFormsH1::VolumetricMatrixForms;
 using namespace WeakFormsH1::VolumetricVectorForms;
 
@@ -132,14 +135,14 @@ public:
 
         for (int i = 0; i < np; i++)
         {
-            /*
+
             node->values[0][0][i] = (magneticLabel[e->marker].conductivity > 0.0) ?
                         0.5 / magneticLabel[e->marker].conductivity * (
                             sqr(2 * M_PI * frequency * magneticLabel[e->marker].conductivity * value2[i]) +
                             sqr(2 * M_PI * frequency * magneticLabel[e->marker].conductivity * value1[i]))
                       :
                         0.0;
-            */
+
         }
 
         if(nodes->present(order)) {
@@ -307,13 +310,20 @@ public:
     void registerForms()
     {
         // magnetic field
-        add_magnetic_material("0", 700.0, 1e6, 0.0);
-        add_magnetic_material("1", 1.0, 0.0, 6e7);
-        add_magnetic_material("2", 1.0, 0.0, 6e7);
-        add_magnetic_material("3", 1.0, 0.0, 0.0);
-        add_magnetic_material("4", 1.0, 0.0, 0.0);
-        add_magnetic_material("5", 1.0, 0.0, 0.0);
-        add_magnetic_material("6", 1.0, 0.0, 0.0);
+//        add_magnetic_material("0", 700.0, 1e6, 0.0);
+//        add_magnetic_material("1", 1.0, 0.0, 6e7);
+//        add_magnetic_material("2", 1.0, 0.0, 6e7);
+//        add_magnetic_material("3", 1.0, 0.0, 0.0);
+//        add_magnetic_material("4", 1.0, 0.0, 0.0);
+//        add_magnetic_material("5", 1.0, 0.0, 0.0);
+//        add_magnetic_material("6", 1.0, 0.0, 0.0);
+
+        for(int i=0; i<NUM_LABELS; i++){
+            char str[5];
+            sprintf(str, "%d", i);
+            //TODO only real part of current density
+            add_magnetic_material(str, magneticLabel[i].permeability, magneticLabel[i].conductivity, magneticLabel[i].current_density_real);
+        }
     }
 
     void add_magnetic_material(std::string marker, double permeability, double conductivity, double external_current_density)
@@ -332,6 +342,111 @@ public:
         if (fabs(external_current_density) > EPS_ZERO)
             add_vector_form(new WeakFormsH1::VolumetricVectorForms::DefaultVectorFormConst(0, marker, external_current_density, HERMES_PLANAR));
     }
+};
+
+class WeakFormTemp : public WeakForm
+{
+public:
+    WeakFormTemp(double time_step) : WeakForm(1)
+    {
+        time_step = time_step;
+    }
+    void registerForms(Solution *prev_time_sln)
+    {
+        // temperature field
+        add_temperature_material("0", 1.0, 1.0, 1.0, 1.0, prev_time_sln);
+        add_temperature_material("1", 1.0, 1.0, 1.0, 1.0, prev_time_sln);
+        add_temperature_material("2", 1.0, 1.0, 1.0, 1.0, prev_time_sln);
+        add_temperature_material("3", 1.0, 1.0, 1.0, 1.0, prev_time_sln);
+        add_temperature_material("4", 1.0, 100.0, 1.0, 1.0, prev_time_sln);
+        add_temperature_material("5", 1.0, 1.0, 1.0, 1.0, prev_time_sln);
+        add_temperature_material("6", 1.0, 1.0, 1.0, 1.0, prev_time_sln);
+    }
+    void add_temperature_material(std::string marker, double thermal_conductivity, double volume_heat, double density, double specific_heat, Solution* prev_time_sln)
+    {
+        // Contribution of the time derivative term.
+        /// TODO NONSYM
+        add_matrix_form(new DefaultLinearMass(0, 0, marker, density * specific_heat * 2 * M_PI / time_step, HERMES_NONSYM, HERMES_AXISYM_Y));
+
+        // Contribution of the diffusion term.
+        /// TODO NONSYM
+        add_matrix_form(new DefaultLinearDiffusion(0, 0, marker, thermal_conductivity * 2 * M_PI, HERMES_NONSYM, HERMES_AXISYM_Y));
+
+        //Heat sources
+        add_vector_form(new DefaultVectorFormConst(0, marker, volume_heat, HERMES_AXISYM_Y));
+
+        // Right-hand side volumetric vector form.
+        CustomVectorFormVol* vec_form_vol = new CustomVectorFormVol(0, marker, time_step);
+        vec_form_vol->ext.push_back(prev_time_sln);
+        add_vector_form(vec_form_vol);
+
+        //add_matrix_form_surf(new DefaultMatrixFormSurf(0, 0, bdy_air, alpha / (density * heatcap)));
+
+        //add_vector_form_surf(new CustomVectorFormSurf(0, bdy_air, alpha, density, heatcap,
+        //                     current_time_ptr, temp_init, t_final));
+
+    }
+
+private:
+    double time_step;
+
+    // This form is custom since it contains previous time-level solution.
+    class CustomVectorFormVol : public WeakForm::VectorFormVol
+    {
+    public:
+        CustomVectorFormVol(int i, std::string marker, double time_step)
+        : WeakForm::VectorFormVol(i, marker), time_step(time_step) { }
+
+      template<typename Real, typename Scalar>
+      Scalar vector_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
+        Func<Real>* temp_prev_time = ext->fn[0];
+        printf("func: %p\n", temp_prev_time);
+        return int_u_v<Real, Scalar>(n, wt, temp_prev_time, v) / time_step;
+      }
+
+      virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const {
+        printf("contribution prev %lf\n", vector_form<double, scalar>(n, wt, u_ext, v, e, ext));
+        return vector_form<double, scalar>(n, wt, u_ext, v, e, ext);
+      }
+
+      virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const {
+        return vector_form<Ord, Ord>(n, wt, u_ext, v, e, ext);
+      }
+
+      double time_step;
+    };
+
+    // This form is custom since it contains time-dependent exterior temperature.
+    class CustomVectorFormSurf : public WeakForm::VectorFormSurf
+    {
+    public:
+      CustomVectorFormSurf(int i, std::string area, double alpha, double density, double heatcap,
+                                  double* current_time_ptr, double temp_init, double t_final)
+        : WeakForm::VectorFormSurf(i, area), alpha(alpha), density(density), heatcap(heatcap), current_time_ptr(current_time_ptr),
+                                   temp_init(temp_init), t_final(t_final) { }
+
+     template<typename Real, typename Scalar>
+      Scalar vector_form_surf(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
+        return  0;//alpha / (density * heatcap) * temp_ext(*current_time_ptr + time_step) * int_v<Real>(n, wt, v);
+      }
+
+      virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const {
+          return vector_form_surf<double, scalar>(n, wt, u_ext, v, e, ext);
+      }
+
+      virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const {
+          return vector_form_surf<Ord, Ord>(n, wt, u_ext, v, e, ext);
+      }
+      // Time-dependent exterior temperature.
+      template<typename Real>
+      Real temp_ext(Real t) const {
+        return temp_init + 10. * sin(2*M_PI*t/t_final);
+      }
+
+      double alpha, density, heatcap, *current_time_ptr, temp_init, t_final;
+    };
+
+
 };
 
 /*

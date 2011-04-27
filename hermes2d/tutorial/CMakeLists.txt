@@ -4,8 +4,8 @@
 # # Nonlinear problems
 # add_subdirectory(P02-nonlinear)
 # 
-# # Time-dependent problems
-# add_subdirectory(P03-timedep)
+# Time-dependent problems
+add_subdirectory(P03-timedep)
 # 
 # # Adaptivity for linear problems
 # add_subdirectory(P04-linear-adapt)
