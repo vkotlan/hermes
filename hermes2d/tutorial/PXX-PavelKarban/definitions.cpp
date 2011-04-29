@@ -133,15 +133,19 @@ public:
         double *y = refmap->get_phys_y(order);
         Element *e = refmap->get_active_element();
 
+        std::string user_marker = mesh->get_element_markers_conversion().get_user_marker(e->marker);
+        int marker = atoi(user_marker.c_str());
         for (int i = 0; i < np; i++)
         {
-
-            node->values[0][0][i] = (magneticLabel[e->marker].conductivity > 0.0) ?
-                        0.5 / magneticLabel[e->marker].conductivity * (
-                            sqr(2 * M_PI * frequency * magneticLabel[e->marker].conductivity * value2[i]) +
-                            sqr(2 * M_PI * frequency * magneticLabel[e->marker].conductivity * value1[i]))
-                      :
-                        0.0;
+            if(magneticLabel[marker].conductivity > 0.0){
+//                printf("jednickovy marker %d, cond %lf\n", marker, magneticLabel[marker].conductivity);
+                node->values[0][0][i] = 0.5 / magneticLabel[marker].conductivity * (
+                    sqr(2 * M_PI * frequency * magneticLabel[marker].conductivity * value2[i]) +
+                    sqr(2 * M_PI * frequency * magneticLabel[marker].conductivity * value1[i]));
+//                node->values[0][0][i] = 1.0;
+            }
+            else
+                node->values[0][0][i] = 0.0;
 
         }
 
@@ -347,30 +351,25 @@ public:
 class WeakFormTemp : public WeakForm
 {
 public:
-    WeakFormTemp(double time_step) : WeakForm(1)
-    {
-        time_step = time_step;
-    }
+    WeakFormTemp(double time_step) : WeakForm(1), time_step(time_step) { };
     void registerForms(Solution *prev_time_sln)
     {
         // temperature field
-        add_temperature_material("0", 1.0, 1.0, 1.0, 1.0, prev_time_sln);
-        add_temperature_material("1", 1.0, 1.0, 1.0, 1.0, prev_time_sln);
-        add_temperature_material("2", 1.0, 1.0, 1.0, 1.0, prev_time_sln);
-        add_temperature_material("3", 1.0, 1.0, 1.0, 1.0, prev_time_sln);
-        add_temperature_material("4", 1.0, 100.0, 1.0, 1.0, prev_time_sln);
-        add_temperature_material("5", 1.0, 1.0, 1.0, 1.0, prev_time_sln);
-        add_temperature_material("6", 1.0, 1.0, 1.0, 1.0, prev_time_sln);
+        add_temperature_material("0", 1.0, 500000000.0, 1000., 1.0, prev_time_sln);
+        add_temperature_material("6", 1.0, 1000000000.0, 1000., 1.0, prev_time_sln);
     }
     void add_temperature_material(std::string marker, double thermal_conductivity, double volume_heat, double density, double specific_heat, Solution* prev_time_sln)
     {
+        /// TODO vsude jsem smazal 2 * M_PI
+
         // Contribution of the time derivative term.
         /// TODO NONSYM
-        add_matrix_form(new DefaultLinearMass(0, 0, marker, density * specific_heat * 2 * M_PI / time_step, HERMES_NONSYM, HERMES_AXISYM_Y));
+        printf("TIME STEP %g\n", time_step);
+        add_matrix_form(new DefaultLinearMass(0, 0, marker, density * specific_heat / time_step, HERMES_NONSYM, HERMES_PLANAR));
 
         // Contribution of the diffusion term.
         /// TODO NONSYM
-        add_matrix_form(new DefaultLinearDiffusion(0, 0, marker, thermal_conductivity * 2 * M_PI, HERMES_NONSYM, HERMES_AXISYM_Y));
+        add_matrix_form(new DefaultLinearDiffusion(0, 0, marker, thermal_conductivity, HERMES_NONSYM, HERMES_AXISYM_Y));
 
         //Heat sources
         add_vector_form(new DefaultVectorFormConst(0, marker, volume_heat, HERMES_AXISYM_Y));
@@ -390,22 +389,48 @@ public:
 private:
     double time_step;
 
+    class CustomVectorFormSource : public WeakForm::VectorFormVol
+    {
+    public:
+        CustomVectorFormSource(int i, std::string marker)
+            : WeakForm::VectorFormVol(i, marker) { }
+
+        template<typename Real, typename Scalar>
+        Scalar vector_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
+            Func<Real>* source = ext->fn[0];
+
+        }
+    };
+
     // This form is custom since it contains previous time-level solution.
     class CustomVectorFormVol : public WeakForm::VectorFormVol
     {
     public:
         CustomVectorFormVol(int i, std::string marker, double time_step)
-        : WeakForm::VectorFormVol(i, marker), time_step(time_step) { }
+        : WeakForm::VectorFormVol(i, marker), time_step(time_step), marker(marker) { }
 
       template<typename Real, typename Scalar>
       Scalar vector_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
         Func<Real>* temp_prev_time = ext->fn[0];
-        printf("func: %p\n", temp_prev_time);
-        return int_u_v<Real, Scalar>(n, wt, temp_prev_time, v) / time_step;
+       // printf("func: %p\n", temp_prev_time);
+
+//        std::string user_marker = this-> wf->get_element_markers_conversion()-> .get_user_marker(e->marker);
+//        int marker = atoi(user_marker.c_str());
+
+
+        //double density = heatLabel[atoi(marker.c_str())].density;
+        double density = 1000.;
+        //printf("  density %lf\n", density);
+       // if(atoi(marker.c_str()) == 0)
+       //     density = 1000000000000000.;
+        double specific_heat = 1.;
+        return int_x_u_v<Real, Scalar>(n, wt, temp_prev_time, v, e) * density * specific_heat / time_step;
       }
 
       virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const {
-        printf("contribution prev %lf\n", vector_form<double, scalar>(n, wt, u_ext, v, e, ext));
+        double contr = vector_form<double, scalar>(n, wt, u_ext, v, e, ext);
+        if (fabs(contr) > 1e-7)
+            printf("contribution prev %g\n", contr);
         return vector_form<double, scalar>(n, wt, u_ext, v, e, ext);
       }
 
@@ -414,6 +439,7 @@ private:
       }
 
       double time_step;
+      std::string marker;
     };
 
     // This form is custom since it contains time-dependent exterior temperature.

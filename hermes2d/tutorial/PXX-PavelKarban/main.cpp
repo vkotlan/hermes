@@ -25,9 +25,9 @@
 
 const bool HERMES_VISUALIZATION = true;           // Set to "false" to suppress Hermes OpenGL visualization. 
 const bool VTK_VISUALIZATION = true;              // Set to "true" to enable VTK output.
-const int P_MAG_INIT = 1;                             // Uniform polynomial degree of mesh elements.
-const int P_TEMP_INIT = 1;
-const int INIT_REF_NUM = 0;                       // Number of initial uniform mesh refinements.
+const int P_MAG_INIT = 2;                             // Uniform polynomial degree of mesh elements.
+const int P_TEMP_INIT = 2;
+const int INIT_REF_NUM = 1;                       // Number of initial uniform mesh refinements.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
@@ -56,10 +56,13 @@ int main(int argc, char* argv[])
     Mesh mesh_mag, mesh_temp;
     H2DReader mloader;
     mloader.load("mesh_mag.mesh", &mesh_mag);
-    mloader.load("mesh_mag.mesh", &mesh_temp);
+    mloader.load("mesh_temp.mesh", &mesh_temp);
 
-    //MeshView mv;
-    //mv.show(&mesh_mag);
+    MeshView mv;
+    mv.show(&mesh_mag);
+
+    MeshView mv_temp;
+    mv_temp.show(&mesh_temp);
 
     // Perform initial mesh refinements (optional).
     // for (int i=0; i < INIT_REF_NUM; i++) mesh_mag.refine_all_elements();
@@ -104,9 +107,10 @@ int main(int argc, char* argv[])
     MagneticVectorPotentialFilter afilter(sln_mag_real);
 
     // Visualize the solution.
-    ScalarView view_a("Ar - real", new WinGeom(0, 0, 440, 350));
+    ScalarView view_a("Ar - real", new WinGeom(0, 0, 440, 750));
     view_a.show(&afilter, HERMES_EPS_NORMAL);
-    ScalarView view_wj("wj", new WinGeom(450, 0, 440, 350));
+    ScalarView view_wj("wj", new WinGeom(450, 0, 440, 750));
+    //view_wj.set_min_max_range(-0.000001, 0.000001);
     view_wj.show(&wjfilter, HERMES_EPS_NORMAL);
  //   View::wait();
 
@@ -121,8 +125,9 @@ int main(int argc, char* argv[])
     double current_time = 0;
 
     // Initialize temperature boundary conditions.
-    DefaultEssentialBCConst bc_essential_temp(Hermes::vector<std::string>("16", "17", "18", "39", "40", "41"), TEMP_INIT);
-    EssentialBCs bcs_temp(&bc_essential_temp);
+    DefaultEssentialBCConst bc_essential_temp1(Hermes::vector<std::string>("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"), TEMP_INIT);
+    DefaultEssentialBCConst bc_essential_temp2(Hermes::vector<std::string>("11", "12", "13", "14", "15", "35", "36", "37", "38", "40"), TEMP_INIT);
+    EssentialBCs bcs_temp(Hermes::vector<EssentialBoundaryCondition*>(&bc_essential_temp1, &bc_essential_temp2));
 
     // Create an H1 space with default shapeset.
     H1Space space_temp(&mesh_temp, &bcs_temp, P_TEMP_INIT);
@@ -158,6 +163,7 @@ int main(int argc, char* argv[])
       FILE *matfile;
       matfile = fopen("matice.txt", "w");
       matrix_temp->dump(matfile, "matrix");
+      rhs_temp->dump(matfile, "rhs");
 
       // Solve the linear system and if successful, obtain the solution.
       info("Solving the temperature matrix problem.");
@@ -170,6 +176,7 @@ int main(int argc, char* argv[])
       sprintf(title, "Time %3.2f s", current_time);
       Tview.set_title(title);
       Tview.show(&sln_temp);
+      //Tview.wait();
 
       // Increase current time and time step counter.
       current_time += TIME_STEP;
