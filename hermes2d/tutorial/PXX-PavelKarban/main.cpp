@@ -32,8 +32,8 @@ MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESO
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
 // Problem parameters.
-const double A_INIT = 0.0;
-const double TEMP_INIT = 0.0;
+const double A_INIT = 10.0;
+const double TEMP_INIT = 10.0;
 const double DK_INIT = 0.0;
 
 const double TIME_STEP = 0.1;
@@ -65,7 +65,8 @@ int main(int argc, char* argv[])
     mv_temp.show(&mesh_temp);
 
     // Perform initial mesh refinements (optional).
-    // for (int i=0; i < INIT_REF_NUM; i++) mesh_mag.refine_all_elements();
+     for (int i=0; i < INIT_REF_NUM; i++)
+         mesh_temp.refine_all_elements();
 
     // Initialize the weak formulation.
     WeakFormMagnetic wf(2);
@@ -117,10 +118,11 @@ int main(int argc, char* argv[])
 
 //****************** TEMPERATURE **********************************************
 
-    printf("mesh address %p\n", &mesh_temp);
-    Solution sln_temp(&mesh_temp, TEMP_INIT);
+    //Solution sln_temp(&mesh_temp, TEMP_INIT);
+    Solution* sln_temp = new Solution();
+    sln_temp->set_const(&mesh_temp, TEMP_INIT);
     WeakFormTemp wf_temp(TIME_STEP);
-    wf_temp.registerForms(&sln_temp);
+    wf_temp.registerForms(sln_temp);
 
     double current_time = 0;
 
@@ -148,6 +150,8 @@ int main(int argc, char* argv[])
     ScalarView Tview("Temperature", new WinGeom(0, 0, 450, 600));
     //Tview.set_min_max_range(0,30);
     //Tview.fix_scale_width(30);
+    Tview.show(sln_temp);
+    Tview.wait();
 
     // Time stepping:
     int ts = 1;
@@ -168,15 +172,15 @@ int main(int argc, char* argv[])
       // Solve the linear system and if successful, obtain the solution.
       info("Solving the temperature matrix problem.");
       if(solver_temp->solve())
-          Solution::vector_to_solution(solver_temp->get_solution(), &space_temp, &sln_temp);
+          Solution::vector_to_solution(solver_temp->get_solution(), &space_temp, sln_temp);
       else error ("Matrix solver failed.\n");
 
       // Visualize the solution.
       char title[100];
       sprintf(title, "Time %3.2f s", current_time);
       Tview.set_title(title);
-      Tview.show(&sln_temp);
-      //Tview.wait();
+      Tview.show(sln_temp);
+      Tview.wait();
 
       // Increase current time and time step counter.
       current_time += TIME_STEP;
