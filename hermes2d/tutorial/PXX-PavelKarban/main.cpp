@@ -25,14 +25,14 @@
 
 const bool HERMES_VISUALIZATION = true;           // Set to "false" to suppress Hermes OpenGL visualization. 
 const bool VTK_VISUALIZATION = true;              // Set to "true" to enable VTK output.
-const int P_MAG_INIT = 2;                             // Uniform polynomial degree of mesh elements.
-const int P_TEMP_INIT = 2;
+const int P_MAG_INIT = 3;                             // Uniform polynomial degree of mesh elements.
+const int P_TEMP_INIT = 3;
 const int INIT_REF_NUM = 1;                       // Number of initial uniform mesh refinements.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
 // Problem parameters.
-const double A_INIT = 10.0;
+const double A_INIT = 0.0;
 const double TEMP_INIT = 10.0;
 const double DK_INIT = 0.0;
 
@@ -65,9 +65,10 @@ int main(int argc, char* argv[])
     mv_temp.show(&mesh_temp);
 
     // Perform initial mesh refinements (optional).
-     for (int i=0; i < INIT_REF_NUM; i++)
+     for (int i=0; i < INIT_REF_NUM; i++){
          mesh_temp.refine_all_elements();
-
+         mesh_mag.refine_all_elements();
+    }
     // Initialize the weak formulation.
     WeakFormMagnetic wf(2);
     wf.registerForms();
@@ -122,14 +123,25 @@ int main(int argc, char* argv[])
     Solution* sln_temp = new Solution();
     sln_temp->set_const(&mesh_temp, TEMP_INIT);
     WeakFormTemp wf_temp(TIME_STEP);
-    wf_temp.registerForms(sln_temp);
+    wf_temp.registerForms(sln_temp, &wjfilter);
 
     double current_time = 0;
 
-    // Initialize temperature boundary conditions.
-    DefaultEssentialBCConst bc_essential_temp1(Hermes::vector<std::string>("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"), TEMP_INIT);
-    DefaultEssentialBCConst bc_essential_temp2(Hermes::vector<std::string>("11", "12", "13", "14", "15", "35", "36", "37", "38", "40"), TEMP_INIT);
-    EssentialBCs bcs_temp(Hermes::vector<EssentialBoundaryCondition*>(&bc_essential_temp1, &bc_essential_temp2));
+    EssentialBCs bcs_temp;
+
+    for(int i = 0; i < NUM_EDGES; i++){
+        if(heatEdge[i].type == PhysicFieldBC_Heat_Temperature){
+            char label[5];
+            sprintf(label, "%d", i);
+            DefaultEssentialBCConst *bc = new DefaultEssentialBCConst(label, heatEdge[i].temperature);
+            bcs_temp.add_boundary_condition(bc);
+        }
+    }
+
+//    // Initialize temperature boundary conditions.
+//    DefaultEssentialBCConst bc_essential_temp1(Hermes::vector<std::string>("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"), TEMP_INIT);
+//    DefaultEssentialBCConst bc_essential_temp2(Hermes::vector<std::string>("11", "12", "13", "14", "15", "35", "36", "37", "38", "40"), TEMP_INIT);
+//    EssentialBCs bcs_temp(Hermes::vector<EssentialBoundaryCondition*>(&bc_essential_temp1, &bc_essential_temp2));
 
     // Create an H1 space with default shapeset.
     H1Space space_temp(&mesh_temp, &bcs_temp, P_TEMP_INIT);
@@ -151,7 +163,7 @@ int main(int argc, char* argv[])
     //Tview.set_min_max_range(0,30);
     //Tview.fix_scale_width(30);
     Tview.show(sln_temp);
-    Tview.wait();
+    //Tview.wait();
 
     // Time stepping:
     int ts = 1;
@@ -180,7 +192,7 @@ int main(int argc, char* argv[])
       sprintf(title, "Time %3.2f s", current_time);
       Tview.set_title(title);
       Tview.show(sln_temp);
-      Tview.wait();
+    //  Tview.wait();
 
       // Increase current time and time step counter.
       current_time += TIME_STEP;

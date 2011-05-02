@@ -348,25 +348,24 @@ public:
     }
 };
 
-const double TIME_CONSTANT = 10000.;
+//const double TIME_CONSTANT = 10000.;
 
 class WeakFormTemp : public WeakForm
 {
 public:
     WeakFormTemp(double time_step) : WeakForm(1), time_step(time_step) { };
-    void registerForms(Solution *prev_time_sln)
+    void registerForms(Solution *prev_time_sln, Filter *joule_loses)
     {
         // temperature field
-        add_temperature_material("0", 1.0, 50.0, 1000., 1.0, prev_time_sln);
-        add_temperature_material("6", 1.0, 50.0, 1000., 1.0, prev_time_sln);
+        add_temperature_material("0", 19.9, 1.0, 8670.0, 450, prev_time_sln, joule_loses);
+        add_temperature_material("6", 1e-6, 0.0, 0.0, 0.0, prev_time_sln, joule_loses);
     }
-    void add_temperature_material(std::string marker, double thermal_conductivity, double volume_heat, double density, double specific_heat, Solution* prev_time_sln)
+    void add_temperature_material(std::string marker, double thermal_conductivity, double volume_heat, double density, double specific_heat, Solution* prev_time_sln, Filter* joule_loses)
     {
         /// TODO vsude jsem smazal 2 * M_PI
 
         // Contribution of the time derivative term.
         /// TODO NONSYM
-        printf("TIME STEP %g\n", time_step);
         add_matrix_form(new DefaultLinearMass(0, 0, marker, density * specific_heat / time_step, HERMES_NONSYM, HERMES_AXISYM_Y));
 
         // Contribution of the diffusion term.
@@ -374,11 +373,12 @@ public:
         add_matrix_form(new DefaultLinearDiffusion(0, 0, marker, thermal_conductivity, HERMES_NONSYM, HERMES_AXISYM_Y));
 
         //Heat sources
-        add_vector_form(new DefaultVectorFormConst(0, marker, volume_heat, HERMES_AXISYM_Y));
+//        add_vector_form(new DefaultVectorFormConst(0, marker, volume_heat, HERMES_AXISYM_Y));
 
         // Right-hand side volumetric vector form.
-        CustomVectorFormVol* vec_form_vol = new CustomVectorFormVol(0, marker, 2 * M_PI * density * specific_heat / time_step);
+        CustomVectorFormVol* vec_form_vol = new CustomVectorFormVol(0, marker, density, specific_heat, volume_heat, time_step);
         vec_form_vol->ext.push_back(prev_time_sln);
+        vec_form_vol->ext.push_back(joule_loses);
         add_vector_form(vec_form_vol);
 
         //add_matrix_form_surf(new DefaultMatrixFormSurf(0, 0, bdy_air, alpha / (density * heatcap)));
@@ -408,25 +408,17 @@ private:
     class CustomVectorFormVol : public WeakForm::VectorFormVol
     {
     public:
-        CustomVectorFormVol(int i, std::string marker, double time_contrib_coef)
-        : WeakForm::VectorFormVol(i, marker), time_contrib_coef(time_contrib_coef) { }
+        CustomVectorFormVol(int i, std::string marker, double density, double specific_heat, double volume_heat, double time_step)
+        : WeakForm::VectorFormVol(i, marker), density(density), specific_heat(specific_heat), volume_heat(volume_heat), time_step(time_step) { }
 
       template<typename Real, typename Scalar>
       Scalar vector_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
-        Func<Real>* temp_prev_time = ext->fn[0];
-       // printf("func: %p\n", temp_prev_time);
+          Func<Real>* temp_prev_time = ext->fn[0];
+          Func<Real>* joule_loses = ext->fn[1];
 
-//        std::string user_marker = this-> wf->get_element_markers_conversion()-> .get_user_marker(e->marker);
-//        int marker = atoi(user_marker.c_str());
-
-
-        //double density = heatLabel[atoi(marker.c_str())].density;
-        double density = 1000.;
-        //printf("  density %lf\n", density);
-       // if(atoi(marker.c_str()) == 0)
-       //     density = 1000000000000000.;
-        double specific_heat = 1.;
-        return int_x_u_v<Real, Scalar>(n, wt, temp_prev_time, v, e)  * time_contrib_coef;
+          /// TODO pridat 2 * M_PI ?????????
+          return int_x_u_v<Real, Scalar>(n, wt, temp_prev_time, v, e)  * density * specific_heat / time_step +
+                 int_x_u_v<Real, Scalar>(n, wt, joule_loses, v, e)  * volume_heat;
       }
 
       virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const {
@@ -440,38 +432,38 @@ private:
         return vector_form<Ord, Ord>(n, wt, u_ext, v, e, ext);
       }
 
-      double time_contrib_coef;
+      double density, specific_heat, volume_heat, time_step;
     };
 
-    // This form is custom since it contains time-dependent exterior temperature.
-    class CustomVectorFormSurf : public WeakForm::VectorFormSurf
-    {
-    public:
-      CustomVectorFormSurf(int i, std::string area, double alpha, double density, double heatcap,
-                                  double* current_time_ptr, double temp_init, double t_final)
-        : WeakForm::VectorFormSurf(i, area), alpha(alpha), density(density), heatcap(heatcap), current_time_ptr(current_time_ptr),
-                                   temp_init(temp_init), t_final(t_final) { }
+//    // This form is custom since it contains time-dependent exterior temperature.
+//    class CustomVectorFormSurf : public WeakForm::VectorFormSurf
+//    {
+//    public:
+//      CustomVectorFormSurf(int i, std::string area, double alpha, double density, double heatcap,
+//                                  double* current_time_ptr, double temp_init, double t_final)
+//        : WeakForm::VectorFormSurf(i, area), alpha(alpha), density(density), heatcap(heatcap), current_time_ptr(current_time_ptr),
+//                                   temp_init(temp_init), t_final(t_final) { }
 
-     template<typename Real, typename Scalar>
-      Scalar vector_form_surf(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
-        return  0;//alpha / (density * heatcap) * temp_ext(*current_time_ptr + time_step) * int_v<Real>(n, wt, v);
-      }
+//     template<typename Real, typename Scalar>
+//      Scalar vector_form_surf(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
+//        return  0;//alpha / (density * heatcap) * temp_ext(*current_time_ptr + time_step) * int_v<Real>(n, wt, v);
+//      }
 
-      virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const {
-          return vector_form_surf<double, scalar>(n, wt, u_ext, v, e, ext);
-      }
+//      virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const {
+//          return vector_form_surf<double, scalar>(n, wt, u_ext, v, e, ext);
+//      }
 
-      virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const {
-          return vector_form_surf<Ord, Ord>(n, wt, u_ext, v, e, ext);
-      }
-      // Time-dependent exterior temperature.
-      template<typename Real>
-      Real temp_ext(Real t) const {
-        return temp_init + 10. * sin(2*M_PI*t/t_final);
-      }
+//      virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const {
+//          return vector_form_surf<Ord, Ord>(n, wt, u_ext, v, e, ext);
+//      }
+//      // Time-dependent exterior temperature.
+//      template<typename Real>
+//      Real temp_ext(Real t) const {
+//        return temp_init + 10. * sin(2*M_PI*t/t_final);
+//      }
 
-      double alpha, density, heatcap, *current_time_ptr, temp_init, t_final;
-    };
+//      double alpha, density, heatcap, *current_time_ptr, temp_init, t_final;
+//    };
 
 
 };
