@@ -24,7 +24,7 @@
 // The following parameters can be changed:
 
 const bool HERMES_VISUALIZATION = true;           // Set to "false" to suppress Hermes OpenGL visualization. 
-const bool VTK_VISUALIZATION = true;              // Set to "true" to enable VTK output.
+const bool VTK_VISUALIZATION = false;              // Set to "true" to enable VTK output.
 const int P_MAG_INIT = 3;                             // Uniform polynomial degree of mesh elements.
 const int P_TEMP_INIT = 3;
 const int INIT_REF_NUM = 1;                       // Number of initial uniform mesh refinements.
@@ -33,11 +33,11 @@ MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESO
 
 // Problem parameters.
 const double A_INIT = 0.0;
-const double TEMP_INIT = 10.0;
+const double TEMP_INIT = 20.0;
 const double DK_INIT = 0.0;
 
 const double TIME_STEP = 0.1;
-const double TIME_FINAL = 10.;
+const double TIME_FINAL = 20.;
 
 #include "tables.cpp"
 
@@ -53,21 +53,28 @@ int main(int argc, char* argv[])
     initTables();
 
     // Load the mesh.
-    Mesh mesh_mag, mesh_temp;
+    Mesh mesh_mag, mesh_temp, mesh_elast_drzak, mesh_elast_stopka;
     H2DReader mloader;
     mloader.load("mesh_mag.mesh", &mesh_mag);
     mloader.load("mesh_temp.mesh", &mesh_temp);
+    mloader.load("mesh_elast_drzak.mesh", &mesh_elast_drzak);
+    mloader.load("mesh_elast_stopka.mesh", &mesh_elast_stopka);
 
-    MeshView mv;
-    mv.show(&mesh_mag);
-
-    MeshView mv_temp;
-    mv_temp.show(&mesh_temp);
+//    MeshView mv;
+//    mv.show(&mesh_mag);
+//    MeshView mv_temp;
+//    mv_temp.show(&mesh_temp);
+//    MeshView mv_elast_stopka;
+//    mv_elast_stopka.show(&mesh_elast_stopka);
+//    MeshView mv_elast_drzak;
+//    mv_elast_drzak.show(&mesh_elast_drzak);
 
     // Perform initial mesh refinements (optional).
      for (int i=0; i < INIT_REF_NUM; i++){
          mesh_temp.refine_all_elements();
          mesh_mag.refine_all_elements();
+         mesh_elast_drzak.refine_all_elements();
+         mesh_elast_stopka.refine_all_elements();
     }
     // Initialize the weak formulation.
     WeakFormMagnetic wf(2);

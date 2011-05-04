@@ -156,6 +156,7 @@ scalar heat_bc_values(int marker, double x, double y)
     case PhysicFieldBC_Heat_Flux:
         return heatEdge[marker].heatFlux;
     }
+    assert(0);
 }
 
 
@@ -232,6 +233,7 @@ scalar elasticity_bc_values_r(int marker, double x, double y)
         return elasticityEdge[marker].forceX;
         break;
     }
+    assert(0);
 }
 
 scalar elasticity_bc_values_z(int marker, double x, double y)
@@ -248,11 +250,12 @@ scalar elasticity_bc_values_z(int marker, double x, double y)
         return elasticityEdge[marker].forceY;
         break;
     }
+    assert(0);
 }
 
 void set_magnetic_edge(Hermes::vector<MagneticEdge *> magneticEdge, PhysicFieldBC type, double value_real, double value_imag)
 {
-    for (int i = 0; i<magneticEdge.size(); i++)
+    for (unsigned int i = 0; i<magneticEdge.size(); i++)
     {
         magneticEdge[i]->type = type;
         magneticEdge[i]->value_real = value_real;
@@ -263,7 +266,7 @@ void set_magnetic_edge(Hermes::vector<MagneticEdge *> magneticEdge, PhysicFieldB
 void set_magnetic_label(Hermes::vector<MagneticLabel *> magneticLabel, double current_density_real, double current_density_imag, double permeability, double conductivity,
                         double remanence, double remanence_angle, double velocity_x, double velocity_y, double velocity_angular)
 {
-    for (int i = 0; i<magneticLabel.size(); i++)
+    for (unsigned int i = 0; i<magneticLabel.size(); i++)
     {
         magneticLabel[i]->current_density_real = current_density_real;
         magneticLabel[i]->current_density_imag = current_density_imag;
@@ -279,7 +282,7 @@ void set_magnetic_label(Hermes::vector<MagneticLabel *> magneticLabel, double cu
 
 void set_heat_edge(Hermes::vector<HeatEdge *> heatEdge, PhysicFieldBC type, double temperature, double heatFlux, double h, double externalTemperature)
 {
-    for (int i = 0; i<heatEdge.size(); i++)
+    for (unsigned int i = 0; i<heatEdge.size(); i++)
     {
         heatEdge[i]->type = type;
         heatEdge[i]->temperature = temperature;
@@ -291,7 +294,7 @@ void set_heat_edge(Hermes::vector<HeatEdge *> heatEdge, PhysicFieldBC type, doub
 
 void set_heat_label(Hermes::vector<HeatLabel *> heatLabel, double thermal_conductivity, double volume_heat, double density, double specific_heat)
 {
-    for (int i = 0; i<heatLabel.size(); i++)
+    for (unsigned int i = 0; i<heatLabel.size(); i++)
     {
         heatLabel[i]->thermal_conductivity = thermal_conductivity;
         heatLabel[i]->volume_heat = volume_heat;
@@ -302,7 +305,7 @@ void set_heat_label(Hermes::vector<HeatLabel *> heatLabel, double thermal_conduc
 
 void set_elasticity_edge(Hermes::vector<ElasticityEdge *> elasticityEdge, PhysicFieldBC typeX, PhysicFieldBC typeY, double forceX, double forceY)
 {
-    for (int i = 0; i<elasticityEdge.size(); i++)
+    for (unsigned int i = 0; i<elasticityEdge.size(); i++)
     {
         elasticityEdge[i]->typeX = typeX;
         elasticityEdge[i]->typeY = typeY;
@@ -313,7 +316,7 @@ void set_elasticity_edge(Hermes::vector<ElasticityEdge *> elasticityEdge, Physic
 
 void set_elasticity_label(Hermes::vector<ElasticityLabel *> elasticityLabel, double young_modulus, double poisson_ratio, double forceX, double forceY, double thermal_expansion)
 {
-    for (int i = 0; i<elasticityLabel.size(); i++)
+    for (unsigned int i = 0; i<elasticityLabel.size(); i++)
     {
         elasticityLabel[i]->young_modulus = young_modulus;
         elasticityLabel[i]->poisson_ratio = poisson_ratio;
