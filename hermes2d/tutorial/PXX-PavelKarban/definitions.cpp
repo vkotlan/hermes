@@ -312,10 +312,8 @@ public:
     void registerForms()
     {
         for(int i=0; i<NUM_LABELS; i++){
-            char str[5];
-            sprintf(str, "%d", i);
             //TODO only real part of current density
-            add_magnetic_material(str, magneticLabel[i].permeability, magneticLabel[i].conductivity, magneticLabel[i].current_density_real);
+            add_magnetic_material(str_marker[i], magneticLabel[i].permeability, magneticLabel[i].conductivity, magneticLabel[i].current_density_real);
         }
     }
 
@@ -346,19 +344,16 @@ public:
     WeakFormTemp(double time_step) : WeakForm(1), time_step(time_step) { };
     void registerForms(Solution *prev_time_sln, Filter *joule_loses)
     {
-        char marker[5];
         int indices[2] = {0,6};
 
         for(int i=0; i<2; i++){
-            sprintf(marker, "%d", indices[i]);
-            add_temperature_material(marker, heatLabel[indices[i]].thermal_conductivity, heatLabel[indices[i]].volume_heat,
+            add_temperature_material(str_marker[indices[i]], heatLabel[indices[i]].thermal_conductivity, heatLabel[indices[i]].volume_heat,
                                      heatLabel[indices[i]].density, heatLabel[indices[i]].specific_heat, prev_time_sln, joule_loses);
         }
 
         for(int i=0; i<NUM_EDGES; i++){
             if(heatEdge[i].type == PhysicFieldBC_Heat_Flux){
-                sprintf(marker, "%d", i);
-                add_temperature_edge(marker, heatEdge[i].heatFlux, heatEdge[i].h, heatEdge[i].externalTemperature);
+                add_temperature_edge(str_marker[i], heatEdge[i].heatFlux, heatEdge[i].h, heatEdge[i].externalTemperature);
             }
         }
     }
@@ -423,15 +418,13 @@ private:
 class WeakFormElast : public WeakForm
 {
 public:
-    WeakFormElast() : WeakForm() {}
+    WeakFormElast() : WeakForm(2) {}
 
     void register_forms(Solution * temperature){
-        char marker[5];
         int indices[2] = {0,6};
 
         for(int i=0; i<2; i++){
-            sprintf(marker, "%d", indices[i]);
-            add_elasticity_material(marker, elasticityLabel[indices[i]].lambda(),  elasticityLabel[indices[i]].mu(),  elasticityLabel[indices[i]].thermal_expansion, temperature);
+            add_elasticity_material(str_marker[indices[i]], elasticityLabel[indices[i]].lambda(),  elasticityLabel[indices[i]].mu(),  elasticityLabel[indices[i]].thermal_expansion, temperature);
         }
     }
 

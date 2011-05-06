@@ -25,8 +25,9 @@
 
 const bool HERMES_VISUALIZATION = true;           // Set to "false" to suppress Hermes OpenGL visualization. 
 const bool VTK_VISUALIZATION = false;              // Set to "true" to enable VTK output.
-const int P_MAG_INIT = 3;                             // Uniform polynomial degree of mesh elements.
-const int P_TEMP_INIT = 3;
+const int P_MAG_INIT = 2;                             // Uniform polynomial degree of mesh elements.
+const int P_TEMP_INIT = 2;
+const int P_ELAST_INIT = 2;
 const int INIT_REF_NUM = 1;                       // Number of initial uniform mesh refinements.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
@@ -39,6 +40,8 @@ const double DK_INIT = 0.0;
 const double TIME_STEP = 0.1;
 const double TIME_FINAL = 20.;
 
+std::string *str_marker;
+
 #include "tables.cpp"
 
 // Weak forms.
@@ -46,6 +49,13 @@ const double TIME_FINAL = 20.;
 
 int main(int argc, char* argv[])
 {
+    str_marker = new std::string[NUM_EDGES + NUM_LABELS];
+    char str[5];
+    for(int i = 0; i < NUM_EDGES + NUM_LABELS; i++){
+        sprintf(str, "%d", i);
+        str_marker[i].assign(str);
+    }
+
     // Instantiate a class with global functions.
     Hermes2D hermes2d;
 
@@ -126,10 +136,11 @@ int main(int argc, char* argv[])
 
 //****************** TEMPERATURE **********************************************
 
-    Solution* sln_temp = new Solution();
-    sln_temp->set_const(&mesh_temp, TEMP_INIT);
+//    Solution* sln_temp = new Solution();
+//    sln_temp->set_const(&mesh_temp, TEMP_INIT);
+    Solution sln_temp(&mesh_temp, TEMP_INIT);
     WeakFormTemp wf_temp(TIME_STEP);
-    wf_temp.registerForms(sln_temp, &wjfilter);
+    wf_temp.registerForms(&sln_temp, &wjfilter);
 
     double current_time = 0;
 
@@ -137,9 +148,7 @@ int main(int argc, char* argv[])
 
     for(int i = 0; i < NUM_EDGES; i++){
         if(heatEdge[i].type == PhysicFieldBC_Heat_Temperature){
-            char label[5];
-            sprintf(label, "%d", i);
-            DefaultEssentialBCConst *bc = new DefaultEssentialBCConst(label, heatEdge[i].temperature);
+            DefaultEssentialBCConst *bc = new DefaultEssentialBCConst(str_marker[i], heatEdge[i].temperature);
             bcs_temp.add_boundary_condition(bc);
         }
     }
@@ -161,10 +170,47 @@ int main(int argc, char* argv[])
 
     // Initialize views.
     ScalarView Tview("Temperature", new WinGeom(0, 0, 450, 600));
-    //Tview.set_min_max_range(0,30);
-    //Tview.fix_scale_width(30);
-    Tview.show(sln_temp);
-    //Tview.wait();
+    Tview.show(&sln_temp);
+
+//    //******************** Elasticita *******************************
+    Solution sln_elast_drzak_r(&mesh_elast_drzak, DK_INIT);
+    Solution sln_elast_drzak_z(&mesh_elast_drzak, DK_INIT);
+    WeakFormElast wf_elast;
+    wf_elast.register_forms(&sln_temp);
+
+    EssentialBCs bcs_elast_drzak_r, bcs_elast_drzak_z;
+
+    for(int i = 0; i < NUM_EDGES; i++){
+        if(elasticityEdge[i].typeX == PhysicFieldBC_Elasticity_Fixed){
+            DefaultEssentialBCConst *bc = new DefaultEssentialBCConst(str_marker[i], 0.);
+            bcs_elast_drzak_r.add_boundary_condition(bc);
+        }
+        if(elasticityEdge[i].typeY == PhysicFieldBC_Elasticity_Fixed){
+            DefaultEssentialBCConst *bc = new DefaultEssentialBCConst(str_marker[i], 0.);
+            bcs_elast_drzak_z.add_boundary_condition(bc);
+        }
+    }
+
+    H1Space space_elast_drzak_r(&mesh_elast_drzak, &bcs_elast_drzak_r, P_ELAST_INIT);
+    H1Space space_elast_drzak_z(&mesh_elast_drzak, &bcs_elast_drzak_z, P_ELAST_INIT);
+    int ndof_elast = Space::get_num_dofs(Hermes::vector<Space*>(&space_elast_drzak_r, &space_elast_drzak_z));
+    info("elasticity ndof = %d", ndof_elast);
+//
+//    // Initialize the FE problem.
+//    is_linear = true;
+//    DiscreteProblem dp_elast_drzak(&wf_elast, Hermes::vector<Space*>(&space_elast_drzak_r, &space_elast_drzak_z), is_linear);
+//
+//    // Set up the solver, matrix, and rhs according to the solver selection.
+//    SparseMatrix* matrix_elast_drzak = create_matrix(matrix_solver);
+//    Vector* rhs_elast_drzak = create_vector(matrix_solver);
+//    Solver* solver_elast_drzak = create_linear_solver(matrix_solver, matrix_elast_drzak, rhs_elast_drzak);
+//    solver_elast_drzak->set_factorization_scheme(HERMES_REUSE_FACTORIZATION_COMPLETELY);
+//
+//    // Initialize views.
+//    ScalarView view_elast_r("Elasticity r", new WinGeom(400, 0, 450, 600));
+//    view_elast_r.show(&sln_elast_drzak_r);
+//    ScalarView view_elast_z("Elasticity z", new WinGeom(800, 0, 450, 600));
+//    view_elast_z.show(&sln_elast_drzak_z);
 
     // Time stepping:
     int ts = 1;
@@ -172,28 +218,47 @@ int main(int argc, char* argv[])
     {
       info("---- Time step %d, time %3.5f s", ts, current_time);
 
-      // First time assemble both the stiffness matrix and right-hand side vector,
-      // then just the right-hand side vector.
-      //wf.set_current_time(current_time);
-      info("Assembling the stiffness matrix and right-hand side vector.");
+      info("Assembling the temperature stiffness matrix and right-hand side vector.");
       dp_temp.assemble(matrix_temp, rhs_temp);
       FILE *matfile;
       matfile = fopen("matice.txt", "w");
       matrix_temp->dump(matfile, "matrix");
       rhs_temp->dump(matfile, "rhs");
 
-      // Solve the linear system and if successful, obtain the solution.
       info("Solving the temperature matrix problem.");
       if(solver_temp->solve())
-          Solution::vector_to_solution(solver_temp->get_solution(), &space_temp, sln_temp);
+          Solution::vector_to_solution(solver_temp->get_solution(), &space_temp, &sln_temp);
       else error ("Matrix solver failed.\n");
 
       // Visualize the solution.
       char title[100];
       sprintf(title, "Time %3.2f s", current_time);
       Tview.set_title(title);
-      Tview.show(sln_temp);
+      Tview.show(&sln_temp);
     //  Tview.wait();
+
+//      info("Assembling the elastic stiffness matrix and right-hand side vector.");
+//      dp_elast_drzak.assemble(matrix_elast_drzak, rhs_elast_drzak);
+////      FILE *matfile;
+////      matfile = fopen("matice.txt", "w");
+////      matrix_temp->dump(matfile, "matrix");
+////      rhs_temp->dump(matfile, "rhs");
+//
+//      info("Solving the elasticity matrix problem.");
+//      if(solver_elast_drzak->solve())
+//          Solution::vector_to_solutions(solver_elast_drzak->get_solution(),
+//                Hermes::vector<Space*>(&space_elast_drzak_r, &space_elast_drzak_z), Hermes::vector<Solution*>(&sln_elast_drzak_r, &sln_elast_drzak_z));
+//      else error ("Matrix solver failed.\n");
+//
+//      // Visualize the solution.
+//      sprintf(title, "Time %3.2f s, elast r", current_time);
+//      view_elast_r.set_title(title);
+//      view_elast_r.show(&sln_elast_drzak_r);
+//
+//      sprintf(title, "Time %3.2f s, elast z", current_time);
+//      view_elast_z.set_title(title);
+//      view_elast_z.show(&sln_elast_drzak_z);
+//    //  Tview.wait();
 
       // Increase current time and time step counter.
       current_time += TIME_STEP;
