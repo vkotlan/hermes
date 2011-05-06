@@ -321,10 +321,13 @@ public:
 
     void add_magnetic_material(std::string marker, double permeability, double conductivity, double external_current_density)
     {
+        /// TODO PROC TO PADA, KDYZ DAM NASLEDUJICIM FORMAM HERMES_SYM ???????????
+        /// TODO PROC TO PADA, KDYZ DAM NASLEDUJICIM FORMAM HERMES_SYM ???????????
+        /// TODO PROC TO PADA, KDYZ DAM NASLEDUJICIM FORMAM HERMES_SYM ???????????
         // real part
-        add_matrix_form(new WeakFormsMaxwell::VolumetricMatrixForms::DefaultLinearMagnetostatics(0, 0, marker, 1.0 / (permeability * MU0), HERMES_SYM, HERMES_AXISYM_Y));
+        add_matrix_form(new WeakFormsMaxwell::VolumetricMatrixForms::DefaultLinearMagnetostatics(0, 0, marker, 1.0 / (permeability * MU0), HERMES_NONSYM, HERMES_AXISYM_Y));
         // imag part
-        add_matrix_form(new WeakFormsMaxwell::VolumetricMatrixForms::DefaultLinearMagnetostatics(1, 1, marker, 1.0 / (permeability * MU0), HERMES_SYM, HERMES_AXISYM_Y));
+        add_matrix_form(new WeakFormsMaxwell::VolumetricMatrixForms::DefaultLinearMagnetostatics(1, 1, marker, 1.0 / (permeability * MU0), HERMES_NONSYM, HERMES_AXISYM_Y));
         // conductivity
         if (fabs(conductivity) > EPS_ZERO)
         {
@@ -419,7 +422,183 @@ private:
 
 class WeakFormElast : public WeakForm
 {
+public:
+    WeakFormElast() : WeakForm() {}
 
+    void register_forms(Solution * temperature){
+        char marker[5];
+        int indices[2] = {0,6};
+
+        for(int i=0; i<2; i++){
+            sprintf(marker, "%d", indices[i]);
+            add_elasticity_material(marker, elasticityLabel[indices[i]].lambda(),  elasticityLabel[indices[i]].mu(),  elasticityLabel[indices[i]].thermal_expansion, temperature);
+        }
+    }
+
+    void add_elasticity_material(std::string marker, double lambda, double mu, double thermal_expansion, Solution* temperature){
+        CustomMatrixFormRR* mat_form_r_r = new CustomMatrixFormRR(marker, lambda, mu);
+        add_matrix_form(mat_form_r_r);
+
+        CustomMatrixFormRZ* mat_form_r_z = new CustomMatrixFormRZ(marker, lambda, mu);
+        add_matrix_form(mat_form_r_z);
+
+        CustomMatrixFormZZ* mat_form_z_z = new CustomMatrixFormZZ(marker, lambda, mu);
+        add_matrix_form(mat_form_z_z);
+
+        CustomVectorFormR* vec_form_r = new CustomVectorFormR(marker, lambda, mu, thermal_expansion);
+        vec_form_r->ext.push_back(temperature);
+        add_vector_form(vec_form_r);
+
+        CustomVectorFormZ* vec_form_z = new CustomVectorFormZ(marker, lambda, mu, thermal_expansion);
+        vec_form_z->ext.push_back(temperature);
+        add_vector_form(vec_form_z);
+    }
+
+private:
+    class CustomMatrixFormRR : public WeakForm::MatrixFormVol
+    {
+    public:
+         CustomMatrixFormRR(std::string marker, double lambda, double mu)
+             : WeakForm::MatrixFormVol(0, 0, marker, HERMES_NONSYM), lambda(lambda), mu(mu) {}
+
+         template<typename Real, typename Scalar>
+         Scalar matrix_form_r_r(int n, double *wt, Func<Real> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
+             Scalar result = 0;
+
+             for (int i = 0; i < n; i++)
+                 result += wt[i] * (e->x[i] * lambda * (u->dx[i] * v->dx[i] +
+                                                        u->val[i]/e->x[i] * v->dx[i] +
+                                                        u->dx[i] * v->val[i]/e->x[i] +
+                                                        1/sqr(e->x[i]) * u->val[i] * v->val[i]) +
+                                    e->x[i] * mu * (2 * u->dx[i] * v->dx[i] +
+                                                    2 * 1/sqr(e->x[i]) * u->val[i] * v->val[i] +
+                                                    u->dy[i] * v->dy[i]));
+             return result;
+         }
+
+         virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *u, Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const {
+           return matrix_form_r_r<double, scalar>(n, wt, u_ext, u, v, e, ext);
+         }
+
+         virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const {
+           return matrix_form_r_r<Ord, Ord>(n, wt, u_ext, u, v, e, ext);
+         }
+
+     private:
+         double lambda, mu;
+    };
+
+    class CustomMatrixFormRZ : public WeakForm::MatrixFormVol
+    {
+    public:
+         CustomMatrixFormRZ(std::string marker, double lambda, double mu)
+             : WeakForm::MatrixFormVol(0, 1, marker, HERMES_SYM), lambda(lambda), mu(mu) {}
+
+         template<typename Real, typename Scalar>
+         Scalar matrix_form_r_z(int n, double *wt, Func<Real> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
+             Scalar result = 0;
+             for (int i = 0; i < n; i++)
+                 result += wt[i] * (e->x[i] * lambda * (u->dy[i] * v->dx[i] +
+                                                        u->dy[i] * v->val[i]/e->x[i]) +
+                                    e->x[i] * mu * u->dx[i] * v->dy[i]);
+             return result;
+         }
+
+         virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *u, Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const {
+           return matrix_form_r_z<double, scalar>(n, wt, u_ext, u, v, e, ext);
+         }
+
+         virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const {
+           return matrix_form_r_z<Ord, Ord>(n, wt, u_ext, u, v, e, ext);
+         }
+
+     private:
+         double lambda, mu;
+    };
+
+    class CustomMatrixFormZZ : public WeakForm::MatrixFormVol
+    {
+    public:
+         CustomMatrixFormZZ(std::string marker, double lambda, double mu)
+             : WeakForm::MatrixFormVol(1, 1, marker, HERMES_NONSYM), lambda(lambda), mu(mu) {}
+
+         template<typename Real, typename Scalar>
+         Scalar matrix_form_z_z(int n, double *wt, Func<Real> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
+             Scalar result = 0;
+             for (int i = 0; i < n; i++)
+                 result += wt[i] * (e->x[i] * lambda * (u->dy[i] * v->dy[i]) +
+                                    e->x[i] * mu * (u->dx[i] * v->dx[i] +
+                                                    2 * u->dy[i] * v->dy[i]));
+             return result;
+         }
+
+         virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *u, Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const {
+           return matrix_form_z_z<double, scalar>(n, wt, u_ext, u, v, e, ext);
+         }
+
+         virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const {
+           return matrix_form_z_z<Ord, Ord>(n, wt, u_ext, u, v, e, ext);
+         }
+
+     private:
+         double lambda, mu;
+    };
+
+    class CustomVectorFormR : public WeakForm::VectorFormVol
+    {
+    public:
+         CustomVectorFormR(std::string marker, double lambda, double mu, double expansion)
+             : WeakForm::VectorFormVol(1, marker), lambda(lambda), mu(mu), expansion(expansion) {}
+
+         template<typename Real, typename Scalar>
+         Scalar vector_form_r(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
+             /// TODO zmenil jsem znamenko na plus!!!!!!!!!!
+             Scalar result = 0;
+             Func<Real>* temperature = ext->fn[0];
+             for (int i = 0; i < n; i++)
+                 result +=  wt[i] * (3*lambda + 2*mu) * expansion * (e->x[i] * temperature->dx[i] * v->val[i]);
+             return result;
+         }
+
+         virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const {
+           return vector_form_r<double, scalar>(n, wt, u_ext, v, e, ext);
+         }
+
+         virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const {
+           return vector_form_r<Ord, Ord>(n, wt, u_ext, v, e, ext);
+         }
+
+     private:
+         double lambda, mu, expansion;
+    };
+
+    class CustomVectorFormZ : public WeakForm::VectorFormVol
+    {
+    public:
+         CustomVectorFormZ(std::string marker, double lambda, double mu, double expansion)
+             : WeakForm::VectorFormVol(1, marker), lambda(lambda), mu(mu), expansion(expansion) {}
+
+         template<typename Real, typename Scalar>
+         Scalar vector_form_z(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
+             /// TODO zmenil jsem znamenko na plus!!!!!!!!!!
+             Scalar result = 0;
+             Func<Real>* temperature = ext->fn[0];
+             for (int i = 0; i < n; i++)
+                 result +=  wt[i] * (3*lambda + 2*mu) * expansion * (e->x[i] * temperature->dy[i] * v->val[i]);
+             return result;
+         }
+
+         virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const {
+           return vector_form_z<double, scalar>(n, wt, u_ext, v, e, ext);
+         }
+
+         virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const {
+           return vector_form_z<Ord, Ord>(n, wt, u_ext, v, e, ext);
+         }
+
+     private:
+         double lambda, mu, expansion;
+    };
 };
 
 /*

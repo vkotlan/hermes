@@ -126,7 +126,6 @@ int main(int argc, char* argv[])
 
 //****************** TEMPERATURE **********************************************
 
-    //Solution sln_temp(&mesh_temp, TEMP_INIT);
     Solution* sln_temp = new Solution();
     sln_temp->set_const(&mesh_temp, TEMP_INIT);
     WeakFormTemp wf_temp(TIME_STEP);
@@ -144,11 +143,6 @@ int main(int argc, char* argv[])
             bcs_temp.add_boundary_condition(bc);
         }
     }
-
-//    // Initialize temperature boundary conditions.
-//    DefaultEssentialBCConst bc_essential_temp1(Hermes::vector<std::string>("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"), TEMP_INIT);
-//    DefaultEssentialBCConst bc_essential_temp2(Hermes::vector<std::string>("11", "12", "13", "14", "15", "35", "36", "37", "38", "40"), TEMP_INIT);
-//    EssentialBCs bcs_temp(Hermes::vector<EssentialBoundaryCondition*>(&bc_essential_temp1, &bc_essential_temp2));
 
     // Create an H1 space with default shapeset.
     H1Space space_temp(&mesh_temp, &bcs_temp, P_TEMP_INIT);
