@@ -176,11 +176,11 @@ int main(int argc, char* argv[])
     Solution sln_elast_drzak_r(&mesh_elast_drzak, DK_INIT);
     Solution sln_elast_drzak_z(&mesh_elast_drzak, DK_INIT);
     WeakFormElast wf_elast;
-    wf_elast.register_forms(&sln_temp);
+    wf_elast.register_forms(&sln_temp, 0); // v drzaku jsou jen elementy s markrem 0
 
     EssentialBCs bcs_elast_drzak_r, bcs_elast_drzak_z;
 
-    for(int i = 0; i < NUM_EDGES; i++){
+    for(int i = 1; i <= 15; i++){ //drzaku prislusi hrany 1...15
         if(elasticityEdge[i].typeX == PhysicFieldBC_Elasticity_Fixed){
             DefaultEssentialBCConst *bc = new DefaultEssentialBCConst(str_marker[i], 0.);
             bcs_elast_drzak_r.add_boundary_condition(bc);
@@ -195,22 +195,29 @@ int main(int argc, char* argv[])
     H1Space space_elast_drzak_z(&mesh_elast_drzak, &bcs_elast_drzak_z, P_ELAST_INIT);
     int ndof_elast = Space::get_num_dofs(Hermes::vector<Space*>(&space_elast_drzak_r, &space_elast_drzak_z));
     info("elasticity ndof = %d", ndof_elast);
-//
-//    // Initialize the FE problem.
-//    is_linear = true;
-//    DiscreteProblem dp_elast_drzak(&wf_elast, Hermes::vector<Space*>(&space_elast_drzak_r, &space_elast_drzak_z), is_linear);
-//
-//    // Set up the solver, matrix, and rhs according to the solver selection.
-//    SparseMatrix* matrix_elast_drzak = create_matrix(matrix_solver);
-//    Vector* rhs_elast_drzak = create_vector(matrix_solver);
-//    Solver* solver_elast_drzak = create_linear_solver(matrix_solver, matrix_elast_drzak, rhs_elast_drzak);
-//    solver_elast_drzak->set_factorization_scheme(HERMES_REUSE_FACTORIZATION_COMPLETELY);
-//
-//    // Initialize views.
-//    ScalarView view_elast_r("Elasticity r", new WinGeom(400, 0, 450, 600));
-//    view_elast_r.show(&sln_elast_drzak_r);
-//    ScalarView view_elast_z("Elasticity z", new WinGeom(800, 0, 450, 600));
-//    view_elast_z.show(&sln_elast_drzak_z);
+
+    // Initialize the FE problem.
+    is_linear = true;
+    DiscreteProblem dp_elast_drzak(&wf_elast, Hermes::vector<Space*>(&space_elast_drzak_r, &space_elast_drzak_z), is_linear);
+
+    // Set up the solver, matrix, and rhs according to the solver selection.
+    SparseMatrix* matrix_elast_drzak = create_matrix(matrix_solver);
+    Vector* rhs_elast_drzak = create_vector(matrix_solver);
+    Solver* solver_elast_drzak = create_linear_solver(matrix_solver, matrix_elast_drzak, rhs_elast_drzak);
+    solver_elast_drzak->set_factorization_scheme(HERMES_REUSE_FACTORIZATION_COMPLETELY);
+
+    // Initialize views.
+    ScalarView view_elast_r("Elasticity r", new WinGeom(400, 0, 450, 600));
+    view_elast_r.show(&sln_elast_drzak_r);
+    ScalarView view_elast_z("Elasticity z", new WinGeom(800, 0, 450, 600));
+    view_elast_z.show(&sln_elast_drzak_z);
+    // Visualize the solution.
+//    WinGeom* stress_win_geom = new WinGeom(0, 0, 800, 400);
+//    ScalarView stress_view("Von Mises stress [Pa]", stress_win_geom);
+//    VonMisesFilter stress_filter(Hermes::vector<MeshFunction*>(&sln_elast_drzak_r, &sln_elast_drzak_z), elasticityLabel[0].lambda(), elasticityLabel[0].mu());
+//    stress_view.show_mesh(false);
+    ScalarView disp_view("Displacement", new WinGeom(0, 0, 800, 400));
+    DisplacementFilter disp_filter(Hermes::vector<MeshFunction*>(&sln_elast_drzak_r, &sln_elast_drzak_z));
 
     // Time stepping:
     int ts = 1;
@@ -237,28 +244,31 @@ int main(int argc, char* argv[])
       Tview.show(&sln_temp);
     //  Tview.wait();
 
-//      info("Assembling the elastic stiffness matrix and right-hand side vector.");
-//      dp_elast_drzak.assemble(matrix_elast_drzak, rhs_elast_drzak);
-////      FILE *matfile;
-////      matfile = fopen("matice.txt", "w");
-////      matrix_temp->dump(matfile, "matrix");
-////      rhs_temp->dump(matfile, "rhs");
-//
-//      info("Solving the elasticity matrix problem.");
-//      if(solver_elast_drzak->solve())
-//          Solution::vector_to_solutions(solver_elast_drzak->get_solution(),
-//                Hermes::vector<Space*>(&space_elast_drzak_r, &space_elast_drzak_z), Hermes::vector<Solution*>(&sln_elast_drzak_r, &sln_elast_drzak_z));
-//      else error ("Matrix solver failed.\n");
-//
-//      // Visualize the solution.
-//      sprintf(title, "Time %3.2f s, elast r", current_time);
-//      view_elast_r.set_title(title);
-//      view_elast_r.show(&sln_elast_drzak_r);
-//
-//      sprintf(title, "Time %3.2f s, elast z", current_time);
-//      view_elast_z.set_title(title);
-//      view_elast_z.show(&sln_elast_drzak_z);
-//    //  Tview.wait();
+      info("Assembling the elastic stiffness matrix and right-hand side vector.");
+      dp_elast_drzak.assemble(matrix_elast_drzak, rhs_elast_drzak);
+//      FILE *matfile;
+//      matfile = fopen("matice.txt", "w");
+//      matrix_temp->dump(matfile, "matrix");
+//      rhs_temp->dump(matfile, "rhs");
+
+      info("Solving the elasticity matrix problem.");
+      if(solver_elast_drzak->solve())
+          Solution::vector_to_solutions(solver_elast_drzak->get_solution(),
+                Hermes::vector<Space*>(&space_elast_drzak_r, &space_elast_drzak_z), Hermes::vector<Solution*>(&sln_elast_drzak_r, &sln_elast_drzak_z));
+      else error ("Matrix solver failed.\n");
+
+      // Visualize the solution.
+      sprintf(title, "Time %3.2f s, elast r", current_time);
+      view_elast_r.set_title(title);
+      view_elast_r.show(&sln_elast_drzak_r);
+
+      sprintf(title, "Time %3.2f s, elast z", current_time);
+      view_elast_z.set_title(title);
+      view_elast_z.show(&sln_elast_drzak_z);
+
+//      stress_view.show(&stress_filter, HERMES_EPS_LOW, H2D_FN_VAL_0, &sln_elast_drzak_r, &sln_elast_drzak_z, 1.5e5);
+//      disp_view.show(&disp_filter);//, HERMES_EPS_LOW, H2D_FN_VAL_0, &sln_elast_drzak_r, &sln_elast_drzak_z, 1.5e5);
+      disp_view.show(&disp_filter, HERMES_EPS_HIGH, H2D_FN_VAL_0, &sln_elast_drzak_r, &sln_elast_drzak_z, 5e2);
 
       // Increase current time and time step counter.
       current_time += TIME_STEP;

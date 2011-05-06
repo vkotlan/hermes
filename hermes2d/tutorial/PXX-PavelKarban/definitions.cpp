@@ -420,12 +420,8 @@ class WeakFormElast : public WeakForm
 public:
     WeakFormElast() : WeakForm(2) {}
 
-    void register_forms(Solution * temperature){
-        int indices[2] = {0,6};
-
-        for(int i=0; i<2; i++){
-            add_elasticity_material(str_marker[indices[i]], elasticityLabel[indices[i]].lambda(),  elasticityLabel[indices[i]].mu(),  elasticityLabel[indices[i]].thermal_expansion, temperature);
-        }
+    void register_forms(Solution * temperature, int marker){
+        add_elasticity_material(str_marker[marker], elasticityLabel[marker].lambda(),  elasticityLabel[marker].mu(),  elasticityLabel[marker].thermal_expansion, temperature);
     }
 
     void add_elasticity_material(std::string marker, double lambda, double mu, double thermal_expansion, Solution* temperature){
@@ -545,11 +541,10 @@ private:
 
          template<typename Real, typename Scalar>
          Scalar vector_form_r(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
-             /// TODO zmenil jsem znamenko na plus!!!!!!!!!!
              Scalar result = 0;
              Func<Real>* temperature = ext->fn[0];
              for (int i = 0; i < n; i++)
-                 result +=  wt[i] * (3*lambda + 2*mu) * expansion * (e->x[i] * temperature->dx[i] * v->val[i]);
+                 result += - wt[i] * (3*lambda + 2*mu) * expansion * (e->x[i] * temperature->dx[i] * v->val[i]);
              return result;
          }
 
@@ -573,11 +568,10 @@ private:
 
          template<typename Real, typename Scalar>
          Scalar vector_form_z(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
-             /// TODO zmenil jsem znamenko na plus!!!!!!!!!!
              Scalar result = 0;
              Func<Real>* temperature = ext->fn[0];
              for (int i = 0; i < n; i++)
-                 result +=  wt[i] * (3*lambda + 2*mu) * expansion * (e->x[i] * temperature->dy[i] * v->val[i]);
+                 result += - wt[i] * (3*lambda + 2*mu) * expansion * (e->x[i] * temperature->dy[i] * v->val[i]);
              return result;
          }
 
