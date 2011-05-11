@@ -77,7 +77,7 @@ set(WITH_H2D                  YES)
 	set(H2D_COMPLEX           YES)
 	# Release and debug versions.
 	set(H2D_DEBUG             YES)
-	set(H2D_RELEASE           YES)
+	set(H2D_RELEASE           NO)
 	# Optional parts of the library.
 	set(H2D_WITH_EXAMPLES     YES)
 	set(H2D_WITH_BENCHMARKS   YES)
@@ -196,6 +196,9 @@ if(WITH_PYTHON)
 endif(WITH_PYTHON)
 
 ### end DEFAULT CONFIGURATION ###
+
+set(H2D_DISABLE_MULTIMESH_TESTS YES)
+
 
 # Allow to override the default values in CMake.vars:
 include(CMake.vars OPTIONAL)
