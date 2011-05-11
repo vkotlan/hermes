@@ -45,8 +45,8 @@ public:
 
         for (int i = 0; i < np; i++)
         {
-            // node->values[0][0][i] = sqrt(sqr(uval[i]) + sqr(vval[i]));
-            node->values[0][0][i] = uval[i];
+            node->values[0][0][i] = sqrt(sqr(uval[i]) + sqr(vval[i]));
+            //node->values[0][0][i] = uval[i];
         }
 
         if(nodes->present(order)) {
@@ -425,20 +425,20 @@ public:
     }
 
     void add_elasticity_material(std::string marker, double lambda, double mu, double thermal_expansion, Solution* temperature){
-        CustomMatrixFormRR* mat_form_r_r = new CustomMatrixFormRR(marker, lambda, mu);
+        CustomMatrixFormRR* mat_form_r_r = new CustomMatrixFormRR(0, 0, marker, lambda, mu);
         add_matrix_form(mat_form_r_r);
 
-        CustomMatrixFormRZ* mat_form_r_z = new CustomMatrixFormRZ(marker, lambda, mu);
+        CustomMatrixFormRZ* mat_form_r_z = new CustomMatrixFormRZ(0, 1, marker, lambda, mu);
         add_matrix_form(mat_form_r_z);
 
-        CustomMatrixFormZZ* mat_form_z_z = new CustomMatrixFormZZ(marker, lambda, mu);
+        CustomMatrixFormZZ* mat_form_z_z = new CustomMatrixFormZZ(1, 1, marker, lambda, mu);
         add_matrix_form(mat_form_z_z);
 
-        CustomVectorFormR* vec_form_r = new CustomVectorFormR(marker, lambda, mu, thermal_expansion);
+        CustomVectorFormR* vec_form_r = new CustomVectorFormR(0, marker, lambda, mu, thermal_expansion);
         vec_form_r->ext.push_back(temperature);
         add_vector_form(vec_form_r);
 
-        CustomVectorFormZ* vec_form_z = new CustomVectorFormZ(marker, lambda, mu, thermal_expansion);
+        CustomVectorFormZ* vec_form_z = new CustomVectorFormZ(1, marker, lambda, mu, thermal_expansion);
         vec_form_z->ext.push_back(temperature);
         add_vector_form(vec_form_z);
     }
@@ -447,8 +447,8 @@ private:
     class CustomMatrixFormRR : public WeakForm::MatrixFormVol
     {
     public:
-         CustomMatrixFormRR(std::string marker, double lambda, double mu)
-             : WeakForm::MatrixFormVol(0, 0, marker, HERMES_NONSYM), lambda(lambda), mu(mu) {}
+         CustomMatrixFormRR(int i, int j, std::string marker, double lambda, double mu)
+             : WeakForm::MatrixFormVol(i, j, marker, HERMES_NONSYM), lambda(lambda), mu(mu) {}
 
          template<typename Real, typename Scalar>
          Scalar matrix_form_r_r(int n, double *wt, Func<Real> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
@@ -480,8 +480,8 @@ private:
     class CustomMatrixFormRZ : public WeakForm::MatrixFormVol
     {
     public:
-         CustomMatrixFormRZ(std::string marker, double lambda, double mu)
-             : WeakForm::MatrixFormVol(0, 1, marker, HERMES_SYM), lambda(lambda), mu(mu) {}
+         CustomMatrixFormRZ(int i, int j, std::string marker, double lambda, double mu)
+             : WeakForm::MatrixFormVol(i, j, marker, HERMES_SYM), lambda(lambda), mu(mu) {}
 
          template<typename Real, typename Scalar>
          Scalar matrix_form_r_z(int n, double *wt, Func<Real> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
@@ -508,8 +508,8 @@ private:
     class CustomMatrixFormZZ : public WeakForm::MatrixFormVol
     {
     public:
-         CustomMatrixFormZZ(std::string marker, double lambda, double mu)
-             : WeakForm::MatrixFormVol(1, 1, marker, HERMES_NONSYM), lambda(lambda), mu(mu) {}
+         CustomMatrixFormZZ(int i, int j, std::string marker, double lambda, double mu)
+             : WeakForm::MatrixFormVol(i, j, marker, HERMES_NONSYM), lambda(lambda), mu(mu) {}
 
          template<typename Real, typename Scalar>
          Scalar matrix_form_z_z(int n, double *wt, Func<Real> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
@@ -536,15 +536,20 @@ private:
     class CustomVectorFormR : public WeakForm::VectorFormVol
     {
     public:
-         CustomVectorFormR(std::string marker, double lambda, double mu, double expansion)
-             : WeakForm::VectorFormVol(1, marker), lambda(lambda), mu(mu), expansion(expansion) {}
+         CustomVectorFormR(int i, std::string marker, double lambda, double mu, double expansion)
+             : WeakForm::VectorFormVol(i, marker), lambda(lambda), mu(mu), expansion(expansion) {}
 
          template<typename Real, typename Scalar>
          Scalar vector_form_r(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
              Scalar result = 0;
              Func<Real>* temperature = ext->fn[0];
              for (int i = 0; i < n; i++)
-                 result += - wt[i] * (3*lambda + 2*mu) * expansion * (e->x[i] * temperature->dx[i] * v->val[i]);
+                 result += - wt[i] * (3*lambda + 2*mu) * expansion * e->x[i] * (
+                             temperature->dx[i] * v->val[i]
+                             + (temperature->val[i] - TEMP_INIT) * v->dx[i]  /// TODO proc je tu tenhle clen
+                             );
+                 //result += wt[i] * (100000000) * e->x[i] * v->val[i];
+                 //result += 0;
              return result;
          }
 
@@ -563,15 +568,20 @@ private:
     class CustomVectorFormZ : public WeakForm::VectorFormVol
     {
     public:
-         CustomVectorFormZ(std::string marker, double lambda, double mu, double expansion)
-             : WeakForm::VectorFormVol(1, marker), lambda(lambda), mu(mu), expansion(expansion) {}
+         CustomVectorFormZ(int i, std::string marker, double lambda, double mu, double expansion)
+             : WeakForm::VectorFormVol(i, marker), lambda(lambda), mu(mu), expansion(expansion) {}
 
          template<typename Real, typename Scalar>
          Scalar vector_form_z(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
              Scalar result = 0;
              Func<Real>* temperature = ext->fn[0];
              for (int i = 0; i < n; i++)
-                 result += - wt[i] * (3*lambda + 2*mu) * expansion * (e->x[i] * temperature->dy[i] * v->val[i]);
+                 result += - wt[i] * (3*lambda + 2*mu) * expansion * e->x[i] * (
+                             temperature->dy[i] * v->val[i]
+                             + (temperature->val[i] - TEMP_INIT) * v->dy[i]  /// TODO proc je tu tenhle clen
+                             );
+                 //result += wt[i] * (-1000000000) * e->x[i] * v->val[i];
+                 //result += 0;
              return result;
          }
 
