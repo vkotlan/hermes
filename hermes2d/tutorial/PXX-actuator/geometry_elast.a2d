@@ -1,0 +1,41 @@
+<document>
+    <problems>
+        <problem adaptivitytolerance="1" frequency="0" numberofrefinements="1" adaptivitytype="disabled" matrix_solver="umfpack" analysistype="steadystate" adaptivitysteps="1" polynomialorder="2" problemtype="planar" timetotal="1.0" type="elasticity" timestep="1.0" id="0" name="nepojmenovaný" initialcondition="0.0">
+            <scriptstartup></scriptstartup>
+            <description></description>
+            <edges>
+                <edge typex="elasticity_free" typey="elasticity_free" id="1" name="hranice" forcex="0" forcey="0"/>
+                <edge typex="elasticity_free" typey="elasticity_fixed" id="2" name="osa rotace" forcex="0" forcey="0"/>
+                <edge typex="elasticity_fixed" typey="elasticity_fixed" id="3" name="fixace" forcex="0" forcey="0"/>
+            </edges>
+            <labels>
+                <label temp="0" poisson_ratio="0.33" temp_ref="0" young_modulus="2e11" alpha="1.2e-5" id="1" name="Fe" forcex="0" forcey="0"/>
+                <label temp="0" poisson_ratio="0.33" temp_ref="0" young_modulus="2e11" alpha="1.2e-5" id="2" name="Fe_nevodive_el" forcex="0" forcey="0"/>
+                <label temp="0" poisson_ratio="0.33" temp_ref="0" young_modulus="2e11" alpha="1.2e-5" id="3" name="azbest" forcex="0" forcey="0"/>
+                <label temp="0" poisson_ratio="0.25" temp_ref="0" young_modulus="1e11" alpha="2.5e-5" id="4" name="mosaz" forcex="0" forcey="0"/>
+                <label temp="0" poisson_ratio="0.33" temp_ref="0" young_modulus="2e11" alpha="1.2e-5" id="5" name="civka" forcex="0" forcey="0"/>
+                <label temp="0" poisson_ratio="0.33" temp_ref="0" young_modulus="2e11" alpha="1.2e-5" id="6" name="civka spojka" forcex="0" forcey="0"/>
+                <label temp="0" poisson_ratio="0.33" temp_ref="0" young_modulus="2e11" alpha="1.2e-5" id="7" name="vzduch" forcex="0" forcey="0"/>
+            </labels>
+        </problem>
+    </problems>
+    <geometry>
+        <nodes>
+            <node x="1.989985324961363e-18" y="0.3645" id="0"/>
+            <node x="0.002999999999999997" y="0.362" id="1"/>
+            <node x="6.582259151795278e-18" y="0.2245" id="2"/>
+            <node x="0.002999999999999997" y="0.2245" id="3"/>
+            <node x="0.003" y="0.2345" id="4"/>
+        </nodes>
+        <edges>
+            <edge end="0" refine_towards="0" marker="1" id="0" start="1" angle="90"/>
+            <edge end="2" refine_towards="0" marker="2" id="1" start="0" angle="0"/>
+            <edge end="3" refine_towards="0" marker="3" id="2" start="2" angle="0"/>
+            <edge end="3" refine_towards="0" marker="3" id="3" start="4" angle="0"/>
+            <edge end="4" refine_towards="0" marker="1" id="4" start="1" angle="0"/>
+        </edges>
+        <labels>
+            <label x="0.001474599999999994" y="0.3522656" polynomialorder="0" marker="4" id="0" area="0"/>
+        </labels>
+    </geometry>
+</document>
