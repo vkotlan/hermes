@@ -40,6 +40,8 @@ const double DK_INIT = 0.0;
 const double TIME_STEP = 0.1;
 const double TIME_FINAL = 20.;
 
+const double frequency = 5000;
+
 std::string *str_marker;
 
 #include "tables.cpp"
@@ -88,15 +90,21 @@ int main(int argc, char* argv[])
     }
     // Initialize the weak formulation.
     WeakFormMagnetic wf(2);
-    wf.registerForms();
+    wf.registerForms(magneticLabels);
 
     // Initialize boundary conditions.
-    DefaultEssentialBCConst bc_essential(Hermes::vector<std::string>("16", "17", "18", "39", "40", "41"), 0.0);
-    EssentialBCs bcs(&bc_essential);
+    EssentialBCs bcs_mag;
+    for(int i = 0; i < NUM_EDGES; i++){
+        if(magneticEdge[i].type == PhysicFieldBC_Magnetic_VectorPotential){
+            /// TODO pridavam jen value_real? cas=0?
+            DefaultEssentialBCConst *bc = new DefaultEssentialBCConst(str_marker[i], magneticEdge[i].value_real);
+            bcs_mag.add_boundary_condition(bc);
+        }
+    }
 
     // Create an H1 space with default shapeset.
-    H1Space space_mag_real(&mesh_mag, &bcs, P_MAG_INIT);
-    H1Space space_mag_imag(&mesh_mag, &bcs, P_MAG_INIT);
+    H1Space space_mag_real(&mesh_mag, &bcs_mag, P_MAG_INIT);
+    H1Space space_mag_imag(&mesh_mag, &bcs_mag, P_MAG_INIT);
     // ndof
     int ndof = Space::get_num_dofs(Hermes::vector<Space *>(&space_mag_real, &space_mag_imag));
     std::cout << "ndof: " << ndof << std::endl;
@@ -140,12 +148,11 @@ int main(int argc, char* argv[])
 //    sln_temp->set_const(&mesh_temp, TEMP_INIT);
     Solution sln_temp(&mesh_temp, TEMP_INIT);
     WeakFormTemp wf_temp(TIME_STEP);
-    wf_temp.registerForms(&sln_temp, &wjfilter);
+    wf_temp.registerForms(heatLabels, &sln_temp, &wjfilter);
 
     double current_time = 0;
 
     EssentialBCs bcs_temp;
-
     for(int i = 0; i < NUM_EDGES; i++){
         if(heatEdge[i].type == PhysicFieldBC_Heat_Temperature){
             DefaultEssentialBCConst *bc = new DefaultEssentialBCConst(str_marker[i], heatEdge[i].temperature);
@@ -176,7 +183,7 @@ int main(int argc, char* argv[])
     Solution sln_elast_drzak_r(&mesh_elast_drzak, DK_INIT);
     Solution sln_elast_drzak_z(&mesh_elast_drzak, DK_INIT);
     WeakFormElast wf_elast;
-    wf_elast.register_forms(&sln_temp, 0); // v drzaku jsou jen elementy s markrem 0
+    wf_elast.register_forms(elasticityDrzakLabels, &sln_temp); // v drzaku jsou jen elementy s markrem 0
 
     EssentialBCs bcs_elast_drzak_r, bcs_elast_drzak_z;
 

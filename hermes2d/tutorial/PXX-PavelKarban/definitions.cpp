@@ -12,8 +12,6 @@
 #define EPS0 8.854e-12
 #define MU0 4*M_PI*1e-7
 
-const double frequency = 5000;
-
 using namespace WeakFormsH1;
 using namespace WeakFormsH1::SurfaceMatrixForms;
 using namespace WeakFormsH1::SurfaceVectorForms;
@@ -309,11 +307,11 @@ class WeakFormMagnetic : public WeakForm
 public:
     WeakFormMagnetic(int neq) : WeakForm(neq) { }
 
-    void registerForms()
+    void registerForms(Hermes::vector<int> labels)
     {
-        for(int i=0; i<NUM_LABELS; i++){
+        for(std::vector<int>::iterator it = labels.begin(); it != labels.end(); ++it) {
             //TODO only real part of current density
-            add_magnetic_material(str_marker[i], magneticLabel[i].permeability, magneticLabel[i].conductivity, magneticLabel[i].current_density_real);
+            add_magnetic_material(str_marker[*it], magneticLabel[*it].permeability, magneticLabel[*it].conductivity, magneticLabel[*it].current_density_real);
         }
     }
 
@@ -342,13 +340,11 @@ class WeakFormTemp : public WeakForm
 {
 public:
     WeakFormTemp(double time_step) : WeakForm(1), time_step(time_step) { };
-    void registerForms(Solution *prev_time_sln, Filter *joule_loses)
+    void registerForms(Hermes::vector<int> labels, Solution *prev_time_sln, Filter *joule_loses)
     {
-        int indices[2] = {0,6};
-
-        for(int i=0; i<2; i++){
-            add_temperature_material(str_marker[indices[i]], heatLabel[indices[i]].thermal_conductivity, heatLabel[indices[i]].volume_heat,
-                                     heatLabel[indices[i]].density, heatLabel[indices[i]].specific_heat, prev_time_sln, joule_loses);
+        for(std::vector<int>::iterator it = labels.begin(); it != labels.end(); ++it) {
+            add_temperature_material(str_marker[*it], heatLabel[*it].thermal_conductivity, heatLabel[*it].volume_heat,
+                                     heatLabel[*it].density, heatLabel[*it].specific_heat, prev_time_sln, joule_loses);
         }
 
         for(int i=0; i<NUM_EDGES; i++){
@@ -420,8 +416,10 @@ class WeakFormElast : public WeakForm
 public:
     WeakFormElast() : WeakForm(2) {}
 
-    void register_forms(Solution * temperature, int marker){
-        add_elasticity_material(str_marker[marker], elasticityLabel[marker].lambda(),  elasticityLabel[marker].mu(),  elasticityLabel[marker].thermal_expansion, temperature);
+    void register_forms(Hermes::vector<int> labels, Solution * temperature){
+        for(std::vector<int>::iterator it = labels.begin(); it != labels.end(); ++it) {
+            add_elasticity_material(str_marker[*it], elasticityLabel[*it].lambda(),  elasticityLabel[*it].mu(), elasticityLabel[*it].thermal_expansion, temperature);
+        }
     }
 
     void add_elasticity_material(std::string marker, double lambda, double mu, double thermal_expansion, Solution* temperature){

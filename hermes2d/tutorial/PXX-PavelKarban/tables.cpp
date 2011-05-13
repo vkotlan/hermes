@@ -72,6 +72,7 @@ struct MagneticLabel
 
 MagneticEdge *magneticEdge;
 MagneticLabel *magneticLabel;
+Hermes::vector<int> magneticLabels;
 
 //BCType magnetic_bc_types(int marker)
 //{
@@ -121,6 +122,7 @@ struct HeatLabel
 
 HeatEdge *heatEdge;
 HeatLabel *heatLabel;
+Hermes::vector<int> heatLabels;
 
 //BCType heat_bc_types(int marker)
 //{
@@ -186,6 +188,7 @@ struct ElasticityLabel
 
 ElasticityEdge *elasticityEdge;
 ElasticityLabel *elasticityLabel;
+Hermes::vector<int> elasticityDrzakLabels;
 
 //BCType elasticity_bc_types_r(int marker)
 //{
@@ -361,6 +364,7 @@ void initTables()
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[4]), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[5]), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[6]), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    magneticLabels = Hermes::vector<int>(0,1,2,3,4,5,6);
 
     // heat
     heatEdge = new HeatEdge[NUM_EDGES];
@@ -375,6 +379,7 @@ void initTables()
     heatLabel = new HeatLabel[NUM_LABELS];
     set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[0]), 19.9, 1.0, 8670.0, 450);
     set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[6]), 1e-6, 0.0, 0.0, 0.0);
+    heatLabels = Hermes::vector<int>(0,6);
 
     // thermoelasticity
     elasticityEdge = new ElasticityEdge[NUM_EDGES];
@@ -389,6 +394,6 @@ void initTables()
     elasticityLabel = new ElasticityLabel[NUM_LABELS];
     set_elasticity_label(Hermes::vector<ElasticityLabel *>(&elasticityLabel[0]), 200e9, 0.28, 0.0, 0.0, 9.7e-6);
     set_elasticity_label(Hermes::vector<ElasticityLabel *>(&elasticityLabel[6]), 200e9, 0.25, 0.0, 0.0, 13e-6);
-
+    elasticityDrzakLabels = Hermes::vector<int>(0);
 }
 
