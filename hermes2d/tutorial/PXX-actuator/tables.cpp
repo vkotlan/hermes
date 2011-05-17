@@ -371,19 +371,19 @@ void initTables()
     // heat
     heatEdge = new HeatEdge[NUM_EDGES];
     set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[13], &heatEdge[54], &heatEdge[55], &heatEdge[56]), PhysicFieldBC_None, 0.0, 0.0, 0.0, 0.0); //osa rotace ???
-    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[47]), PhysicFieldBC_Heat_Temperature, 20.0, 0.0, 0.0, 0.0); //spodni hrana ukotveni ma pevnou teplotu - kvuli srovnani s Bohousem
-    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[24], &heatEdge[25], &heatEdge[45], &heatEdge[46], &heatEdge[1], &heatEdge[2], &heatEdge[3],
+    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[24], &heatEdge[25], &heatEdge[47]), PhysicFieldBC_Heat_Temperature, 20.0, 0.0, 0.0, 0.0); //spodni hrana ukotveni ma pevnou teplotu - kvuli srovnani s Bohousem
+    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[45], &heatEdge[46], &heatEdge[1], &heatEdge[2], &heatEdge[3],
                                              &heatEdge[59], &heatEdge[60], &heatEdge[11], &heatEdge[12], &heatEdge[39], &heatEdge[40], &heatEdge[41],
                                              &heatEdge[42], &heatEdge[43]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 20.0, 20.0); //hranice
 
 
     heatLabel = new HeatLabel[NUM_LABELS];
-    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[1], &heatLabel[2], &heatLabel[3]), 50.0, 1.0, 8670.0, 450); //Fe_vod
-    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[4], &heatLabel[5]), 50.0, 0.0, 8670.0, 450); //Fe_nevod
-    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[13], &heatLabel[14], &heatLabel[15], &heatLabel[16], &heatLabel[17], &heatLabel[18]), 306.1, 0.0, 0.0, 0.0);//med
-    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[6], &heatLabel[7], &heatLabel[11], &heatLabel[12]), 3e-3, 0.0, 0.0, 0.0);//vzduch
-    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[8]), 116, 1.0, 0.0, 0.0);//mosaz
-    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[9], &heatLabel[10]), 0.12, 0.0, 0.0, 0.0); //azbest
+    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[1], &heatLabel[2], &heatLabel[3]), 50.0, 1.0, 7850.0, 469); //Fe_vod
+    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[4], &heatLabel[5]), 50.0, 0.0, 7850.0, 469); //Fe_nevod
+    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[13], &heatLabel[14], &heatLabel[15], &heatLabel[16], &heatLabel[17], &heatLabel[18]), 306.1, 0.0, 8700.0, 385);//med
+    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[6], &heatLabel[7], &heatLabel[11], &heatLabel[12]), 3e-3, 0.0, 1.29, 1);//vzduch
+    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[8]), 116, 1.0, 8400.0, 380);//mosaz
+    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[9], &heatLabel[10]), 0.12, 0.0, 2100.0, 220); //azbest
 
     heatLabels = Hermes::vector<int>(1,2,3,4,5,13,14,15,16,17,18,6,7,11,12,8,9,10);
 

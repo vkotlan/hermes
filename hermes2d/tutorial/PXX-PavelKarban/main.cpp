@@ -144,8 +144,6 @@ int main(int argc, char* argv[])
 
 //****************** TEMPERATURE **********************************************
 
-//    Solution* sln_temp = new Solution();
-//    sln_temp->set_const(&mesh_temp, TEMP_INIT);
     Solution sln_temp(&mesh_temp, TEMP_INIT);
     WeakFormTemp wf_temp(TIME_STEP);
     wf_temp.registerForms(heatLabels, &sln_temp, &wjfilter);

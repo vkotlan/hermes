@@ -71,20 +71,20 @@ int main(int argc, char* argv[])
     mloader.load("act_mesh_temp.mesh", &mesh_temp);
     mloader.load("act_mesh_elast.mesh", &mesh_elast);
 
-    MeshView mv_mag;
-    mv_mag.show(&mesh_mag);
-    MeshView mv_temp;
-    mv_temp.show(&mesh_temp);
-    MeshView mv_elast;
-    mv_elast.show(&mesh_elast);
-
-    mv_elast.wait();
+//    MeshView mv_mag;
+//    mv_mag.show(&mesh_mag);
+//    MeshView mv_temp;
+//    mv_temp.show(&mesh_temp);
+//    MeshView mv_elast;
+//    mv_elast.show(&mesh_elast);
+//
+//    mv_elast.wait();
 
     // Perform initial mesh refinements (optional).
      for (int i=0; i < INIT_REF_NUM; i++){
          mesh_temp.refine_all_elements();
          mesh_mag.refine_all_elements();
-   //      mesh_elast.refine_all_elements();
+         mesh_elast.refine_all_elements();
     }
     // Initialize the weak formulation.
     WeakFormMagnetic wf(2);
@@ -176,7 +176,8 @@ int main(int argc, char* argv[])
 
     // Initialize views.
     ScalarView Tview("Temperature", new WinGeom(0, 0, 450, 600));
-    Tview.show(&sln_temp);
+    ScalarView Tview_dx("Temperature dx", new WinGeom(0, 0, 450, 600));
+    ScalarView Tview_dy("Temperature dy", new WinGeom(0, 0, 450, 600));
 
 //    //******************** Elasticita *******************************
     Solution sln_elast_r(&mesh_elast, DK_INIT);
@@ -245,9 +246,11 @@ int main(int argc, char* argv[])
 
       // Visualize the solution.
       char title[100];
-      sprintf(title, "Time %3.2f s", current_time);
+      sprintf(title, "Temperature, Time %3.2f s", current_time);
       Tview.set_title(title);
       Tview.show(&sln_temp);
+//      Tview_dx.show(&sln_temp, HERMES_EPS_NORMAL, H2D_FN_DX);
+//      Tview_dy.show(&sln_temp, HERMES_EPS_NORMAL, H2D_FN_DY);
     //  Tview.wait();
 
       info("Assembling the elastic stiffness matrix and right-hand side vector.");

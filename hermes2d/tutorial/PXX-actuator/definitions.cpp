@@ -542,9 +542,9 @@ private:
              Scalar result = 0;
              Func<Real>* temperature = ext->fn[0];
              for (int i = 0; i < n; i++)
-                 result += - wt[i] * (3*lambda + 2*mu) * expansion * e->x[i] * (
-                             temperature->dx[i] * v->val[i]
-                             + (temperature->val[i] - TEMP_INIT) * v->dx[i]  /// TODO proc je tu tenhle clen
+                 result += wt[i] * (3*lambda + 2*mu) * expansion * e->x[i] * (
+                            // temperature->dx[i] * v->val[i]
+                              (temperature->val[i] - TEMP_INIT) * (v->dx[i] + v->val[i]/e->x[i])
                              );
                  //result += wt[i] * (100000000) * e->x[i] * v->val[i];
                  //result += 0;
@@ -574,9 +574,9 @@ private:
              Scalar result = 0;
              Func<Real>* temperature = ext->fn[0];
              for (int i = 0; i < n; i++)
-                 result += - wt[i] * (3*lambda + 2*mu) * expansion * e->x[i] * (
-                             temperature->dy[i] * v->val[i]
-                             + (temperature->val[i] - TEMP_INIT) * v->dy[i]  /// TODO proc je tu tenhle clen
+                 result += wt[i] * (3*lambda + 2*mu) * expansion * e->x[i] * (
+                            // temperature->dy[i] * v->val[i]
+                              (temperature->val[i] - TEMP_INIT) * v->dy[i]
                              );
                  //result += wt[i] * (-1000000000) * e->x[i] * v->val[i];
                  //result += 0;
