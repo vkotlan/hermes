@@ -86,9 +86,15 @@ int main(int argc, char* argv[])
          mesh_mag.refine_all_elements();
          mesh_elast.refine_all_elements();
     }
+
+     Solution sln_mag_real(&mesh_mag, A_INIT);
+     Solution sln_mag_imag(&mesh_mag, A_INIT);;
+     Solution sln_temp(&mesh_temp, TEMP_INIT);
+     DoNothingFilter filter_temp(&sln_temp);
+
     // Initialize the weak formulation.
     WeakFormMagnetic wf(2);
-    wf.registerForms(magneticLabels);
+    wf.registerForms(magneticLabels, &sln_mag_real, &sln_mag_imag, &filter_temp);
 
     // Initialize boundary conditions.
     EssentialBCs bcs_mag;
@@ -107,11 +113,6 @@ int main(int argc, char* argv[])
     int ndof = Space::get_num_dofs(Hermes::vector<Space *>(&space_mag_real, &space_mag_imag));
     std::cout << "ndof: " << ndof << std::endl;
 
-    Solution *sln_mag_real = new Solution();
-    sln_mag_real->set_const(&mesh_mag, A_INIT);
-    Solution *sln_mag_imag = new Solution();
-    sln_mag_imag->set_const(&mesh_mag, A_INIT);
-
     // Set up the solver, matrix, and rhs according to the solver selection.
     SparseMatrix* matrix = create_matrix(matrix_solver);
     Vector* rhs = create_vector(matrix_solver);
@@ -119,32 +120,19 @@ int main(int argc, char* argv[])
 
     // Initialize the FE problem.
     DiscreteProblem dp(&wf, Hermes::vector<Space *>(&space_mag_real, &space_mag_imag));
-    dp.assemble(matrix, rhs);
 
-    if (solver->solve())
-        Solution::vector_to_solutions(solver->get_solution(),
-                                      Hermes::vector<Space *>(&space_mag_real, &space_mag_imag),
-                                      Hermes::vector<Solution *>(sln_mag_real, sln_mag_imag));
-    else
-        error ("Matrix solver failed.\n");
-
-    WjFilter wjfilter(sln_mag_real, sln_mag_imag);
-    MagneticVectorPotentialFilter afilter(sln_mag_real);
+    WjFilter wjfilter(&sln_mag_real, &sln_mag_imag);
+    MagneticVectorPotentialFilter afilter(&sln_mag_real);
 
     // Visualize the solution.
     ScalarView view_a("Ar - real", new WinGeom(0, 0, 440, 750));
-    view_a.show(&afilter, HERMES_EPS_NORMAL);
     ScalarView view_wj("wj", new WinGeom(450, 0, 440, 750));
     //view_wj.set_min_max_range(-0.000001, 0.000001);
-    view_wj.show(&wjfilter, HERMES_EPS_NORMAL);
  //   View::wait();
 
 
 //****************** TEMPERATURE **********************************************
 
-//    Solution* sln_temp = new Solution();
-//    sln_temp->set_const(&mesh_temp, TEMP_INIT);
-    Solution sln_temp(&mesh_temp, TEMP_INIT);
     WeakFormTemp wf_temp(TIME_STEP);
     wf_temp.registerForms(heatLabels, &sln_temp, &wjfilter);
 
@@ -176,8 +164,6 @@ int main(int argc, char* argv[])
 
     // Initialize views.
     ScalarView Tview("Temperature", new WinGeom(0, 0, 450, 600));
-    ScalarView Tview_dx("Temperature dx", new WinGeom(0, 0, 450, 600));
-    ScalarView Tview_dy("Temperature dy", new WinGeom(0, 0, 450, 600));
 
 //    //******************** Elasticita *******************************
     Solution sln_elast_r(&mesh_elast, DK_INIT);
@@ -232,12 +218,24 @@ int main(int argc, char* argv[])
     {
       info("---- Time step %d, time %3.5f s", ts, current_time);
 
+      if(ts == 2)
+          wf.push_previous_temperature(&sln_temp);
+
+      info("Assembling the magnetic stiffness matrix and right-hand side vector.");
+      dp.assemble(matrix, rhs);
+
+      if (solver->solve())
+          Solution::vector_to_solutions(solver->get_solution(),
+                                        Hermes::vector<Space *>(&space_mag_real, &space_mag_imag),
+                                        Hermes::vector<Solution *>(&sln_mag_real, &sln_mag_imag));
+      else
+          error ("Matrix solver failed.\n");
+
+      view_a.show(&afilter, HERMES_EPS_NORMAL);
+      view_wj.show(&wjfilter, HERMES_EPS_NORMAL);
+
       info("Assembling the temperature stiffness matrix and right-hand side vector.");
       dp_temp.assemble(matrix_temp, rhs_temp);
-      FILE *matfile;
-      matfile = fopen("matice.txt", "w");
-      matrix_temp->dump(matfile, "matrix");
-      rhs_temp->dump(matfile, "rhs");
 
       info("Solving the temperature matrix problem.");
       if(solver_temp->solve())
@@ -248,9 +246,7 @@ int main(int argc, char* argv[])
       char title[100];
       sprintf(title, "Temperature, Time %3.2f s", current_time);
       Tview.set_title(title);
-      Tview.show(&sln_temp);
-//      Tview_dx.show(&sln_temp, HERMES_EPS_NORMAL, H2D_FN_DX);
-//      Tview_dy.show(&sln_temp, HERMES_EPS_NORMAL, H2D_FN_DY);
+      Tview.show(&sln_temp, HERMES_EPS_NORMAL, H2D_FN_VAL_0);
     //  Tview.wait();
 
       info("Assembling the elastic stiffness matrix and right-hand side vector.");

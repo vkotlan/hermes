@@ -58,6 +58,44 @@ public:
     inline scalar get_pt_value(double x, double y, int item) { error("Not implemented"); return 0;}
 };
 
+class DoNothingFilter : public Filter
+{
+public:
+    DoNothingFilter(MeshFunction* solution)
+        : Filter()
+    {
+        num = 1;
+        sln[0] = solution;
+        init();
+    }
+
+    inline void precalculate(int order, int mask)
+    {
+        Quad2D* quad = quads[cur_quad];
+        int np = quad->get_num_points(order);
+        Node* node = new_node(H2D_FN_VAL_0, np);
+
+        sln[0]->set_quad_order(order, H2D_FN_VAL);
+
+        scalar *uval = sln[0]->get_fn_values();
+        update_refmap();
+
+        for (int i = 0; i < np; i++)
+        {
+            node->values[0][0][i] = uval[i];
+        }
+
+        if(nodes->present(order)) {
+          assert(nodes->get(order) == cur_node);
+          ::free(nodes->get(order));
+        }
+        nodes->add(node, order);
+        cur_node = node;
+    }
+
+    inline scalar get_pt_value(double x, double y, int item) { error("Not implemented"); return 0;}
+};
+
 class MagneticVectorPotentialFilter : public Filter
 {
 public:
@@ -302,28 +340,50 @@ private:
     GeomType gt;
 };
 
+double prev_temp_set;
+const double NONLINEAR_PERMEABILITY = -1.;
+
 class WeakFormMagnetic : public WeakForm
 {
 public:
     WeakFormMagnetic(int neq) : WeakForm(neq) { }
 
-    void registerForms(Hermes::vector<int> labels)
+    void registerForms(Hermes::vector<int> labels, Solution *prev_mag_r_sln, Solution *prev_mag_i_sln, Filter *prev_temp_sln)
     {
         for(std::vector<int>::iterator it = labels.begin(); it != labels.end(); ++it) {
-            //TODO only real part of current density
-            add_magnetic_material(str_marker[*it], magneticLabel[*it].permeability, magneticLabel[*it].conductivity, magneticLabel[*it].current_density_real);
+            double perm = magneticLabel[*it].permeability;
+
+            if (zelezoLabels.find_index(*it, false) != -1)
+                perm = NONLINEAR_PERMEABILITY;
+            else
+                perm = magneticLabel[*it].permeability;
+
+            add_magnetic_material(str_marker[*it], perm, magneticLabel[*it].conductivity, magneticLabel[*it].current_density_real, prev_mag_r_sln, prev_mag_i_sln, prev_temp_sln);
         }
+        prev_temp_set = false;
     }
 
-    void add_magnetic_material(std::string marker, double permeability, double conductivity, double external_current_density)
+    void add_magnetic_material(std::string marker, double permeability, double conductivity, double external_current_density, Solution *prev_mag_r_sln, Solution *prev_mag_i_sln, Filter *prev_temp_filter)
     {
         /// TODO PROC TO PADA, KDYZ DAM NASLEDUJICIM FORMAM HERMES_SYM ???????????
         /// TODO PROC TO PADA, KDYZ DAM NASLEDUJICIM FORMAM HERMES_SYM ???????????
         /// TODO PROC TO PADA, KDYZ DAM NASLEDUJICIM FORMAM HERMES_SYM ???????????
+//        // real part
+//        add_matrix_form(new WeakFormsMaxwell::VolumetricMatrixForms::DefaultLinearMagnetostatics(0, 0, marker, 1.0 / (permeability * MU0), HERMES_NONSYM, HERMES_AXISYM_Y));
+//        // imag part
+//        add_matrix_form(new WeakFormsMaxwell::VolumetricMatrixForms::DefaultLinearMagnetostatics(1, 1, marker, 1.0 / (permeability * MU0), HERMES_NONSYM, HERMES_AXISYM_Y));
+
         // real part
-        add_matrix_form(new WeakFormsMaxwell::VolumetricMatrixForms::DefaultLinearMagnetostatics(0, 0, marker, 1.0 / (permeability * MU0), HERMES_NONSYM, HERMES_AXISYM_Y));
+        CustomMatrixFormVol *mat_form_real = new CustomMatrixFormVol(0, 0, marker, permeability);
+        mat_form_real->ext.push_back(prev_mag_r_sln);
+        mat_form_real->ext.push_back(prev_mag_i_sln);
+        add_matrix_form(mat_form_real);
         // imag part
-        add_matrix_form(new WeakFormsMaxwell::VolumetricMatrixForms::DefaultLinearMagnetostatics(1, 1, marker, 1.0 / (permeability * MU0), HERMES_NONSYM, HERMES_AXISYM_Y));
+        CustomMatrixFormVol *mat_form_imag = new CustomMatrixFormVol(1, 1, marker, permeability);
+        mat_form_imag->ext.push_back(prev_mag_r_sln);
+        mat_form_imag->ext.push_back(prev_mag_i_sln);
+        add_matrix_form(mat_form_imag);
+
         // conductivity
         if (fabs(conductivity) > EPS_ZERO)
         {
@@ -334,6 +394,64 @@ public:
         if (fabs(external_current_density) > EPS_ZERO)
             add_vector_form(new WeakFormsH1::VolumetricVectorForms::DefaultVectorFormConst(0, marker, external_current_density, HERMES_PLANAR));
     }
+
+    void push_previous_temperature(Solution *prev_temp_sln)
+    {
+        for(std::vector<MatrixFormVol *>::iterator it = mfvol.begin(); it != mfvol.end(); ++it) {
+            (*it)->ext.push_back(prev_temp_sln);
+        }
+        prev_temp_set = true;
+    }
+
+private:
+    class CustomMatrixFormVol : public WeakForm::MatrixFormVol
+    {
+    public:
+        CustomMatrixFormVol(int i, int j, std::string marker, double permeability_const)
+            : WeakForm::MatrixFormVol(i, j, marker, HERMES_NONSYM), permeability_const(permeability_const){}
+
+        template<typename Real, typename Scalar>
+        Scalar matrix_form(int n, double *wt, Func<Real> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
+
+        }
+
+        virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *u, Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const {
+           // return matrix_form<double, scalar>(n, wt, u_ext, u, v, e, ext);
+
+            Func<scalar>* sln_mag_r_prev = ext->fn[0];
+            Func<scalar>* sln_mag_i_prev = ext->fn[1];
+            Func<scalar>* sln_temp_prev = ext->fn[2];
+
+            //            if (sln_temp_prev == NULL)
+            //                info("sln temp je NULL");
+
+            scalar result = 0;
+            for (int i = 0; i < n; i++){
+                scalar B = sqrt(sqr(sln_mag_r_prev->val[i]) + sqr(sln_mag_i_prev->val[i]));
+                scalar T = (prev_temp_set) ? sln_temp_prev->val[i] : TEMP_INIT;
+                scalar permeability = (permeability_const == NONLINEAR_PERMEABILITY) ? permeability_function(B,T) : permeability_const;
+                //scalar permeability = permeability_const;
+
+//                if ((permeability != 1) && (permeability != 750))
+//                    info("permeability %lf", permeability);
+
+                result += wt[i] / (MU0 * permeability) * (
+                            u->dx[i] * v->dx[i] + u->dy[i] * v->dy[i] +
+                            u->val[i] * v->dx[i] / e->x[i]); //TODO pryc
+                     //     (e->x[i] > 0) ? u->val[i] * v->dx[i] / e->x[i] : 0.0);
+            }
+            return result;
+
+        }
+
+        virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const {
+            //return matrix_form<Ord, Ord>(n, wt, u_ext, u, v, e, ext);
+            return Ord(20);
+        }
+    private:
+        double permeability_const;
+    };
+
 };
 
 class WeakFormTemp : public WeakForm
@@ -421,11 +539,12 @@ public:
             add_elasticity_material(str_marker[*it], elasticityLabel[*it].lambda(),  elasticityLabel[*it].mu(), elasticityLabel[*it].thermal_expansion, temperature);
         }
     }
-
+    
     void add_elasticity_material(std::string marker, double lambda, double mu, double thermal_expansion, Solution* temperature){
         CustomMatrixFormRR* mat_form_r_r = new CustomMatrixFormRR(0, 0, marker, lambda, mu);
+        mat_form_r_r->ext.push_back(temperature);
         add_matrix_form(mat_form_r_r);
-
+        
         CustomMatrixFormRZ* mat_form_r_z = new CustomMatrixFormRZ(0, 1, marker, lambda, mu);
         add_matrix_form(mat_form_r_z);
 
