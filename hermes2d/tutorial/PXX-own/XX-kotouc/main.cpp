@@ -67,9 +67,9 @@ int main(int argc, char* argv[])
     // Load the mesh.
     Mesh mesh_mag, mesh_temp, mesh_elast;
     H2DReader mloader;
-    mloader.load("act_mesh_mag.mesh", &mesh_mag);
-    mloader.load("act_mesh_temp.mesh", &mesh_temp);
-    mloader.load("act_mesh_elast.mesh", &mesh_elast);
+    mloader.load("kotouc_mesh_mag.mesh", &mesh_mag);
+    mloader.load("kotouc_mesh_temp.mesh", &mesh_temp);
+    mloader.load("kotouc_mesh_elast.mesh", &mesh_elast);
 
 //    MeshView mv_mag;
 //    mv_mag.show(&mesh_mag);

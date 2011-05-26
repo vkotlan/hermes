@@ -30,3 +30,5 @@ add_subdirectory(P03-timedep)
 
 add_subdirectory(PXX-PavelKarban)
 add_subdirectory(PXX-actuator)
+add_subdirectory(PXX-own)
+
