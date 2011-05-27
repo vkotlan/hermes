@@ -427,7 +427,8 @@ private:
 
             scalar result = 0;
             for (int i = 0; i < n; i++){
-                scalar B = sqrt(sqr(sln_mag_r_prev->val[i]) + sqr(sln_mag_i_prev->val[i]));
+                scalar B = sqrt(sqr(sln_mag_r_prev->dx[i]) + sqr(sln_mag_r_prev->dy[i]) + sqr(sln_mag_i_prev->dx[i]) + sqr(sln_mag_i_prev->dy[i]));
+                if(B>maxB) maxB = B;
                 scalar T = (prev_temp_set) ? sln_temp_prev->val[i] : TEMP_INIT;
                 scalar permeability = (permeability_const == NONLINEAR_PERMEABILITY) ? permeability_function(B,T) : permeability_const;
                 //scalar permeability = permeability_const;

@@ -44,6 +44,9 @@ const double frequency = 5000;
 
 std::string *str_marker;
 
+scalar maxB = 0;
+
+
 #include "tables.cpp"
 
 // Weak forms.
@@ -217,6 +220,7 @@ int main(int argc, char* argv[])
     do
     {
       info("---- Time step %d, time %3.5f s", ts, current_time);
+      info("maxB %lf", maxB);
 
       if(ts == 2)
           wf.push_previous_temperature(&sln_temp);

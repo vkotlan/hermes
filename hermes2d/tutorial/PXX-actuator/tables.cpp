@@ -370,6 +370,8 @@ void initTables()
 
     magneticLabels = Hermes::vector<int>(1,2,3,4,5,9,10,8,13,14,15,16,17,18,0,6,7,11,12);
     zelezoLabels = Hermes::vector<int>(1,2,3,4,5);
+    //nevodiveZelezoLabels = Hermes::vector<int>(4,5);
+    //mosazLabels =
 
     // heat
     heatEdge = new HeatEdge[NUM_EDGES];
