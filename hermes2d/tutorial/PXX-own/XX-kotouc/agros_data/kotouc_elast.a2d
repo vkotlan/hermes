@@ -1,0 +1,65 @@
+<document>
+    <problems>
+        <problem maxdofs="60000" adaptivitytolerance="1" id="0" analysistype="steadystate" initialcondition="0.0" linearitysteps="10" adaptivitysteps="1" linearity="linear" name="geom" date="2011-05-23" polynomialorder="2" meshtype="triangle" timestep="1.0" problemtype="axisymmetric" adaptivitytype="disabled" linearitytolerance="0.001" numberofrefinements="1" frequency="0" matrix_solver="umfpack" type="elasticity" timetotal="1.0">
+            <scriptstartup></scriptstartup>
+            <description></description>
+            <edges>
+                <edge typex="elasticity_free" typey="elasticity_free" id="1" name="okr_elastic1" forcex="0" forcey="0"/>
+                <edge typex="elasticity_free" typey="elasticity_fixed" id="2" name="okr_elastic2" forcex="0" forcey="0"/>
+            </edges>
+            <labels>
+                <label temp="600" poisson_ratio="0.3" temp_ref="30" young_modulus="2e11" alpha="1.25e-5" id="1" name="Fe" forcex="0" forcey="0"/>
+                <label temp="0" poisson_ratio="0.33" temp_ref="0" young_modulus="2e11" alpha="1.2e-5" id="2" name="teflon" forcex="0" forcey="0"/>
+                <label temp="0" poisson_ratio="0.33" temp_ref="0" young_modulus="2e11" alpha="1.2e-5" id="3" name="vata" forcex="0" forcey="0"/>
+                <label temp="0" poisson_ratio="0.33" temp_ref="0" young_modulus="2e11" alpha="1.2e-5" id="4" name="Cu" forcex="0" forcey="0"/>
+                <label temp="0" poisson_ratio="0.33" temp_ref="0" young_modulus="2e11" alpha="1.2e-5" id="5" name="vzduch" forcex="0" forcey="0"/>
+                <label temp="0" poisson_ratio="0.33" temp_ref="0" young_modulus="2e11" alpha="1.2e-5" id="6" name="voda" forcex="0" forcey="0"/>
+            </labels>
+        </problem>
+    </problems>
+    <geometry>
+        <nodes>
+            <node x="0.06" y="0" id="0"/>
+            <node x="0.06" y="-0.075" id="1"/>
+            <node x="0.095" y="-0.06999999999999999" id="2"/>
+            <node x="0.405" y="-0.02999999999999998" id="3"/>
+            <node x="0.44" y="-0.03" id="4"/>
+            <node x="0.44" y="0" id="5"/>
+            <node x="0.4049999999999997" y="-0.03000000183259569" id="6"/>
+            <node x="0.4" y="-0.025" id="7"/>
+            <node x="0.09" y="-0.075" id="8"/>
+            <node x="0.06" y="0.075" id="9"/>
+            <node x="0.09" y="0.075" id="10"/>
+            <node x="0.4" y="0.025" id="11"/>
+            <node x="0.44" y="0.03" id="12"/>
+            <node x="0.405" y="0.03" id="13"/>
+            <node x="0.4049999999999997" y="0.03000000183259578" id="14"/>
+            <node x="0.095" y="0.07000000000000001" id="15"/>
+            <node x="0.4049994138156364" y="0.02999985240034866" id="16"/>
+            <node x="0.4049998389373503" y="0.03000010072297089" id="17"/>
+            <node x="0.4049998389373503" y="-0.0300001007229708" id="18"/>
+            <node x="0.4049994155096139" y="-0.02999985365288377" id="19"/>
+        </nodes>
+        <edges>
+            <edge end="1" refine_towards="0" marker="1" id="0" start="0" angle="0"/>
+            <edge end="4" refine_towards="0" marker="1" id="1" start="3" angle="0"/>
+            <edge end="5" refine_towards="0" marker="1" id="2" start="4" angle="0"/>
+            <edge end="0" refine_towards="0" marker="1" id="3" start="9" angle="0"/>
+            <edge end="13" refine_towards="0" marker="1" id="4" start="12" angle="0"/>
+            <edge end="12" refine_towards="0" marker="1" id="5" start="5" angle="0"/>
+            <edge end="5" refine_towards="0" marker="2" id="6" start="0" angle="0"/>
+            <edge end="11" refine_towards="0" marker="1" id="7" start="15" angle="0"/>
+            <edge end="10" refine_towards="0" marker="1" id="8" start="9" angle="0"/>
+            <edge end="8" refine_towards="0" marker="1" id="9" start="1" angle="0"/>
+            <edge end="7" refine_towards="0" marker="1" id="10" start="2" angle="0"/>
+            <edge end="15" refine_towards="0" marker="1" id="11" start="10" angle="90"/>
+            <edge end="13" refine_towards="0" marker="1" id="12" start="11" angle="90"/>
+            <edge end="8" refine_towards="0" marker="1" id="13" start="2" angle="90"/>
+            <edge end="7" refine_towards="0" marker="1" id="14" start="19" angle="90"/>
+        </edges>
+        <labels>
+            <label x="0.124266" y="0.00810585" polynomialorder="0" marker="1" id="0" area="0"/>
+            <label x="0.115172" y="-0.0348391" polynomialorder="0" marker="1" id="1" area="0"/>
+        </labels>
+    </geometry>
+</document>
