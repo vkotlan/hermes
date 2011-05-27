@@ -96,9 +96,20 @@ for p in range(0,len(Pole)):
                 #print opravenyRadek
                 Zapis[novychRadku-1]=opravenyRadek
         elif re.search("  { \d+, \d+, -\d+ },\s",radek):
-            zapis = ""
+            for i in Boundaries[p]:
+                if re.search("  { \d+, \d+, -" + str(i-1) + " },\s",radek):
+                    zapis=radek 
+                    break
+                else: 
+                    zapis = ""
         elif re.search("  { \d+, \d+, -\d+ }\s",radek):
-            zapis = ""
+            for i in Boundaries[p]:
+                if re.search("  { \d+, \d+, -" + str(i-1) + " }\s",radek):
+                    zapis=radek 
+                    break
+                else: 
+                    zapis = ""
+                
             if zapis == "":
                 # """ musim prepsat predchozi radek """
                 predchRadek=Zapis[novychRadku-1]
