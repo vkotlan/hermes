@@ -331,14 +331,14 @@ void set_elasticity_label(Hermes::vector<ElasticityLabel *> elasticityLabel, dou
 
 void initTables()
 {
-    // thermal conductivity
-    double temp_thermal_conductivity[] = { 0, 100, 200, 300, 400, 500, 600, 2000 };
-    double data_thermal_conductivity[] = { 54, 49.4, 46.9, 43.9, 40.2, 37.2, 33.5, 23.0 };
-    thermal_conductivity_fe.add(temp_thermal_conductivity, data_thermal_conductivity, 8);
+    // thermal conductivity STEEL CSN 12040
+    double temp_thermal_conductivity[] = { 0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000 };
+    double data_thermal_conductivity[] = { 47.9, 49.3, 48.6, 46.6, 44.1, 41.4, 38.0, 35.0, 32.4, 31.0, 30.0 };
+    thermal_conductivity_fe.add(temp_thermal_conductivity, data_thermal_conductivity, 11);
 
-    // electric conductivity
-    double temp_electric_conductivity[] = { 0, 20, 100, 200, 400, 500, 600, 2000 };
-    double data_electric_conductivity[] = { 5.5e6, 5.02e6, 4.08e6, 3.14e6, 1.96e6, 1.65e6, 1.31e6, 0.9e6 };
+    // electric conductivity STEEL CSN 12040
+    double temp_electric_conductivity[] = { 0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000 };
+    double data_electric_conductivity[] = { 5.70e6, 4.45e6, 3.36e6, 2.60e6, 2.05e6, 1.62e6, 1.32e6, 1.12e6, 1.01e6, 9.10e5, 8.90e5 };
     electric_conductivity_fe.add(temp_electric_conductivity, data_electric_conductivity, 8);
 
     // relative permeabilty temp
