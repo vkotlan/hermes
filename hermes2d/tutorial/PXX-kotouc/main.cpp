@@ -37,8 +37,8 @@ const double A_INIT = 0.0;
 const double TEMP_INIT = 20.0;
 const double DK_INIT = 0.0;
 
-const double TIME_STEP = 0.1;
-const double TIME_FINAL = 20.;
+const double TIME_STEP = 1.0;
+const double TIME_FINAL = 800.0;
 
 const double frequency = 5000;
 
@@ -47,7 +47,7 @@ std::string *str_marker;
 scalar maxB;
 
 //when true, parameters are taken as functions, otherwise constanst from tables
-const bool USE_NONLINEARITIES = false;
+const bool USE_NONLINEARITIES = true;
 
 
 #include "tables.cpp"
@@ -218,6 +218,16 @@ int main(int argc, char* argv[])
     ScalarView disp_view("Displacement", new WinGeom(0, 0, 800, 400));
     DisplacementFilter disp_filter(Hermes::vector<MeshFunction*>(&sln_elast_r, &sln_elast_z));
 
+    GnuplotGraph temp_graph_time("Temperature/time", "time", "temperature");
+    temp_graph_time.add_row("inner","k", "-");
+    temp_graph_time.add_row("middle","k", "--");
+    temp_graph_time.add_row("outer","k", ":");
+
+    GnuplotGraph deformation_graph_time("Deformation/time", "time", "radial deformation");
+    deformation_graph_time.add_row("inner","k", "-");
+    deformation_graph_time.add_row("middle","k", "--");
+    deformation_graph_time.add_row("outer","k", ":");
+
     // Time stepping:
     int ts = 1;
     do
@@ -260,10 +270,6 @@ int main(int argc, char* argv[])
 
       info("Assembling the elastic stiffness matrix and right-hand side vector.");
       dp_elast.assemble(matrix_elast, rhs_elast);
-//      FILE *matfile;
-//      matfile = fopen("matice.txt", "w");
-//      matrix_temp->dump(matfile, "matrix");
-//      rhs_temp->dump(matfile, "rhs");
 
       info("Solving the elasticity matrix problem.");
       if(solver_elast->solve())
@@ -283,6 +289,38 @@ int main(int argc, char* argv[])
 //      stress_view.show(&stress_filter, HERMES_EPS_LOW, H2D_FN_VAL_0, &sln_elast_r, &sln_elast_z, 1.5e5);
 //      disp_view.show(&disp_filter);//, HERMES_EPS_LOW, H2D_FN_VAL_0, &sln_elast_r, &sln_elast_z, 1.5e5);
       disp_view.show(&disp_filter, HERMES_EPS_HIGH, H2D_FN_VAL_0, &sln_elast_r, &sln_elast_z, 5e2);
+
+      temp_graph_time.add_values(0, current_time, sln_temp.get_pt_value(0.06, 0));
+      temp_graph_time.add_values(1, current_time, sln_temp.get_pt_value(0.245, 0));
+      temp_graph_time.add_values(2, current_time, sln_temp.get_pt_value(0.43, 0));
+      temp_graph_time.save("results/temp_time.gnu");
+
+      deformation_graph_time.add_values(0, current_time, sln_elast_r.get_pt_value(0.06, 0));
+      deformation_graph_time.add_values(1, current_time, sln_elast_r.get_pt_value(0.245, 0));
+      deformation_graph_time.add_values(2, current_time, sln_elast_r.get_pt_value(0.43, 0));
+      deformation_graph_time.save("results/deformation_time.gnu");
+
+      GnuplotGraph loses_graph_axis("Joule loses on axis", "r", "temperature");
+      loses_graph_axis.add_row();
+
+      GnuplotGraph deformation_graph_axis("Radial deformation on axis", "r", "temperature");
+      deformation_graph_axis.add_row();
+
+      GnuplotGraph temp_graph_axis("Temperature on axis", "r", "temperature");
+      temp_graph_axis.add_row();
+
+      for (double rr = 0.06; rr <= 0.43; rr+=0.005){
+          temp_graph_axis.add_values(0, rr, sln_temp.get_pt_value(rr, 0));
+          //loses_graph_axis.add_values(0, rr, wjfilter.get_pt_value(rr, 0, H2D_FN_VAL_0));
+          deformation_graph_axis.add_values(0, rr, sln_elast_r.get_pt_value(rr, 0));
+      }
+      char filename[100];
+      sprintf(filename, "results/temp_axis_%3.1lf.gnu", current_time);
+      temp_graph_axis.save(filename);
+      //loses_graph_axis.save_numbered("results/loses_axis.gnu", ts);
+      sprintf(filename, "results/deformation_axis_%3.1lf.gnu", current_time);
+      deformation_graph_axis.save(filename);
+
 
       // Increase current time and time step counter.
       current_time += TIME_STEP;

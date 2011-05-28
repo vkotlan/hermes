@@ -358,7 +358,7 @@ public:
                 perm = NONLINEAR_PARAMETER;
 
             double cond = magneticLabel[*it].conductivity;
-            if (USE_NONLINEARITIES && (vodiveZelezoMosazLabels.find_index(*it, false) != -1))
+            if (USE_NONLINEARITIES && (zelezoLabels.find_index(*it, false) != -1))
                 cond = NONLINEAR_PARAMETER;
 
             add_magnetic_material(str_marker[*it], perm, cond, magneticLabel[*it].current_density_real, prev_mag_r_sln, prev_mag_i_sln, prev_temp_sln);
