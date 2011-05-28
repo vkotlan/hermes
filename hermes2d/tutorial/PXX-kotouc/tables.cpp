@@ -124,7 +124,6 @@ HeatEdge *heatEdge;
 HeatLabel *heatLabel;
 Hermes::vector<int> heatLabels;
 Hermes::vector<int> zelezoLabels;
-Hermes::vector<int> vodiveZelezoMosazLabels;
 
 //BCType heat_bc_types(int marker)
 //{
@@ -383,6 +382,8 @@ void initTables()
     {
         magneticLabels.push_back(i);
     }
+
+    zelezoLabels = Hermes::vector<int>(5, 67);
 
     // heat
     heatEdge = new HeatEdge[NUM_EDGES];
