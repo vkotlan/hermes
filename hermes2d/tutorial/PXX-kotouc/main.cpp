@@ -28,7 +28,7 @@ const bool VTK_VISUALIZATION = false;              // Set to "true" to enable VT
 const int P_MAG_INIT = 2;                             // Uniform polynomial degree of mesh elements.
 const int P_TEMP_INIT = 2;
 const int P_ELAST_INIT = 2;
-const int INIT_REF_NUM = 3;                       // Number of initial uniform mesh refinements.
+const int INIT_REF_NUM = 0;                       // Number of initial uniform mesh refinements.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
@@ -44,12 +44,10 @@ const double frequency = 5000;
 
 std::string *str_marker;
 
-
 scalar maxB;
 
 //when true, parameters are taken as functions, otherwise constanst from tables
-const bool USE_NONLINEARITIES = true;
-
+const bool USE_NONLINEARITIES = false;
 
 
 #include "tables.cpp"
@@ -75,9 +73,9 @@ int main(int argc, char* argv[])
     // Load the mesh.
     Mesh mesh_mag, mesh_temp, mesh_elast;
     H2DReader mloader;
-    mloader.load("act_mesh_mag.mesh", &mesh_mag);
-    mloader.load("act_mesh_temp.mesh", &mesh_temp);
-    mloader.load("act_mesh_elast.mesh", &mesh_elast);
+    mloader.load("kotouc_mesh_mag.mesh", &mesh_mag);
+    mloader.load("kotouc_mesh_temp.mesh", &mesh_temp);
+    mloader.load("kotouc_mesh_elast.mesh", &mesh_elast);
 
 //    MeshView mv_mag;
 //    mv_mag.show(&mesh_mag);
@@ -225,7 +223,6 @@ int main(int argc, char* argv[])
     do
     {
       info("---- Time step %d, time %3.5f s", ts, current_time);
-
       maxB = -10000;
 
       if(ts == 2)
@@ -244,7 +241,7 @@ int main(int argc, char* argv[])
       info("max B %lf",maxB);
 
       view_a.show(&afilter, HERMES_EPS_NORMAL);
-      view_wj.show(&wjfilter, HERMES_EPS_NORMAL);
+//      view_wj.show(&wjfilter, HERMES_EPS_NORMAL);
 
       info("Assembling the temperature stiffness matrix and right-hand side vector.");
       dp_temp.assemble(matrix_temp, rhs_temp);

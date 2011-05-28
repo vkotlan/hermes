@@ -340,10 +340,10 @@ private:
     GeomType gt;
 };
 
+double prev_temp_set;  //TODO dat dovnitr, tady je to osklivy
 
-double prev_temp_set;
-const double NONLINEAR_PERMEABILITY = -1.;
-
+// Nonlinear parameter, supposes that we consider only positive parameters !!!
+const double NONLINEAR_PARAMETER = -1.;
 
 class WeakFormMagnetic : public WeakForm
 {
@@ -354,7 +354,6 @@ public:
     {
         for(std::vector<int>::iterator it = labels.begin(); it != labels.end(); ++it) {
             double perm = magneticLabel[*it].permeability;
-
             if (USE_NONLINEARITIES && (zelezoLabels.find_index(*it, false) != -1))
                 perm = NONLINEAR_PARAMETER;
 
@@ -363,7 +362,6 @@ public:
                 cond = NONLINEAR_PARAMETER;
 
             add_magnetic_material(str_marker[*it], perm, cond, magneticLabel[*it].current_density_real, prev_mag_r_sln, prev_mag_i_sln, prev_temp_sln);
-
         }
         prev_temp_set = false;
     }
@@ -425,11 +423,9 @@ private:
         virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *u, Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const {
            // return matrix_form<double, scalar>(n, wt, u_ext, u, v, e, ext);
 
-
             Func<double>* sln_mag_r_prev = ext->fn[0];
             Func<double>* sln_mag_i_prev = ext->fn[1];
             Func<double>* sln_temp_prev = ext->fn[2];
-
 
             //            if (sln_temp_prev == NULL)
             //                info("sln temp je NULL");
@@ -439,9 +435,7 @@ private:
                 scalar B = sqrt(sqr(sln_mag_r_prev->dx[i]) + sqr(sln_mag_r_prev->dy[i]) + sqr(sln_mag_i_prev->dx[i]) + sqr(sln_mag_i_prev->dy[i]));
                 if(B>maxB) maxB = B;
                 scalar T = (prev_temp_set) ? sln_temp_prev->val[i] : TEMP_INIT;
-
                 scalar permeability = (permeability_const == NONLINEAR_PARAMETER) ? permeability_function(B,T) : permeability_const;
-
 
                 result += wt[i] / (MU0 * permeability) * (
                             u->dx[i] * v->dx[i] + u->dy[i] * v->dy[i] +
@@ -460,7 +454,6 @@ private:
     private:
         double permeability_const;
     };
-
 
     class CustomMatrixFormCond : public WeakForm::MatrixFormVol
     {
@@ -489,7 +482,6 @@ private:
     private:
         double coeff, conductivity_const;
     };
-
 
 };
 
