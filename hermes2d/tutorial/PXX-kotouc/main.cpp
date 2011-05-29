@@ -44,7 +44,7 @@ const double frequency = 5000;
 
 std::string *str_marker;
 
-scalar maxB;
+scalar maxB, max_el_cond, min_el_cond;
 
 //when true, parameters are taken as functions, otherwise constanst from tables
 const bool USE_NONLINEARITIES = true;
@@ -233,7 +233,7 @@ int main(int argc, char* argv[])
     do
     {
       info("---- Time step %d, time %3.5f s", ts, current_time);
-      maxB = -10000;
+      maxB = -10000; max_el_cond = -1000; min_el_cond = 1e10;
 
       if(ts == 2)
           wf.push_previous_temperature(&sln_temp);
@@ -248,7 +248,7 @@ int main(int argc, char* argv[])
       else
           error ("Matrix solver failed.\n");
 
-      info("max B %lf",maxB);
+      info("max B %lf, min el cond %lf, max el cond %lf",maxB, min_el_cond, max_el_cond);
 
       view_a.show(&afilter, HERMES_EPS_NORMAL);
 //      view_wj.show(&wjfilter, HERMES_EPS_NORMAL);
