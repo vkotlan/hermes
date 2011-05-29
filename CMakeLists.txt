@@ -76,10 +76,10 @@ set(WITH_H2D                  YES)
 	set(H2D_REAL              YES)
 	set(H2D_COMPLEX           YES)
 	# Release and debug versions.
-	set(H2D_DEBUG             YES)
+        set(H2D_DEBUG             YES)
 	set(H2D_RELEASE           NO)
 	# Optional parts of the library.
-	set(H2D_WITH_EXAMPLES     YES)
+        set(H2D_WITH_EXAMPLES     YES)
         set(H2D_WITH_BENCHMARKS   NO)
         set(H2D_WITH_TESTS        NO)
 	set(H2D_WITH_TUTORIAL     YES)
@@ -188,7 +188,7 @@ set(WITH_MPI                NO)
 # set(MPI_INCLUDE_PATH      /usr/include/openmpi
 
 # Enable or disable Python.
-set(WITH_PYTHON             YES)
+set(WITH_PYTHON             NO)
 
 # Set overrides:
 if(WITH_PYTHON)
