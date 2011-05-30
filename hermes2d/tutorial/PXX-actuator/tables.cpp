@@ -33,13 +33,13 @@ enum PhysicFieldBC
     PhysicFieldBC_Flow_Wall,
 };
 
-double permeability(double B, double T)
+double permeability_function(double B, double T)
 {
     double koef = 1.25350233e-28 * pow(T, 10) - 9.38795536e-25 * pow(T, 9) + 2.95485549e-21 * pow(T, 8) - 5.06321208e-18 * pow(T, 7) +
             5.11236483e-15 * pow(T, 6) - 3.08097605e-12 * pow(T, 5) + 1.08123707e-09 * pow(T, 4) - 2.12158135e-07 * pow(T, 3) +
             2.11535604e-05 * pow(T, 2) - 8.14585198e-04 * pow(T, 1) + 1.00001549e+00;
 
-    double perm = relative_mag_permeability.value(T);
+    double perm = relative_mag_permeability.value(B);
 
     perm = perm * koef;
     if (perm < 1.0) perm = 1.0;
@@ -123,6 +123,7 @@ struct HeatLabel
 HeatEdge *heatEdge;
 HeatLabel *heatLabel;
 Hermes::vector<int> heatLabels;
+Hermes::vector<int> zelezoLabels;
 
 //BCType heat_bc_types(int marker)
 //{
@@ -356,6 +357,7 @@ void initTables()
     set_magnetic_edge(Hermes::vector<MagneticEdge *>(&magneticEdge[24], &magneticEdge[25], &magneticEdge[46],
                                             &magneticEdge[47], &magneticEdge[48], &magneticEdge[49]), PhysicFieldBC_Magnetic_VectorPotential, 0.0, 0.0); //nulovy potencial, melo by byt spravne
 
+    //nelinearni elektricka vodivost pouze u vodiveho zeleza a mosazi
     magneticLabel = new MagneticLabel[NUM_LABELS];
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[1], &magneticLabel[2], &magneticLabel[3]), 0.0, 0.0, 750.0, 6.6e6, 0.0, 0.0, 0.0, 0.0, 0.0); //vodive zelezo - jadro,ukotveni,kostra spojky
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[4], &magneticLabel[5]), 0.0, 0.0, 750.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //el.nevodive zelezo - plast
@@ -367,6 +369,9 @@ void initTables()
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[0], &magneticLabel[6], &magneticLabel[7], &magneticLabel[11], &magneticLabel[12]), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vzduch
 
     magneticLabels = Hermes::vector<int>(1,2,3,4,5,9,10,8,13,14,15,16,17,18,0,6,7,11,12);
+    zelezoLabels = Hermes::vector<int>(1,2,3,4,5);
+    //nevodiveZelezoLabels = Hermes::vector<int>(4,5);
+    //mosazLabels =
 
     // heat
     heatEdge = new HeatEdge[NUM_EDGES];
@@ -377,6 +382,7 @@ void initTables()
                                              &heatEdge[42], &heatEdge[43]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 20.0, 20.0); //hranice
 
 
+    //nelinearni teplotni vodivost pro obe zeleza
     heatLabel = new HeatLabel[NUM_LABELS];
     set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[1], &heatLabel[2], &heatLabel[3]), 50.0, 1.0, 7850.0, 469); //Fe_vod
     set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[4], &heatLabel[5]), 50.0, 0.0, 7850.0, 469); //Fe_nevod
