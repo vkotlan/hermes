@@ -364,11 +364,11 @@ void initTables()
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[3], &magneticLabel[1], &magneticLabel[2], &magneticLabel[4]), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vata
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[7], &magneticLabel[8], &magneticLabel[9], &magneticLabel[10], &magneticLabel[11], &magneticLabel[12],
                                                        &magneticLabel[13], &magneticLabel[14], &magneticLabel[15], &magneticLabel[16], &magneticLabel[17], &magneticLabel[18],
-                                                       &magneticLabel[19]), 4.2441e6, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vodice
+                                                       &magneticLabel[19]), 5*4.2441e6, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vodice
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[20], &magneticLabel[21], &magneticLabel[22], &magneticLabel[23], &magneticLabel[24],
                                                        &magneticLabel[25], &magneticLabel[26], &magneticLabel[27], &magneticLabel[28], &magneticLabel[29], &magneticLabel[30],
                                                        &magneticLabel[31], &magneticLabel[36], &magneticLabel[35], &magneticLabel[34], &magneticLabel[33],
-                                                       &magneticLabel[32]), 4.2441e6, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vodice pokracovani
+                                                       &magneticLabel[32]), 5.*4.2441e6, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vodice pokracovani
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[6]), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vzduch
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[37], &magneticLabel[38], &magneticLabel[39], &magneticLabel[40], &magneticLabel[41], &magneticLabel[42], &magneticLabel[43],
                                                        &magneticLabel[44], &magneticLabel[45], &magneticLabel[46], &magneticLabel[47], &magneticLabel[48], &magneticLabel[49], &magneticLabel[50],

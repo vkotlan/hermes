@@ -38,9 +38,9 @@ const double TEMP_INIT = 20.0;
 const double DK_INIT = 0.0;
 
 const double TIME_STEP = 1.0;
-const double TIME_FINAL = 800.0;
+const double TIME_FINAL = 10.0;
 
-const double frequency = 5000;
+const double frequency = 50;
 
 std::string *str_marker;
 
@@ -251,7 +251,7 @@ int main(int argc, char* argv[])
       info("max B %lf",maxB);
 
       view_a.show(&afilter, HERMES_EPS_NORMAL);
-//      view_wj.show(&wjfilter, HERMES_EPS_NORMAL);
+      view_wj.show(&wjfilter, HERMES_EPS_NORMAL);
 
       info("Assembling the temperature stiffness matrix and right-hand side vector.");
       dp_temp.assemble(matrix_temp, rhs_temp);
