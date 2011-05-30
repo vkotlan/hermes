@@ -495,8 +495,8 @@ public:
     {
         for(std::vector<int>::iterator it = labels.begin(); it != labels.end(); ++it) {
             double cond = heatLabel[*it].thermal_conductivity;
-//            if (USE_NONLINEARITIES && (zelezoLabels.find_index(*it, false) != -1))
-//                cond = NONLINEAR_PARAMETER;
+            if (USE_NONLINEARITIES && (zelezoLabels.find_index(*it, false) != -1))
+                cond = NONLINEAR_PARAMETER;
 
             add_temperature_material(str_marker[*it], cond, heatLabel[*it].volume_heat,
                                      heatLabel[*it].density, heatLabel[*it].specific_heat, prev_time_sln, joule_loses);
@@ -525,10 +525,10 @@ public:
 
         // Contribution of the diffusion term.
         /// TODO NONSYM
-        add_matrix_form(new DefaultLinearDiffusion(0, 0, marker, thermal_conductivity, HERMES_SYM, HERMES_AXISYM_Y));
-        //CustomNonlinearDiffusion* diffusion_form = new CustomNonlinearDiffusion(0, 0, marker, thermal_conductivity);
-        //diffusion_form->ext.push_back(prev_time_sln);
-        //add_matrix_form(diffusion_form);
+        //add_matrix_form(new DefaultLinearDiffusion(0, 0, marker, thermal_conductivity, HERMES_SYM, HERMES_AXISYM_Y));
+        CustomNonlinearDiffusion* diffusion_form = new CustomNonlinearDiffusion(0, 0, marker, thermal_conductivity);
+        diffusion_form->ext.push_back(prev_time_sln);
+        add_matrix_form(diffusion_form);
 
         // Right-hand side volumetric vector form.
         CustomVectorFormVol* vec_form_vol = new CustomVectorFormVol(0, marker, density, specific_heat, volume_heat, time_step);
