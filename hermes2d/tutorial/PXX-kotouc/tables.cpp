@@ -339,8 +339,9 @@ void initTables()
 
     // electric conductivity STEEL CSN 12040
     double temp_electric_conductivity[] = { 0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000 };
-//    double data_electric_conductivity[] = { 5.70e6, 4.45e6, 3.36e6, 2.60e6, 2.05e6, 1.62e6, 1.32e6, 1.12e6, 1.01e6, 9.10e5, 8.90e5 };
-    double data_electric_conductivity[] = { 5e6, 5e6, 5e6, 5e6, 5e6, 5e6, 5e6, 5e6, 5e6, 5e6, 5e6 };
+    double data_electric_conductivity[] = { 5.70e6, 4.45e6, 3.36e6, 2.60e6, 2.05e6, 1.62e6, 1.32e6, 1.12e6, 1.01e6, 9.10e5, 8.90e5 };
+//    double temp_electric_conductivity[] = { 0, 1000 };
+//    double data_electric_conductivity[] = { 5e6, 5e6 };
     electric_conductivity_fe.add(temp_electric_conductivity, data_electric_conductivity, 8);
 
     // relative permeabilty temp
