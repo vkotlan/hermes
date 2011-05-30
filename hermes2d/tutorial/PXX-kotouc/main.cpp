@@ -262,7 +262,7 @@ int main(int argc, char* argv[])
     std::cout << "ndof: " << ndof << std::endl;
 
     //adaptivity ?????
-    adapt_mesh(Hermes::vector<Space*>(&space_mag_real, &space_mag_imag), &wf);
+   //adapt_mesh(Hermes::vector<Space*>(&space_mag_real, &space_mag_imag), &wf);
 
 
     // Set up the solver, matrix, and rhs according to the solver selection.
