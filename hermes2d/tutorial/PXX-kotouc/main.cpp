@@ -364,12 +364,12 @@ int main(int argc, char* argv[])
     ScalarView disp_view("Displacement", new WinGeom(0, 0, 800, 400));
     DisplacementFilter disp_filter(Hermes::vector<MeshFunction*>(&sln_elast_r, &sln_elast_z));
 
-    GnuplotGraph temp_graph_time("Temperature/time", "time", "temperature");
+    GnuplotGraph temp_graph_time("Temperature/time", "time [s]", "temperature [°C]");
     temp_graph_time.add_row("inner","k", "-");
     temp_graph_time.add_row("middle","k", "--");
     temp_graph_time.add_row("outer","k", ":");
 
-    GnuplotGraph deformation_graph_time("Deformation/time", "time", "radial deformation");
+    GnuplotGraph deformation_graph_time("Deformation/time", "time [s]", "radial deformation [m]");
     deformation_graph_time.add_row("inner","k", "-");
     deformation_graph_time.add_row("middle","k", "--");
     deformation_graph_time.add_row("outer","k", ":");
@@ -446,13 +446,13 @@ int main(int argc, char* argv[])
       deformation_graph_time.add_values(2, current_time, sln_elast_r.get_pt_value(0.43, 0));
       deformation_graph_time.save("results/deformation_time.gnu");
 
-      GnuplotGraph loses_graph_axis("Joule loses on axis", "r", "temperature");
+      GnuplotGraph loses_graph_axis("Joule loses on axis", "r [m]", "temperature [°C]");
       loses_graph_axis.add_row();
 
-      GnuplotGraph deformation_graph_axis("Radial deformation on axis", "r", "temperature");
+      GnuplotGraph deformation_graph_axis("Radial deformation on axis", "r [m]", "temperature [°C]");
       deformation_graph_axis.add_row();
 
-      GnuplotGraph temp_graph_axis("Temperature on axis", "r", "temperature");
+      GnuplotGraph temp_graph_axis("Temperature on axis", "r [m]", "temperature [°C]");
       temp_graph_axis.add_row();
 
       for (double rr = 0.06; rr <= 0.43; rr+=0.005){
