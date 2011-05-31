@@ -342,7 +342,8 @@ private:
 
 
 double prev_temp_set;
-const double NONLINEAR_PERMEABILITY = -1.;
+// Nonlinear parameter, supposes that we consider only positive parameters !!!
+const double NONLINEAR_PARAMETER = -1.;
 
 
 class WeakFormMagnetic : public WeakForm

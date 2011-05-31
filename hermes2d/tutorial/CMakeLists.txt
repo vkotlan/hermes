@@ -34,4 +34,4 @@ add_subdirectory(PXX-actuator)
 
 add_subdirectory(PXX-kotouc)
 
-add_subdirectory(PXX-own)
+#add_subdirectory(PXX-own)
