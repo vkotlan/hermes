@@ -194,6 +194,54 @@ public:
     inline scalar get_pt_value(double x, double y, int item) { error("Not implemented"); return 0;}
 };
 
+class BFilter : public Filter
+{
+public:
+    BFilter(MeshFunction* slnr, MeshFunction* slni)
+    {
+        num = 2;
+
+        sln[0] = slnr;
+        sln[1] = slni;
+
+        init();
+    }
+
+    inline void precalculate(int order, int mask)
+    {
+        Quad2D* quad = quads[cur_quad];
+        int np = quad->get_num_points(order);
+        Node* node = new_node(H2D_FN_DEFAULT, np);
+
+        double *dudx1, *dudy1, *dudx2, *dudy2;
+
+        sln[0]->set_quad_order(order, H2D_FN_VAL | H2D_FN_DX | H2D_FN_DY);
+        sln[0]->get_dx_dy_values(dudx1, dudy1);
+
+        sln[1]->set_quad_order(order, H2D_FN_VAL | H2D_FN_DX | H2D_FN_DY);
+        sln[1]->get_dx_dy_values(dudx2, dudy2);
+
+        update_refmap();
+
+        double *x = refmap->get_phys_x(order);
+        Element *e = refmap->get_active_element();
+
+        for (int i = 0; i < np; i++)
+        {
+                node->values[0][0][i] = x[i] * sqrt(sqr(dudx1[i]) + sqr(dudy1[i]) + sqr(dudx2[i]) + sqr(dudy2[i]));
+        }
+
+        if(nodes->present(order)) {
+          assert(nodes->get(order) == cur_node);
+          ::free(nodes->get(order));
+        }
+        nodes->add(node, order);
+        cur_node = node;
+    }
+
+    inline scalar get_pt_value(double x, double y, int item) { error("Not implemented"); return 0;}
+};
+
 class CustomVectorFormTimeDep : public WeakForm::VectorFormVol
 {
 public:

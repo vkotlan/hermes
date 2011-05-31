@@ -25,10 +25,10 @@
 
 const bool HERMES_VISUALIZATION = true;           // Set to "false" to suppress Hermes OpenGL visualization. 
 const bool VTK_VISUALIZATION = false;              // Set to "true" to enable VTK output.
-const int P_MAG_INIT = 2;                             // Uniform polynomial degree of mesh elements.
+const int P_MAG_INIT = 3;                             // Uniform polynomial degree of mesh elements.
 const int P_TEMP_INIT = 2;
 const int P_ELAST_INIT = 2;
-const int INIT_REF_NUM = 0;                       // Number of initial uniform mesh refinements.
+const int INIT_REF_NUM = 1;                       // Number of initial uniform mesh refinements.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
@@ -277,9 +277,11 @@ int main(int argc, char* argv[])
 
     WjFilter wjfilter(&sln_mag_real, &sln_mag_imag);
     MagneticVectorPotentialFilter afilter(&sln_mag_real);
+    BFilter bfilter(&sln_mag_real, &sln_mag_imag);
 
     // Visualize the solution.
     ScalarView view_a("Ar - real", new WinGeom(0, 0, 440, 750));
+    ScalarView view_b("Size of B", new WinGeom(0, 0, 440, 750));
     ScalarView view_wj("wj", new WinGeom(450, 0, 440, 750));
     //view_wj.set_min_max_range(-0.000001, 0.000001);
  //   View::wait();
@@ -399,7 +401,10 @@ int main(int argc, char* argv[])
       info("max B %lf, min el cond %lf, max el cond %lf",maxB, min_el_cond, max_el_cond);
 
       view_a.show(&afilter, HERMES_EPS_NORMAL);
-      view_wj.show(&wjfilter, HERMES_EPS_NORMAL);
+
+      view_b.show(&bfilter, HERMES_EPS_NORMAL);
+//      view_wj.show(&wjfilter, HERMES_EPS_NORMAL);
+
 
       info("Assembling the temperature stiffness matrix and right-hand side vector.");
       dp_temp.assemble(matrix_temp, rhs_temp);
