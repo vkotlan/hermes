@@ -25,10 +25,10 @@
 
 const bool HERMES_VISUALIZATION = true;           // Set to "false" to suppress Hermes OpenGL visualization. 
 const bool VTK_VISUALIZATION = false;              // Set to "true" to enable VTK output.
-const int P_MAG_INIT = 3;                             // Uniform polynomial degree of mesh elements.
+const int P_MAG_INIT = 2;                             // Uniform polynomial degree of mesh elements.
 const int P_TEMP_INIT = 2;
 const int P_ELAST_INIT = 2;
-const int INIT_REF_NUM = 1;                       // Number of initial uniform mesh refinements.
+const int INIT_REF_NUM = 0;                       // Number of initial uniform mesh refinements.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
@@ -47,7 +47,7 @@ std::string *str_marker;
 scalar maxB, max_el_cond, min_el_cond;
 
 //when true, parameters are taken as functions, otherwise constanst from tables
-const bool USE_NONLINEARITIES = true;
+const bool USE_NONLINEARITIES = false;
 
 
 #include "tables.cpp"
