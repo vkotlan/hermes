@@ -38,13 +38,13 @@ const double TEMP_INIT = 20.0;
 const double DK_INIT = 0.0;
 
 const double TIME_STEP = 1.0;
-const double TIME_FINAL = 800.0;
+const double TIME_FINAL = 10.0;
 
-const double frequency = 5000;
+const double frequency = 50;
 
 std::string *str_marker;
 
-scalar maxB;
+scalar maxB, max_el_cond, min_el_cond;
 
 //when true, parameters are taken as functions, otherwise constanst from tables
 const bool USE_NONLINEARITIES = true;
@@ -54,6 +54,148 @@ const bool USE_NONLINEARITIES = true;
 
 // Weak forms.
 #include "definitions.cpp"
+
+using namespace RefinementSelectors;
+const double THRESHOLD = 0.2;                     // This is a quantitative parameter of the adapt(...) function and
+                                                  // it has different meanings for various adaptive strategies (see below).
+const int STRATEGY = 0;                           // Adaptive strategy:
+                                                  // STRATEGY = 0 ... refine elements until sqrt(THRESHOLD) times total
+                                                  //   error is processed. If more elements have similar errors, refine
+                                                  //   all to keep the mesh symmetric.
+                                                  // STRATEGY = 1 ... refine all elements whose error is larger
+                                                  //   than THRESHOLD times maximum element error.
+                                                  // STRATEGY = 2 ... refine all elements whose error is larger
+                                                  //   than THRESHOLD.
+                                                  // More adaptive strategies can be created in adapt_ortho_h1.cpp.
+const CandList CAND_LIST = H2D_HP_ANISO_H;        // Predefined list of element refinement candidates. Possible values are
+                                                  // H2D_P_ISO, H2D_P_ANISO, H2D_H_ISO, H2D_H_ANISO, H2D_HP_ISO, H2D_HP_ANISO_H
+                                                  // H2D_HP_ANISO_P, H2D_HP_ANISO. See User Documentation for details.
+const int MESH_REGULARITY = -1;                   // Maximum allowed level of hanging nodes:
+                                                  // MESH_REGULARITY = -1 ... arbitrary level hangning nodes (default),
+                                                  // MESH_REGULARITY = 1 ... at most one-level hanging nodes,
+                                                  // MESH_REGULARITY = 2 ... at most two-level hanging nodes, etc.
+                                                  // Note that regular meshes are not supported, this is due to
+                                                  // their notoriously bad performance.
+const double ERR_STOP = 1.0;                      // Stopping criterion for adaptivity (rel. error tolerance between the
+const double CONV_EXP = 1.0;                      // Default value is 1.0. This parameter influences the selection of
+                                                  // cancidates in hp-adaptivity. See get_optimal_refinement() for details.
+                                                  // fine mesh and coarse mesh solution in percent).
+const int NDOF_STOP = 60000;                      // Adaptivity process stops when the number of degrees of freedom grows
+
+
+void adapt_mesh(Hermes::vector<Space*> spaces, WeakForm *wf)
+{
+    // Initialize refinement selector.
+    H1ProjBasedSelector selector(CAND_LIST, CONV_EXP, H2DRS_DEFAULT_ORDER);
+
+    Solution sln1, sln2, ref_sln1, ref_sln2;
+    Hermes::vector<Solution*> solutions = Hermes::vector<Solution*>(&sln1, &sln2);
+    Hermes::vector<Solution*> ref_solutions = Hermes::vector<Solution*>(&ref_sln1, &ref_sln2);
+
+    // Initialize views.
+    OrderView  oview("Polynomial orders", new WinGeom(420, 0, 400, 600));
+
+    // DOF and CPU convergence graphs initialization.
+    SimpleGraph graph_dof, graph_cpu;
+
+    // Time measurement.
+    TimePeriod cpu_time;
+    cpu_time.tick();
+
+    // Adaptivity loop:
+    int as = 1;
+    bool done = false;
+    do
+    {
+      info("---- Adaptivity step %d:", as);
+
+      // Construct globally refined reference mesh and setup reference space.
+      Hermes::vector<Space*> *ref_spaces = Space::construct_refined_spaces(spaces, 1);
+      int ndof_ref = Space::get_num_dofs(*ref_spaces);
+
+      // Initialize matrix solver.
+      SparseMatrix* matrix = create_matrix(matrix_solver);
+      Vector* rhs = create_vector(matrix_solver);
+      Solver* solver = create_linear_solver(matrix_solver, matrix, rhs);
+
+      // Assemble reference problem.
+      info("Solving on reference mesh.");
+      DiscreteProblem* dp = new DiscreteProblem(wf, *ref_spaces, true);
+
+      // Time measurement.
+      cpu_time.tick();
+
+      dp->assemble(matrix, rhs);
+      solver->solve();
+      Solution::vector_to_solutions(solver->get_solution(), *ref_spaces, ref_solutions);
+
+      // Project the fine mesh solution onto the coarse mesh.
+      info("Projecting reference solution on coarse mesh.");
+      OGProjection::project_global(spaces, ref_solutions, solutions, matrix_solver);
+
+      // Time measurement.
+      cpu_time.tick();
+
+      // Skip visualization time.
+      cpu_time.tick(HERMES_SKIP);
+
+      // Calculate element errors and total error estimate.
+      info("Calculating error estimate.");
+      Adapt* adaptivity = new Adapt(spaces);
+      bool solutions_for_adapt = true;
+      // In the following function, the Boolean parameter "solutions_for_adapt" determines whether
+      // the calculated errors are intended for use with adaptivity (this may not be the case, for example,
+      // when error wrt. an exact solution is calculated). The default value is solutions_for_adapt = true,
+      // The last parameter "error_flags" determine whether the total and element errors are treated as
+      // absolute or relative. Its default value is error_flags = HERMES_TOTAL_ERROR_REL | HERMES_ELEMENT_ERROR_REL.
+      // In subsequent examples and benchmarks, these two parameters will be often used with
+      // their default values, and thus they will not be present in the code explicitly.
+      //      double err_est_rel = adaptivity->calc_err_est(&sln, &ref_sln, solutions_for_adapt,
+      //                           HERMES_TOTAL_ERROR_REL | HERMES_ELEMENT_ERROR_REL) * 100;
+      double err_est_rel = adaptivity->calc_err_est(solutions, ref_solutions);
+
+      // Report results.
+      info("ndof_coarse: %d, ndof_fine: %d, err_est_rel: %g%%",
+        Space::get_num_dofs(spaces), Space::get_num_dofs(*ref_spaces), err_est_rel);
+
+      // Time measurement.
+      cpu_time.tick();
+
+      // View the coarse mesh solution and polynomial orders.
+      if (HERMES_VISUALIZATION) {
+        oview.show(spaces[0]);
+      }
+
+      // Add entry to DOF and CPU convergence graphs.
+      graph_dof.add_values(Space::get_num_dofs(spaces), err_est_rel);
+      graph_dof.save("conv_dof_est.dat");
+      graph_cpu.add_values(cpu_time.accumulated(), err_est_rel);
+      graph_cpu.save("conv_cpu_est.dat");
+
+      // If err_est too large, adapt the mesh.
+      if (err_est_rel < ERR_STOP) done = true;
+      else
+      {
+        info("Adapting coarse mesh.");
+        done = adaptivity->adapt(&selector, THRESHOLD, STRATEGY, MESH_REGULARITY);
+
+        // Increase the counter of performed adaptivity steps.
+        if (done == false)  as++;
+      }
+      if (Space::get_num_dofs(spaces) >= NDOF_STOP) done = true;
+
+      // Clean up.
+      delete solver;
+      delete matrix;
+      delete rhs;
+      delete adaptivity;
+      //if(done == false) delete ref_spaces[0]->get_mesh();
+      delete dp;
+
+    }
+    while (done == false);
+
+}
 
 int main(int argc, char* argv[])
 {
@@ -118,6 +260,12 @@ int main(int argc, char* argv[])
     // ndof
     int ndof = Space::get_num_dofs(Hermes::vector<Space *>(&space_mag_real, &space_mag_imag));
     std::cout << "ndof: " << ndof << std::endl;
+
+    //adaptivity ?????
+
+    //adapt_mesh(Hermes::vector<Space*>(&space_mag_real, &space_mag_imag), &wf);
+
+
 
     // Set up the solver, matrix, and rhs according to the solver selection.
     SparseMatrix* matrix = create_matrix(matrix_solver);
@@ -218,12 +366,12 @@ int main(int argc, char* argv[])
     ScalarView disp_view("Displacement", new WinGeom(0, 0, 800, 400));
     DisplacementFilter disp_filter(Hermes::vector<MeshFunction*>(&sln_elast_r, &sln_elast_z));
 
-    GnuplotGraph temp_graph_time("Temperature/time", "time", "temperature");
+    GnuplotGraph temp_graph_time("Temperature/time", "time [s]", "temperature [°C]");
     temp_graph_time.add_row("inner","k", "-");
     temp_graph_time.add_row("middle","k", "--");
     temp_graph_time.add_row("outer","k", ":");
 
-    GnuplotGraph deformation_graph_time("Deformation/time", "time", "radial deformation");
+    GnuplotGraph deformation_graph_time("Deformation/time", "time [s]", "radial deformation [m]");
     deformation_graph_time.add_row("inner","k", "-");
     deformation_graph_time.add_row("middle","k", "--");
     deformation_graph_time.add_row("outer","k", ":");
@@ -233,7 +381,7 @@ int main(int argc, char* argv[])
     do
     {
       info("---- Time step %d, time %3.5f s", ts, current_time);
-      maxB = -10000;
+      maxB = -10000; max_el_cond = -1000; min_el_cond = 1e10;
 
       if(ts == 2)
           wf.push_previous_temperature(&sln_temp);
@@ -243,15 +391,15 @@ int main(int argc, char* argv[])
 
       if (solver->solve())
           Solution::vector_to_solutions(solver->get_solution(),
-                                        Hermes::vector<Space *>(&space_mag_real, &space_mag_imag),
-                                        Hermes::vector<Solution *>(&sln_mag_real, &sln_mag_imag));
+                     Hermes::vector<Space *>(&space_mag_real, &space_mag_imag),
+                     Hermes::vector<Solution *>(&sln_mag_real, &sln_mag_imag));
       else
           error ("Matrix solver failed.\n");
 
-      info("max B %lf",maxB);
+      info("max B %lf, min el cond %lf, max el cond %lf",maxB, min_el_cond, max_el_cond);
 
       view_a.show(&afilter, HERMES_EPS_NORMAL);
-//      view_wj.show(&wjfilter, HERMES_EPS_NORMAL);
+      view_wj.show(&wjfilter, HERMES_EPS_NORMAL);
 
       info("Assembling the temperature stiffness matrix and right-hand side vector.");
       dp_temp.assemble(matrix_temp, rhs_temp);
@@ -300,13 +448,13 @@ int main(int argc, char* argv[])
       deformation_graph_time.add_values(2, current_time, sln_elast_r.get_pt_value(0.43, 0));
       deformation_graph_time.save("results/deformation_time.gnu");
 
-      GnuplotGraph loses_graph_axis("Joule loses on axis", "r", "temperature");
+      GnuplotGraph loses_graph_axis("Joule loses on axis", "r [m]", "temperature [°C]");
       loses_graph_axis.add_row();
 
-      GnuplotGraph deformation_graph_axis("Radial deformation on axis", "r", "temperature");
+      GnuplotGraph deformation_graph_axis("Radial deformation on axis", "r [m]", "temperature [°C]");
       deformation_graph_axis.add_row();
 
-      GnuplotGraph temp_graph_axis("Temperature on axis", "r", "temperature");
+      GnuplotGraph temp_graph_axis("Temperature on axis", "r [m]", "temperature [°C]");
       temp_graph_axis.add_row();
 
       for (double rr = 0.06; rr <= 0.43; rr+=0.005){

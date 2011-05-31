@@ -30,7 +30,7 @@
 
 #add_subdirectory(PXX-PavelKarban)
 
-add_subdirectory(PXX-actuator)
+#add_subdirectory(PXX-actuator)
 
 add_subdirectory(PXX-kotouc)
 
