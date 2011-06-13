@@ -342,9 +342,9 @@ void initTables()
     double data_electric_conductivity[] = { 5.70e6, 4.45e6, 3.36e6, 2.60e6, 2.05e6, 1.62e6, 1.32e6, 1.12e6, 1.01e6, 9.10e5, 8.90e5 };
 //    double temp_electric_conductivity[] = { 0, 1000 };
 //    double data_electric_conductivity[] = { 5e6, 5e6 };
-    electric_conductivity_fe.add(temp_electric_conductivity, data_electric_conductivity, 8);
+    electric_conductivity_fe.add(temp_electric_conductivity, data_electric_conductivity, 11);
 
-    // relative permeabilty temp
+    // relative permeabilty temp -nepouziva se
     double temp_relative_mag_permeability_temp[] = { 0, 100, 200, 300, 400, 500, 600, 700, 800, 10000 };
     double data_relative_mag_permeability_temp[] = { 2600, 2600, 2598, 2595, 2500, 2100, 1490, 750, 2, 1 };
     relative_mag_permeability_temp.add(temp_relative_mag_permeability_temp, data_relative_mag_permeability_temp, 10);
@@ -353,7 +353,7 @@ void initTables()
     // mi-B charackteristic
     double temp_relative_mag_permeability[] = { 1.2566370614359172e-07, 0.2402, 0.8654, 1.1106, 1.2458, 1.331, 1.5, 1.6, 1.683, 1.741, 1.78, 1.905, 2.025, 2.085, 2.13, 2.165, 2.28, 2.485, 2.585 };
     double data_relative_mag_permeability[] = { 1000.0, 1202.1703563104797, 2165.6082979831167, 1852.803771466027, 1558.7675165399623, 1332.2970393415892, 750.25900263307039, 400.01242373080828, 280.53809093387082, 217.63175928604289, 178.01671402763208, 95.25295840089872, 50.624981898320513, 34.750351479349241, 26.624990479857455, 21.650128290457886, 11.399995923769952, 6.2124977786334066, 5.1700046482110427 };
-    relative_mag_permeability.add(temp_relative_mag_permeability, data_relative_mag_permeability, 10);
+    relative_mag_permeability.add(temp_relative_mag_permeability, data_relative_mag_permeability, 19);
 
     // harmonic elmag. field
     magneticEdge = new MagneticEdge[NUM_EDGES];
@@ -366,11 +366,11 @@ void initTables()
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[3], &magneticLabel[1], &magneticLabel[2], &magneticLabel[4]), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vata
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[7], &magneticLabel[8], &magneticLabel[9], &magneticLabel[10], &magneticLabel[11], &magneticLabel[12],
                                                        &magneticLabel[13], &magneticLabel[14], &magneticLabel[15], &magneticLabel[16], &magneticLabel[17], &magneticLabel[18],
-                                                       &magneticLabel[19]), 4.2441e6, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vodice
+                                                       &magneticLabel[19]), 5*4.2441e6, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vodice
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[20], &magneticLabel[21], &magneticLabel[22], &magneticLabel[23], &magneticLabel[24],
                                                        &magneticLabel[25], &magneticLabel[26], &magneticLabel[27], &magneticLabel[28], &magneticLabel[29], &magneticLabel[30],
                                                        &magneticLabel[31], &magneticLabel[36], &magneticLabel[35], &magneticLabel[34], &magneticLabel[33],
-                                                       &magneticLabel[32]), 4.2441e6, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vodice pokracovani
+                                                       &magneticLabel[32]), 5.*4.2441e6, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vodice pokracovani
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[6]), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vzduch
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[37], &magneticLabel[38], &magneticLabel[39], &magneticLabel[40], &magneticLabel[41], &magneticLabel[42], &magneticLabel[43],
                                                        &magneticLabel[44], &magneticLabel[45], &magneticLabel[46], &magneticLabel[47], &magneticLabel[48], &magneticLabel[49], &magneticLabel[50],

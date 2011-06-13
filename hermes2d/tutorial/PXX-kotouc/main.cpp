@@ -25,10 +25,10 @@
 
 const bool HERMES_VISUALIZATION = true;           // Set to "false" to suppress Hermes OpenGL visualization. 
 const bool VTK_VISUALIZATION = false;              // Set to "true" to enable VTK output.
-const int P_MAG_INIT = 3;                             // Uniform polynomial degree of mesh elements.
+const int P_MAG_INIT = 2;                             // Uniform polynomial degree of mesh elements.
 const int P_TEMP_INIT = 2;
 const int P_ELAST_INIT = 2;
-const int INIT_REF_NUM = 1;                       // Number of initial uniform mesh refinements.
+const int INIT_REF_NUM = 0;                       // Number of initial uniform mesh refinements.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
@@ -38,16 +38,16 @@ const double TEMP_INIT = 20.0;
 const double DK_INIT = 0.0;
 
 const double TIME_STEP = 1.0;
-const double TIME_FINAL = 800.0;
+const double TIME_FINAL = 60.0;
 
-const double frequency = 5000;
+const double frequency = 50;
 
 std::string *str_marker;
 
 scalar maxB, max_el_cond, min_el_cond;
 
 //when true, parameters are taken as functions, otherwise constanst from tables
-const bool USE_NONLINEARITIES = true;
+const bool USE_NONLINEARITIES = false;
 
 
 #include "tables.cpp"
@@ -262,7 +262,9 @@ int main(int argc, char* argv[])
     std::cout << "ndof: " << ndof << std::endl;
 
     //adaptivity ?????
+
     //adapt_mesh(Hermes::vector<Space*>(&space_mag_real, &space_mag_imag), &wf);
+
 
 
     // Set up the solver, matrix, and rhs according to the solver selection.
@@ -366,12 +368,12 @@ int main(int argc, char* argv[])
     ScalarView disp_view("Displacement", new WinGeom(0, 0, 800, 400));
     DisplacementFilter disp_filter(Hermes::vector<MeshFunction*>(&sln_elast_r, &sln_elast_z));
 
-    GnuplotGraph temp_graph_time("Temperature/time", "time", "temperature");
+    GnuplotGraph temp_graph_time("Temperature/time", "time [s]", "temperature [{/Symbol°}C]");
     temp_graph_time.add_row("inner","k", "-");
     temp_graph_time.add_row("middle","k", "--");
     temp_graph_time.add_row("outer","k", ":");
 
-    GnuplotGraph deformation_graph_time("Deformation/time", "time", "radial deformation");
+    GnuplotGraph deformation_graph_time("Deformation/time", "time [s]", "radial deformation [m]");
     deformation_graph_time.add_row("inner","k", "-");
     deformation_graph_time.add_row("middle","k", "--");
     deformation_graph_time.add_row("outer","k", ":");
@@ -399,8 +401,10 @@ int main(int argc, char* argv[])
       info("max B %lf, min el cond %lf, max el cond %lf",maxB, min_el_cond, max_el_cond);
 
       view_a.show(&afilter, HERMES_EPS_NORMAL);
+
       view_b.show(&bfilter, HERMES_EPS_NORMAL);
 //      view_wj.show(&wjfilter, HERMES_EPS_NORMAL);
+
 
       info("Assembling the temperature stiffness matrix and right-hand side vector.");
       dp_temp.assemble(matrix_temp, rhs_temp);
@@ -449,13 +453,13 @@ int main(int argc, char* argv[])
       deformation_graph_time.add_values(2, current_time, sln_elast_r.get_pt_value(0.43, 0));
       deformation_graph_time.save("results/deformation_time.gnu");
 
-      GnuplotGraph loses_graph_axis("Joule loses on axis", "r", "temperature");
+      GnuplotGraph loses_graph_axis("Joule loses on axis", "r [m]", "temperature [{/Symbol°}C]");
       loses_graph_axis.add_row();
 
-      GnuplotGraph deformation_graph_axis("Radial deformation on axis", "r", "temperature");
+      GnuplotGraph deformation_graph_axis("Radial deformation on axis", "r [m]", "displacement [m]");
       deformation_graph_axis.add_row();
 
-      GnuplotGraph temp_graph_axis("Temperature on axis", "r", "temperature");
+      GnuplotGraph temp_graph_axis("Temperature on axis", "r [m]", "temperature [{/Symbol°}C]");
       temp_graph_axis.add_row();
 
       for (double rr = 0.06; rr <= 0.43; rr+=0.005){

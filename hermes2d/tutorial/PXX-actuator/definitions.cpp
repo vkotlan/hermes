@@ -340,15 +340,11 @@ private:
     GeomType gt;
 };
 
-<<<<<<< HEAD
-double prev_temp_set;
-const double NONLINEAR_PERMEABILITY = -1.;
-=======
-double prev_temp_set;  //TODO dat dovnitr, tady je to osklivy
 
+double prev_temp_set;
 // Nonlinear parameter, supposes that we consider only positive parameters !!!
 const double NONLINEAR_PARAMETER = -1.;
->>>>>>> d8fe1c104c1e235c51425ad6ff692d5fcbc73ad9
+
 
 class WeakFormMagnetic : public WeakForm
 {
@@ -434,6 +430,7 @@ private:
             Func<double>* sln_mag_r_prev = ext->fn[0];
             Func<double>* sln_mag_i_prev = ext->fn[1];
             Func<double>* sln_temp_prev = ext->fn[2];
+
 
             //            if (sln_temp_prev == NULL)
             //                info("sln temp je NULL");

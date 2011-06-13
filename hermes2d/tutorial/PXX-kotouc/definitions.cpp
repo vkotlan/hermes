@@ -487,7 +487,7 @@ private:
 
                 result += wt[i] / (MU0 * permeability) * (
                             u->dx[i] * v->dx[i] + u->dy[i] * v->dy[i] +
-                            u->val[i] * v->dx[i] / e->x[i]); //TODO pryc
+                            u->val[i] * v->dx[i] / e->x[i]); //TODO: pryc
                      //     (e->x[i] > 0) ? u->val[i] * v->dx[i] / e->x[i] : 0.0);
             }
             return result;

@@ -1,6 +1,6 @@
 <document>
     <problems>
-        <problem maxdofs="60000" adaptivitytolerance="1" id="0" analysistype="steadystate" initialcondition="0" linearitysteps="10" adaptivitysteps="1" linearity="linear" name="geom" date="2011-05-27" polynomialorder="2" meshtype="triangle" timestep="1" problemtype="axisymmetric" adaptivitytype="disabled" linearitytolerance="0.001" numberofrefinements="1" frequency="0" matrix_solver="umfpack" type="magnetic" timetotal="1">
+        <problem maxdofs="60000" adaptivitytolerance="1" id="0" analysistype="steadystate" initialcondition="0" linearitysteps="10" adaptivitysteps="1" linearity="linear" name="geom" date="2011-05-27" polynomialorder="2" meshtype="triangle" timestep="1" problemtype="axisymmetric" adaptivitytype="disabled" linearitytolerance="0.001" numberofrefinements="0" frequency="0" matrix_solver="umfpack" type="magnetic" timetotal="1">
             <scriptstartup></scriptstartup>
             <description></description>
             <edges>

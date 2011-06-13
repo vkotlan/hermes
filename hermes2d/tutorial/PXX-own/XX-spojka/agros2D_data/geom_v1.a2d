@@ -1,0 +1,158 @@
+<document>
+    <problems>
+        <problem maxdofs="60000" adaptivitytolerance="1" id="0" analysistype="steadystate" initialcondition="0" linearitysteps="10" adaptivitysteps="1" linearity="linear" name="nepojmenovaný" date="2011-06-07" polynomialorder="2" meshtype="triangle" timestep="1" problemtype="planar" adaptivitytype="disabled" linearitytolerance="0.001" numberofrefinements="1" frequency="0" matrix_solver="umfpack" type="magnetic" timetotal="1">
+            <scriptstartup></scriptstartup>
+            <description></description>
+            <edges>
+                <edge value_imag="0" type="magnetic_vector_potential" id="1" name="hranice" value_real="0"/>
+            </edges>
+            <labels>
+                <label current_density_real="0" remanence="0" conductivity="0" velocity_x="0" velocity_y="0" remanence_angle="0" id="1" name="vzduch" current_density_imag="0" permeability="1" velocity_angular="0"/>
+                <label current_density_real="0" remanence="0" conductivity="5e+06" velocity_x="0" velocity_y="0" remanence_angle="0" id="2" name="osa" current_density_imag="0" permeability="1" velocity_angular="0"/>
+                <label current_density_real="0" remanence="0" conductivity="0" velocity_x="0" velocity_y="0" remanence_angle="0" id="3" name="izolace" current_density_imag="0" permeability="1" velocity_angular="0"/>
+                <label current_density_real="0" remanence="0" conductivity="6e+06" velocity_x="0" velocity_y="0" remanence_angle="0" id="4" name="Fe_rozt" current_density_imag="0" permeability="2000" velocity_angular="0"/>
+                <label current_density_real="0" remanence="0" conductivity="2e+06" velocity_x="0" velocity_y="0" remanence_angle="0" id="5" name="Fe_nerozt" current_density_imag="0" permeability="350" velocity_angular="0"/>
+                <label current_density_real="0" remanence="0" conductivity="0" velocity_x="0" velocity_y="0" remanence_angle="0" id="6" name="magnet_vnitrni" current_density_imag="0" permeability="1" velocity_angular="0"/>
+                <label current_density_real="0" remanence="0" conductivity="0" velocity_x="0" velocity_y="0" remanence_angle="0" id="7" name="magnet_vnejsi_obal" current_density_imag="0" permeability="1" velocity_angular="0"/>
+                <label current_density_real="0" remanence="0" conductivity="0" velocity_x="0" velocity_y="0" remanence_angle="90" id="8" name="M_N" current_density_imag="0" permeability="1" velocity_angular="0"/>
+                <label current_density_real="0" remanence="0" conductivity="0" velocity_x="0" velocity_y="0" remanence_angle="45" id="9" name="M_NW" current_density_imag="0" permeability="1" velocity_angular="0"/>
+                <label current_density_real="0" remanence="0" conductivity="0" velocity_x="0" velocity_y="0" remanence_angle="0" id="10" name="M_W" current_density_imag="0" permeability="1" velocity_angular="0"/>
+                <label current_density_real="0" remanence="0" conductivity="0" velocity_x="0" velocity_y="0" remanence_angle="315" id="11" name="M_SW" current_density_imag="0" permeability="1" velocity_angular="0"/>
+                <label current_density_real="0" remanence="0" conductivity="0" velocity_x="0" velocity_y="0" remanence_angle="270" id="12" name="M_S" current_density_imag="0" permeability="1" velocity_angular="0"/>
+                <label current_density_real="0" remanence="0" conductivity="0" velocity_x="0" velocity_y="0" remanence_angle="225" id="13" name="M_SE" current_density_imag="0" permeability="1" velocity_angular="0"/>
+                <label current_density_real="0" remanence="0" conductivity="0" velocity_x="180" velocity_y="0" remanence_angle="0" id="14" name="M_E" current_density_imag="0" permeability="1" velocity_angular="0"/>
+                <label current_density_real="0" remanence="0" conductivity="0" velocity_x="135" velocity_y="0" remanence_angle="0" id="15" name="M_NE" current_density_imag="0" permeability="1" velocity_angular="0"/>
+            </labels>
+        </problem>
+    </problems>
+    <geometry>
+        <nodes>
+            <node x="0" y="-0.005" id="0"/>
+            <node x="0" y="0.005" id="1"/>
+            <node x="0" y="-0.007" id="2"/>
+            <node x="0" y="0.007" id="3"/>
+            <node x="0" y="-0.015" id="4"/>
+            <node x="0" y="0.015" id="5"/>
+            <node x="0" y="-0.016" id="6"/>
+            <node x="0" y="0.016" id="7"/>
+            <node x="0" y="-0.025" id="8"/>
+            <node x="0" y="0.025" id="9"/>
+            <node x="0" y="-0.0255" id="10"/>
+            <node x="0" y="0.0255" id="11"/>
+            <node x="0" y="-0.035" id="12"/>
+            <node x="0" y="0.035" id="13"/>
+            <node x="0" y="-0.037" id="14"/>
+            <node x="0" y="0.037" id="15"/>
+            <node x="0" y="-0.052" id="16"/>
+            <node x="0" y="0.052" id="17"/>
+            <node x="0" y="-0.3" id="18"/>
+            <node x="0" y="0.3" id="19"/>
+            <node x="-0.01388765030130075" y="0.038" id="20"/>
+            <node x="0.01388765030130075" y="0.038" id="21"/>
+            <node x="-0.01388765030130075" y="0.04882326633718607" id="22"/>
+            <node x="0.01388765030130075" y="0.04882326633718607" id="23"/>
+            <node x="0.01763579241991856" y="0.03569010938788596" id="24"/>
+            <node x="0.03869010938788597" y="0.01663579241991855" id="25"/>
+            <node x="0.02270321100390401" y="0.04475752797187142" id="26"/>
+            <node x="0.04375752797187142" y="0.02570321100390401" id="27"/>
+            <node x="0.038" y="0.01388765030130075" id="28"/>
+            <node x="0.038" y="-0.01388765030130075" id="29"/>
+            <node x="0.04882326633718607" y="-0.01388765030130075" id="30"/>
+            <node x="0.04882326633718607" y="0.01388765030130075" id="31"/>
+            <node x="0.01763579241991856" y="-0.03569010938788596" id="32"/>
+            <node x="0.03869010938788597" y="-0.01663579241991855" id="33"/>
+            <node x="0.02270321100390401" y="-0.04475752797187142" id="34"/>
+            <node x="0.04375752797187142" y="-0.02570321100390401" id="35"/>
+            <node x="-0.01388765030130075" y="-0.038" id="36"/>
+            <node x="0.01388765030130075" y="-0.038" id="37"/>
+            <node x="-0.01388765030130075" y="-0.04882326633718607" id="38"/>
+            <node x="0.01388765030130075" y="-0.04882326633718607" id="39"/>
+            <node x="-0.01763579241991856" y="-0.03569010938788596" id="40"/>
+            <node x="-0.03869010938788597" y="-0.01663579241991855" id="41"/>
+            <node x="-0.02270321100390401" y="-0.04475752797187142" id="42"/>
+            <node x="-0.04375752797187142" y="-0.02570321100390401" id="43"/>
+            <node x="-0.038" y="0.01388765030130075" id="44"/>
+            <node x="-0.038" y="-0.01388765030130075" id="45"/>
+            <node x="-0.04882326633718607" y="-0.01388765030130075" id="46"/>
+            <node x="-0.04882326633718607" y="0.01388765030130075" id="47"/>
+            <node x="-0.01763579241991856" y="0.03569010938788596" id="48"/>
+            <node x="-0.03869010938788597" y="0.01663579241991855" id="49"/>
+            <node x="-0.02270321100390401" y="0.04475752797187142" id="50"/>
+            <node x="-0.04375752797187142" y="0.02570321100390401" id="51"/>
+        </nodes>
+        <edges>
+            <edge end="1" refine_towards="0" marker="0" id="0" start="0" angle="180"/>
+            <edge end="0" refine_towards="0" marker="0" id="1" start="1" angle="180"/>
+            <edge end="3" refine_towards="0" marker="0" id="2" start="2" angle="180"/>
+            <edge end="2" refine_towards="0" marker="0" id="3" start="3" angle="180"/>
+            <edge end="5" refine_towards="0" marker="0" id="4" start="4" angle="180"/>
+            <edge end="4" refine_towards="0" marker="0" id="5" start="5" angle="180"/>
+            <edge end="7" refine_towards="0" marker="0" id="6" start="6" angle="180"/>
+            <edge end="6" refine_towards="0" marker="0" id="7" start="7" angle="180"/>
+            <edge end="9" refine_towards="0" marker="0" id="8" start="8" angle="180"/>
+            <edge end="8" refine_towards="0" marker="0" id="9" start="9" angle="180"/>
+            <edge end="11" refine_towards="0" marker="0" id="10" start="10" angle="180"/>
+            <edge end="10" refine_towards="0" marker="0" id="11" start="11" angle="180"/>
+            <edge end="13" refine_towards="0" marker="0" id="12" start="12" angle="180"/>
+            <edge end="12" refine_towards="0" marker="0" id="13" start="13" angle="180"/>
+            <edge end="15" refine_towards="0" marker="0" id="14" start="14" angle="180"/>
+            <edge end="14" refine_towards="0" marker="0" id="15" start="15" angle="180"/>
+            <edge end="17" refine_towards="0" marker="0" id="16" start="16" angle="180"/>
+            <edge end="16" refine_towards="0" marker="0" id="17" start="17" angle="180"/>
+            <edge end="19" refine_towards="0" marker="1" id="18" start="18" angle="180"/>
+            <edge end="18" refine_towards="0" marker="1" id="19" start="19" angle="180"/>
+            <edge end="21" refine_towards="0" marker="0" id="20" start="20" angle="0"/>
+            <edge end="23" refine_towards="0" marker="0" id="21" start="22" angle="0"/>
+            <edge end="22" refine_towards="0" marker="0" id="22" start="20" angle="0"/>
+            <edge end="23" refine_towards="0" marker="0" id="23" start="21" angle="0"/>
+            <edge end="25" refine_towards="0" marker="0" id="24" start="24" angle="0"/>
+            <edge end="27" refine_towards="0" marker="0" id="25" start="26" angle="0"/>
+            <edge end="26" refine_towards="0" marker="0" id="26" start="24" angle="0"/>
+            <edge end="27" refine_towards="0" marker="0" id="27" start="25" angle="0"/>
+            <edge end="29" refine_towards="0" marker="0" id="28" start="28" angle="0"/>
+            <edge end="31" refine_towards="0" marker="0" id="29" start="30" angle="0"/>
+            <edge end="31" refine_towards="0" marker="0" id="30" start="28" angle="0"/>
+            <edge end="30" refine_towards="0" marker="0" id="31" start="29" angle="0"/>
+            <edge end="33" refine_towards="0" marker="0" id="32" start="32" angle="0"/>
+            <edge end="35" refine_towards="0" marker="0" id="33" start="34" angle="0"/>
+            <edge end="34" refine_towards="0" marker="0" id="34" start="32" angle="0"/>
+            <edge end="35" refine_towards="0" marker="0" id="35" start="33" angle="0"/>
+            <edge end="37" refine_towards="0" marker="0" id="36" start="36" angle="0"/>
+            <edge end="39" refine_towards="0" marker="0" id="37" start="38" angle="0"/>
+            <edge end="38" refine_towards="0" marker="0" id="38" start="36" angle="0"/>
+            <edge end="39" refine_towards="0" marker="0" id="39" start="37" angle="0"/>
+            <edge end="41" refine_towards="0" marker="0" id="40" start="40" angle="0"/>
+            <edge end="43" refine_towards="0" marker="0" id="41" start="42" angle="0"/>
+            <edge end="42" refine_towards="0" marker="0" id="42" start="40" angle="0"/>
+            <edge end="43" refine_towards="0" marker="0" id="43" start="41" angle="0"/>
+            <edge end="45" refine_towards="0" marker="0" id="44" start="44" angle="0"/>
+            <edge end="47" refine_towards="0" marker="0" id="45" start="46" angle="0"/>
+            <edge end="47" refine_towards="0" marker="0" id="46" start="44" angle="0"/>
+            <edge end="46" refine_towards="0" marker="0" id="47" start="45" angle="0"/>
+            <edge end="49" refine_towards="0" marker="0" id="48" start="48" angle="0"/>
+            <edge end="51" refine_towards="0" marker="0" id="49" start="50" angle="0"/>
+            <edge end="50" refine_towards="0" marker="0" id="50" start="48" angle="0"/>
+            <edge end="51" refine_towards="0" marker="0" id="51" start="49" angle="0"/>
+        </edges>
+        <labels>
+            <label x="-0.176" y="0" polynomialorder="0" marker="1" id="0" area="0"/>
+            <label x="-0.05" y="0" polynomialorder="0" marker="7" id="1" area="0"/>
+            <label x="-0.036" y="0" polynomialorder="0" marker="1" id="2" area="0"/>
+            <label x="-0.03025" y="0" polynomialorder="0" marker="5" id="3" area="0"/>
+            <label x="-0.02525" y="0" polynomialorder="0" marker="1" id="4" area="0"/>
+            <label x="-0.0205" y="0" polynomialorder="0" marker="4" id="5" area="0"/>
+            <label x="-0.0155" y="0" polynomialorder="0" marker="1" id="6" area="0"/>
+            <label x="-0.011" y="0" polynomialorder="0" marker="6" id="7" area="0"/>
+            <label x="-0.006" y="0" polynomialorder="0" marker="3" id="8" area="0"/>
+            <label x="-0.0025" y="0" polynomialorder="0" marker="2" id="9" area="0"/>
+            <label x="0" y="0.04341163316859303" polynomialorder="0" marker="8" id="10" area="0"/>
+            <label x="0.03142653014589411" y="0.03142653014589411" polynomialorder="0" marker="9" id="11" area="0"/>
+            <label x="0.04341163316859303" y="0" polynomialorder="0" marker="10" id="12" area="0"/>
+            <label x="0.03142653014589411" y="-0.03142653014589411" polynomialorder="0" marker="11" id="13" area="0"/>
+            <label x="0" y="-0.04341163316859303" polynomialorder="0" marker="12" id="14" area="0"/>
+            <label x="-0.03142653014589411" y="-0.03142653014589411" polynomialorder="0" marker="13" id="15" area="0"/>
+            <label x="-0.04341163316859303" y="0" polynomialorder="0" marker="14" id="16" area="0"/>
+            <label x="-0.03142653014589411" y="0.03142653014589411" polynomialorder="0" marker="15" id="17" area="0"/>
+        </labels>
+    </geometry>
+</document>

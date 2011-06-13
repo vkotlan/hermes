@@ -228,7 +228,6 @@ int main(int argc, char* argv[])
 
       maxB = -10000;
 
-
       if(ts == 2)
           wf.push_previous_temperature(&sln_temp);
 
@@ -242,9 +241,7 @@ int main(int argc, char* argv[])
       else
           error ("Matrix solver failed.\n");
 
-
       info("max B %lf",maxB);
-
 
       view_a.show(&afilter, HERMES_EPS_NORMAL);
       view_wj.show(&wjfilter, HERMES_EPS_NORMAL);
