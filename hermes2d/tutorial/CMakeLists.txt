@@ -7,14 +7,14 @@
 # Time-dependent problems
 add_subdirectory(P03-timedep)
 # 
-# # Adaptivity for linear problems
-# add_subdirectory(P04-linear-adapt)
+# Adaptivity for linear problems
+add_subdirectory(P04-linear-adapt)
+
+# Adaptivity for nonlinear problems
+add_subdirectory(P05-nonlinear-adapt)
 # 
-# # Adaptivity for nonlinear problems
-# add_subdirectory(P05-nonlinear-adapt)
-# 
-# # Adaptivity for time-dependent problems
-# add_subdirectory(P06-timedep-adapt)
+# Adaptivity for time-dependent problems
+add_subdirectory(P06-timedep-adapt)
 # 
 # # Eigenproblems
 # add_subdirectory(P07-eigen)
@@ -28,7 +28,8 @@ add_subdirectory(P03-timedep)
 # # Miscellaneous techniques
 # add_subdirectory(P10-miscellaneous)
 
-add_subdirectory(PXX-PavelKarban)
-add_subdirectory(PXX-actuator)
+
 add_subdirectory(PXX-own)
+
+add_subdirectory(PXX-kotouc)
 

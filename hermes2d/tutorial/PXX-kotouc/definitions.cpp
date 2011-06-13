@@ -194,6 +194,54 @@ public:
     inline scalar get_pt_value(double x, double y, int item) { error("Not implemented"); return 0;}
 };
 
+class BFilter : public Filter
+{
+public:
+    BFilter(MeshFunction* slnr, MeshFunction* slni)
+    {
+        num = 2;
+
+        sln[0] = slnr;
+        sln[1] = slni;
+
+        init();
+    }
+
+    inline void precalculate(int order, int mask)
+    {
+        Quad2D* quad = quads[cur_quad];
+        int np = quad->get_num_points(order);
+        Node* node = new_node(H2D_FN_DEFAULT, np);
+
+        double *dudx1, *dudy1, *dudx2, *dudy2;
+
+        sln[0]->set_quad_order(order, H2D_FN_VAL | H2D_FN_DX | H2D_FN_DY);
+        sln[0]->get_dx_dy_values(dudx1, dudy1);
+
+        sln[1]->set_quad_order(order, H2D_FN_VAL | H2D_FN_DX | H2D_FN_DY);
+        sln[1]->get_dx_dy_values(dudx2, dudy2);
+
+        update_refmap();
+
+        double *x = refmap->get_phys_x(order);
+        Element *e = refmap->get_active_element();
+
+        for (int i = 0; i < np; i++)
+        {
+                node->values[0][0][i] = x[i] * sqrt(sqr(dudx1[i]) + sqr(dudy1[i]) + sqr(dudx2[i]) + sqr(dudy2[i]));
+        }
+
+        if(nodes->present(order)) {
+          assert(nodes->get(order) == cur_node);
+          ::free(nodes->get(order));
+        }
+        nodes->add(node, order);
+        cur_node = node;
+    }
+
+    inline scalar get_pt_value(double x, double y, int item) { error("Not implemented"); return 0;}
+};
+
 class CustomVectorFormTimeDep : public WeakForm::VectorFormVol
 {
 public:
@@ -340,15 +388,10 @@ private:
     GeomType gt;
 };
 
-<<<<<<< HEAD
-double prev_temp_set;
-const double NONLINEAR_PERMEABILITY = -1.;
-=======
 double prev_temp_set;  //TODO dat dovnitr, tady je to osklivy
 
 // Nonlinear parameter, supposes that we consider only positive parameters !!!
 const double NONLINEAR_PARAMETER = -1.;
->>>>>>> d8fe1c104c1e235c51425ad6ff692d5fcbc73ad9
 
 class WeakFormMagnetic : public WeakForm
 {
@@ -359,16 +402,14 @@ public:
     {
         for(std::vector<int>::iterator it = labels.begin(); it != labels.end(); ++it) {
             double perm = magneticLabel[*it].permeability;
-
             if (USE_NONLINEARITIES && (zelezoLabels.find_index(*it, false) != -1))
                 perm = NONLINEAR_PARAMETER;
 
             double cond = magneticLabel[*it].conductivity;
-            if (USE_NONLINEARITIES && (vodiveZelezoMosazLabels.find_index(*it, false) != -1))
+            if (USE_NONLINEARITIES && (zelezoLabels.find_index(*it, false) != -1))
                 cond = NONLINEAR_PARAMETER;
 
             add_magnetic_material(str_marker[*it], perm, cond, magneticLabel[*it].current_density_real, prev_mag_r_sln, prev_mag_i_sln, prev_temp_sln);
-
         }
         prev_temp_set = false;
     }
@@ -430,7 +471,6 @@ private:
         virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *u, Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const {
            // return matrix_form<double, scalar>(n, wt, u_ext, u, v, e, ext);
 
-
             Func<double>* sln_mag_r_prev = ext->fn[0];
             Func<double>* sln_mag_i_prev = ext->fn[1];
             Func<double>* sln_temp_prev = ext->fn[2];
@@ -443,9 +483,7 @@ private:
                 scalar B = sqrt(sqr(sln_mag_r_prev->dx[i]) + sqr(sln_mag_r_prev->dy[i]) + sqr(sln_mag_i_prev->dx[i]) + sqr(sln_mag_i_prev->dy[i]));
                 if(B>maxB) maxB = B;
                 scalar T = (prev_temp_set) ? sln_temp_prev->val[i] : TEMP_INIT;
-
                 scalar permeability = (permeability_const == NONLINEAR_PARAMETER) ? permeability_function(B,T) : permeability_const;
-
 
                 result += wt[i] / (MU0 * permeability) * (
                             u->dx[i] * v->dx[i] + u->dy[i] * v->dy[i] +
@@ -465,7 +503,6 @@ private:
         double permeability_const;
     };
 
-
     class CustomMatrixFormCond : public WeakForm::MatrixFormVol
     {
     public:
@@ -479,6 +516,8 @@ private:
             for (int i = 0; i < n; i++){
                 scalar T = (prev_temp_set) ? sln_temp_prev->val[i] : TEMP_INIT;
                 scalar conductivity = (conductivity_const == NONLINEAR_PARAMETER) ? electric_conductivity_fe.value(T) : conductivity_const;
+                if(conductivity > max_el_cond) max_el_cond = conductivity;
+                if(conductivity < min_el_cond) min_el_cond = conductivity;
                 result += wt[i] * conductivity * u->val[i] * v->val[i];
             }
             return coeff * result;
@@ -493,7 +532,6 @@ private:
     private:
         double coeff, conductivity_const;
     };
-
 
 };
 
@@ -554,7 +592,7 @@ private:
     {
     public:
         CustomNonlinearDiffusion(int i, int j, std::string marker, double thermal_conductivity_const)
-            : WeakForm::MatrixFormVol(i, j, marker, HERMES_NONSYM), thermal_conductivity_const(thermal_conductivity_const) {};
+            : WeakForm::MatrixFormVol(i, j, marker, HERMES_SYM), thermal_conductivity_const(thermal_conductivity_const) {};
 
         template<typename Real, typename Scalar>
         Scalar matrix_form(int n, double *wt, Func<Real> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
