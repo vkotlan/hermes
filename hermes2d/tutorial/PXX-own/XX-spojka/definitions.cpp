@@ -697,13 +697,8 @@ private:
              Scalar result = 0;
 
              for (int i = 0; i < n; i++)
-                 result += wt[i] * (lambda * (u->dx[i] * v->dx[i] +
-                                                        u->val[i]/1.0 * v->dx[i] +
-                                                        u->dx[i] * v->val[i]/1.0 +
-                                                        1/sqr(u->val[i] * v->val[i]) +
-                                    mu * (2 * u->dx[i] * v->dx[i] +
-                                                    2 * 1/sqr(u->val[i] * v->val[i] +
-                                                    u->dy[i] * v->dy[i]));
+                 result += wt[i] * ((2.0 * mu + lambda) * (u->dx[i] * v->dx[i]) +
+                                    mu * ( u->dy[i] * v->dy[i]));
              return result;
          }
 
@@ -729,9 +724,8 @@ private:
          Scalar matrix_form_x_y(int n, double *wt, Func<Real> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
              Scalar result = 0;
              for (int i = 0; i < n; i++)
-                 result += wt[i] * (lambda * (u->dy[i] * v->dx[i] +
-                                                        u->dy[i] * v->val[i]/1.0) +
-                                    mu * u->dx[i] * v->dy[i]);
+                 result += wt[i] * (lambda * (u->dx[i] * v->dy[i]) +
+                                    mu * (u->dy[i] * v->dx[i]));
              return result;
          }
 
@@ -757,9 +751,8 @@ private:
          Scalar matrix_form_y_y(int n, double *wt, Func<Real> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
              Scalar result = 0;
              for (int i = 0; i < n; i++)
-                 result += wt[i] * (lambda * (u->dy[i] * v->dy[i]) +
-                                    mu * (u->dx[i] * v->dx[i] +
-                                                    2 * u->dy[i] * v->dy[i]));
+                 result += wt[i] * ((2 * mu + lambda) * (u->dy[i] * v->dy[i]) +
+                                    mu * (u->dx[i] * v->dx[i]));
              return result;
          }
 
@@ -778,7 +771,7 @@ private:
     class CustomVectorFormX : public WeakForm::VectorFormVol
     {
     public:
-         CustomVectorFormR(int i, std::string marker, double lambda, double mu, double expansion)
+         CustomVectorFormX(int i, std::string marker, double lambda, double mu, double expansion)
              : WeakForm::VectorFormVol(i, marker), lambda(lambda), mu(mu), expansion(expansion) {}
 
          template<typename Real, typename Scalar>
@@ -810,7 +803,7 @@ private:
     class CustomVectorFormY : public WeakForm::VectorFormVol
     {
     public:
-         CustomVectorFormZ(int i, std::string marker, double lambda, double mu, double expansion)
+         CustomVectorFormY(int i, std::string marker, double lambda, double mu, double expansion)
              : WeakForm::VectorFormVol(i, marker), lambda(lambda), mu(mu), expansion(expansion) {}
 
          template<typename Real, typename Scalar>

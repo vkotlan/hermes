@@ -28,7 +28,7 @@ const bool VTK_VISUALIZATION = false;              // Set to "true" to enable VT
 const int P_MAG_INIT = 2;                             // Uniform polynomial degree of mesh elements.
 const int P_TEMP_INIT = 2;
 const int P_ELAST_INIT = 2;
-const int INIT_REF_NUM = 3;                       // Number of initial uniform mesh refinements.
+const int INIT_REF_NUM = 2;                       // Number of initial uniform mesh refinements.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
@@ -220,6 +220,7 @@ int main(int argc, char* argv[])
 //    VonMisesFilter stress_filter(Hermes::vector<MeshFunction*>(&sln_elast_r, &sln_elast_z), elasticityLabel[0].lambda(), elasticityLabel[0].mu());
 //    stress_view.show_mesh(false);
     ScalarView disp_view("Displacement", new WinGeom(0, 0, 800, 400));
+
     DisplacementFilter disp_filter(Hermes::vector<MeshFunction*>(&sln_elast_r, &sln_elast_z));
     char obrB[50], obrWj[50], obrT[50], obrDisp[50];
     int k=5;
@@ -308,6 +309,47 @@ int main(int argc, char* argv[])
           sprintf(obrDisp, "screenshot_displacement_%d.bmp",ts);
           disp_view.save_screenshot(obrDisp);
       }
+
+      // SAVING DATA  - T and displacement on axis z
+
+      if(ts % k == 0) {
+
+          int N = 100;
+          FILE *f0, *f1;
+          char fn0[50], fn1[50];
+          sprintf(fn0, "chart_T_%d.dat", ts);
+          sprintf(fn1, "chart_displ_%d.dat", ts);
+          f0 = fopen(fn0, "w");
+          f1 = fopen(fn1, "w");
+
+          double rs = 0.0;
+          double zsT = 0.022;
+          double zsu = 0.225;
+
+          double re = 0.0;
+          double zeT = 0.364;
+          double zeu = 0.364;
+
+
+          for (int k = 0; k <= N; k++)
+              {
+                  double rr = rs + k * (re - rs)/(double) N;
+                  double zzT = zsT + k * (zeT - zsT)/(double) N;
+                  double zzu = zsu + k * (zeu - zsu)/(double) N;
+
+                  double T = sln_temp.get_pt_value(rr, zzT);
+                  double u = sln_elast_z.get_pt_value(rr, zzu);
+                  fprintf(f0, "%3.5e\t%3.5e\n", zzT, T);
+                  fprintf(f1, "%3.5e\t%3.5e\n", zzu, u);
+              }
+              fclose(f0);
+              fclose(f1);
+      }
+
+
+
+
+
       // Increase current time and time step counter.
       current_time += TIME_STEP;
       ts++;
