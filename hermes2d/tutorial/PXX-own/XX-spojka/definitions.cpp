@@ -559,8 +559,8 @@ public:
 
     void add_temperature_edge(std::string marker, double flux, double h, double ext_temp)
     {
-        add_matrix_form_surf(new DefaultMatrixFormSurf(0, 0, marker, h, HERMES_AXISYM_Y));
-        add_vector_form_surf(new DefaultVectorFormSurf(0, marker, flux + h * ext_temp, HERMES_AXISYM_Y));
+        add_matrix_form_surf(new DefaultMatrixFormSurf(0, 0, marker, h, HERMES_PLANAR));
+        add_vector_form_surf(new DefaultVectorFormSurf(0, marker, flux + h * ext_temp, HERMES_PLANAR));
     }
 
     void add_temperature_material(std::string marker, double thermal_conductivity, double volume_heat, double density, double specific_heat, Solution* prev_time_sln, Filter* joule_loses)
@@ -569,7 +569,7 @@ public:
 
         // Contribution of the time derivative term.
         /// TODO NONSYM
-        add_matrix_form(new DefaultLinearMass(0, 0, marker, density * specific_heat / time_step, HERMES_SYM, HERMES_AXISYM_Y));
+        add_matrix_form(new DefaultLinearMass(0, 0, marker, density * specific_heat / time_step, HERMES_SYM, HERMES_PLANAR));
 
         // Contribution of the diffusion term.
         /// TODO NONSYM

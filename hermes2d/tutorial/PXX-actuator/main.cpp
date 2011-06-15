@@ -37,8 +37,8 @@ const double A_INIT = 0.0;
 const double TEMP_INIT = 20.0;
 const double DK_INIT = 0.0;
 
-const double TIME_STEP = 0.1;
-const double TIME_FINAL = 20.;
+const double TIME_STEP = 1.;
+const double TIME_FINAL = 60.;
 
 const double frequency = 5000;
 
@@ -130,10 +130,12 @@ int main(int argc, char* argv[])
     DiscreteProblem dp(&wf, Hermes::vector<Space *>(&space_mag_real, &space_mag_imag));
 
     WjFilter wjfilter(&sln_mag_real, &sln_mag_imag);
+    BFilter bfilter(&sln_mag_real, &sln_mag_imag);
     MagneticVectorPotentialFilter afilter(&sln_mag_real);
 
     // Visualize the solution.
     ScalarView view_a("Ar - real", new WinGeom(0, 0, 440, 750));
+    ScalarView view_b("Size of B", new WinGeom(0, 0, 440, 750));
     ScalarView view_wj("wj", new WinGeom(450, 0, 440, 750));
     //view_wj.set_min_max_range(-0.000001, 0.000001);
  //   View::wait();
@@ -219,7 +221,8 @@ int main(int argc, char* argv[])
 //    stress_view.show_mesh(false);
     ScalarView disp_view("Displacement", new WinGeom(0, 0, 800, 400));
     DisplacementFilter disp_filter(Hermes::vector<MeshFunction*>(&sln_elast_r, &sln_elast_z));
-
+    char obrB[50], obrWj[50], obrT[50], obrDisp[50];
+    int k=5;
     // Time stepping:
     int ts = 1;
     do
@@ -244,7 +247,17 @@ int main(int argc, char* argv[])
       info("max B %lf",maxB);
 
       view_a.show(&afilter, HERMES_EPS_NORMAL);
+      view_b.show(&bfilter, HERMES_EPS_NORMAL);
+      if(ts % k == 0) {
+          sprintf(obrB, "screenshot_magnetic_flux_%d.bmp",ts);
+          view_b.save_screenshot(obrB);
+      }
       view_wj.show(&wjfilter, HERMES_EPS_NORMAL);
+
+      if(ts % k == 0) {
+          sprintf(obrWj, "screenshot_losses_%d.bmp",ts);
+          view_wj.save_screenshot(obrWj);
+      }
 
       info("Assembling the temperature stiffness matrix and right-hand side vector.");
       dp_temp.assemble(matrix_temp, rhs_temp);
@@ -256,9 +269,14 @@ int main(int argc, char* argv[])
 
       // Visualize the solution.
       char title[100];
-      sprintf(title, "Temperature, Time %3.2f s", current_time);
+      sprintf(title, "Temperature, Time %3.2f s", current_time+TIME_STEP);
       Tview.set_title(title);
       Tview.show(&sln_temp, HERMES_EPS_NORMAL, H2D_FN_VAL_0);
+
+      if(ts % k == 0) {
+          sprintf(obrT, "screenshot_temperatur_%d.bmp",ts);
+          Tview.save_screenshot(obrT);
+      }
     //  Tview.wait();
 
       info("Assembling the elastic stiffness matrix and right-hand side vector.");
@@ -286,7 +304,10 @@ int main(int argc, char* argv[])
 //      stress_view.show(&stress_filter, HERMES_EPS_LOW, H2D_FN_VAL_0, &sln_elast_r, &sln_elast_z, 1.5e5);
 //      disp_view.show(&disp_filter);//, HERMES_EPS_LOW, H2D_FN_VAL_0, &sln_elast_r, &sln_elast_z, 1.5e5);
       disp_view.show(&disp_filter, HERMES_EPS_HIGH, H2D_FN_VAL_0, &sln_elast_r, &sln_elast_z, 5e2);
-
+      if(ts % k == 0) {
+          sprintf(obrDisp, "screenshot_displacement_%d.bmp",ts);
+          disp_view.save_screenshot(obrDisp);
+      }
       // Increase current time and time step counter.
       current_time += TIME_STEP;
       ts++;

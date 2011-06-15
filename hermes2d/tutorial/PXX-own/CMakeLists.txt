@@ -4,4 +4,4 @@
 add_subdirectory(XX-kotouc)
 
 
-#add_subdirectory(XX-actuator)
+#add_subdirectory(XX-spojka)
