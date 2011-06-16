@@ -236,13 +236,15 @@ int main(int argc, char* argv[])
     }
 
      Solution sln_mag_real(&mesh_mag, A_INIT);
-     Solution sln_mag_imag(&mesh_mag, A_INIT);;
+    // VK // Solution sln_mag_imag(&mesh_mag, A_INIT);;
      Solution sln_temp(&mesh_temp, TEMP_INIT);
      DoNothingFilter filter_temp(&sln_temp);
 
     // Initialize the weak formulation.
-    WeakFormMagnetic wf(2);
-    wf.registerForms(magneticLabels, &sln_mag_real, &sln_mag_imag, &filter_temp);
+    // VK // WeakFormMagnetic wf(2);
+    WeakFormMagnetic wf(1);
+    // VK // wf.registerForms(magneticLabels, &sln_mag_real, &sln_mag_imag, &filter_temp);
+    wf.registerForms(magneticLabels, &sln_mag_real, &filter_temp);
 
     // Initialize boundary conditions.
     EssentialBCs bcs_mag;
@@ -256,9 +258,10 @@ int main(int argc, char* argv[])
 
     // Create an H1 space with default shapeset.
     H1Space space_mag_real(&mesh_mag, &bcs_mag, P_MAG_INIT);
-    H1Space space_mag_imag(&mesh_mag, &bcs_mag, P_MAG_INIT);
+    // VK // H1Space space_mag_imag(&mesh_mag, &bcs_mag, P_MAG_INIT);
     // ndof
-    int ndof = Space::get_num_dofs(Hermes::vector<Space *>(&space_mag_real, &space_mag_imag));
+    // VK // int ndof = Space::get_num_dofs(Hermes::vector<Space *>(&space_mag_real, &space_mag_imag));
+    int ndof = Space::get_num_dofs(Hermes::vector<Space *>(&space_mag_real));
     std::cout << "ndof: " << ndof << std::endl;
 
     //adaptivity ?????
@@ -273,11 +276,14 @@ int main(int argc, char* argv[])
     Solver* solver = create_linear_solver(matrix_solver, matrix, rhs);
 
     // Initialize the FE problem.
-    DiscreteProblem dp(&wf, Hermes::vector<Space *>(&space_mag_real, &space_mag_imag));
+    // VK // DiscreteProblem dp(&wf, Hermes::vector<Space *>(&space_mag_real, &space_mag_imag));
+    DiscreteProblem dp(&wf, Hermes::vector<Space *>(&space_mag_real));
 
-    WjFilter wjfilter(&sln_mag_real, &sln_mag_imag);
+    // VK // WjFilter wjfilter(&sln_mag_real, &sln_mag_imag);
+    WjFilter wjfilter(&sln_mag_real);
     MagneticVectorPotentialFilter afilter(&sln_mag_real);
-    BFilter bfilter(&sln_mag_real, &sln_mag_imag);
+    // VK // BFilter bfilter(&sln_mag_real, &sln_mag_imag);
+    BFilter bfilter(&sln_mag_real);
 
     // Visualize the solution.
     ScalarView view_a("Ar - real", new WinGeom(0, 0, 440, 750));
@@ -393,8 +399,8 @@ int main(int argc, char* argv[])
 
       if (solver->solve())
           Solution::vector_to_solutions(solver->get_solution(),
-                     Hermes::vector<Space *>(&space_mag_real, &space_mag_imag),
-                     Hermes::vector<Solution *>(&sln_mag_real, &sln_mag_imag));
+                     Hermes::vector<Space *>(&space_mag_real),
+                     Hermes::vector<Solution *>(&sln_mag_real));
       else
           error ("Matrix solver failed.\n");
 

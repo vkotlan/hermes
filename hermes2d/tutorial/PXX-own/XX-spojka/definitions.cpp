@@ -136,12 +136,12 @@ public:
 class WjFilter : public Filter
 {
 public:
-    WjFilter(MeshFunction* slnr, MeshFunction* slni)
+    WjFilter(MeshFunction* slnr)
     {
-        num = 2;
+        num = 1;
 
         sln[0] = slnr;
-        sln[1] = slni;
+
 
         init();
     }
@@ -152,16 +152,12 @@ public:
         int np = quad->get_num_points(order);
         Node* node = new_node(H2D_FN_DEFAULT, np);
 
-        double *dudx1, *dudy1, *dudx2, *dudy2;
-        double *value1, *value2;
+        double *dudx1, *dudy1;
+        double *value1;
 
         sln[0]->set_quad_order(order, H2D_FN_VAL | H2D_FN_DX | H2D_FN_DY);
         sln[0]->get_dx_dy_values(dudx1, dudy1);
         value1 = sln[0]->get_fn_values();
-
-        sln[1]->set_quad_order(order, H2D_FN_VAL | H2D_FN_DX | H2D_FN_DY);
-        sln[1]->get_dx_dy_values(dudx2, dudy2);
-        value2 = sln[1]->get_fn_values();
 
         update_refmap();
 
@@ -175,7 +171,6 @@ public:
         {
             if(magneticLabel[marker].conductivity > 0.0){
                 node->values[0][0][i] = 0.5 / magneticLabel[marker].conductivity * (
-                    sqr(2 * M_PI * frequency * magneticLabel[marker].conductivity * value2[i]) +
                     sqr(2 * M_PI * frequency * magneticLabel[marker].conductivity * value1[i]));
             }
             else
@@ -197,12 +192,12 @@ public:
 class BFilter : public Filter
 {
 public:
-    BFilter(MeshFunction* slnr, MeshFunction* slni)
+    BFilter(MeshFunction* slnr)
     {
-        num = 2;
+        num = 1;
 
         sln[0] = slnr;
-        sln[1] = slni;
+
 
         init();
     }
@@ -213,13 +208,10 @@ public:
         int np = quad->get_num_points(order);
         Node* node = new_node(H2D_FN_DEFAULT, np);
 
-        double *dudx1, *dudy1, *dudx2, *dudy2;
+        double *dudx1, *dudy1;
 
         sln[0]->set_quad_order(order, H2D_FN_VAL | H2D_FN_DX | H2D_FN_DY);
         sln[0]->get_dx_dy_values(dudx1, dudy1);
-
-        sln[1]->set_quad_order(order, H2D_FN_VAL | H2D_FN_DX | H2D_FN_DY);
-        sln[1]->get_dx_dy_values(dudx2, dudy2);
 
         update_refmap();
 
@@ -228,7 +220,7 @@ public:
 
         for (int i = 0; i < np; i++)
         {
-                node->values[0][0][i] = x[i] * sqrt(sqr(dudx1[i]) + sqr(dudy1[i]) + sqr(dudx2[i]) + sqr(dudy2[i]));
+                node->values[0][0][i] = x[i] * sqrt(sqr(dudx1[i]) + sqr(dudy1[i]));
         }
 
         if(nodes->present(order)) {
@@ -286,107 +278,6 @@ private:
     GeomType gt;
 };
 
-class DefaultLinearThermoelasticityX : public WeakForm::VectorFormVol
-{
-public:
-    DefaultLinearThermoelasticityX(int i, scalar lambda, scalar mu, scalar alpha, scalar temp, scalar temp_ref, GeomType gt = HERMES_PLANAR)
-        : WeakForm::VectorFormVol(i), lambda(lambda), mu(mu), alpha(alpha), temp(temp), temp_ref(temp_ref), gt(gt) { }
-
-    DefaultLinearThermoelasticityX(int i, int j, std::string area, scalar lambda, scalar mu, scalar alpha, scalar temp, scalar temp_ref, GeomType gt = HERMES_PLANAR)
-        : WeakForm::VectorFormVol(i, area), lambda(lambda), mu(mu), alpha(alpha), temp(temp), temp_ref(temp_ref), gt(gt) { }
-
-    virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *v,
-                         Geom<double> *e, ExtData<scalar> *ext) const {
-        scalar result = 0.0;
-        if (gt == HERMES_PLANAR)
-            for (int i = 0; i < n; i++)
-                result += wt[i] * v->dx[i];
-        else if (gt == HERMES_AXISYM_X)
-            for (int i = 0; i < n; i++)
-                result += wt[i] * e->x[i] * v->dy[i];
-        else
-            for (int i = 0; i < n; i++)
-                result += wt[i] * v->dx[i];
-
-        return (3*lambda + 2*mu) * alpha * (temp - temp_ref) * result;
-    }
-
-    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
-                    Geom<Ord> *e, ExtData<Ord> *ext) const {
-        Ord result = 0;
-        if (gt == HERMES_PLANAR)
-            for (int i = 0; i < n; i++)
-                result += wt[i] * v->dx[i];
-        else if (gt == HERMES_AXISYM_X)
-            for (int i = 0; i < n; i++)
-                result += wt[i] * e->x[i] * v->dy[i];
-        else
-            for (int i = 0; i < n; i++)
-                result += wt[i] * v->dx[i];
-
-        return result;
-    }
-
-    // This is to make the form usable in rk_time_step().
-    virtual WeakForm::VectorFormVol* clone() {
-        return new DefaultLinearThermoelasticityX(*this);
-    }
-
-private:
-    scalar lambda, mu, alpha, temp, temp_ref, vel_ang;
-    GeomType gt;
-};
-
-class DefaultLinearThermoelasticityY : public WeakForm::VectorFormVol
-{
-public:
-    DefaultLinearThermoelasticityY(int i, scalar lambda, scalar mu, scalar alpha, scalar temp, scalar temp_ref, GeomType gt = HERMES_PLANAR)
-        : WeakForm::VectorFormVol(i), lambda(lambda), mu(mu), alpha(alpha), temp(temp), temp_ref(temp_ref), gt(gt) { }
-
-    DefaultLinearThermoelasticityY(int i, std::string area, scalar lambda, scalar mu, scalar alpha, scalar temp, scalar temp_ref, GeomType gt = HERMES_PLANAR)
-        : WeakForm::VectorFormVol(i, area), lambda(lambda), mu(mu), alpha(alpha), temp(temp), temp_ref(temp_ref), gt(gt) { }
-
-    virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *v,
-                         Geom<double> *e, ExtData<scalar> *ext) const {
-        scalar result = 0.0;
-        if (gt == HERMES_PLANAR)
-            for (int i = 0; i < n; i++)
-                result += wt[i] * v->dy[i];
-        else if (gt == HERMES_AXISYM_X)
-            for (int i = 0; i < n; i++)
-                result += wt[i] * v->dx[i];
-        else
-            for (int i = 0; i < n; i++)
-                result += wt[i] * e->x[i] * v->dy[i];
-
-        return (3*lambda + 2*mu) * alpha * (temp - temp_ref) * result;
-    }
-
-    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
-                    Geom<Ord> *e, ExtData<Ord> *ext) const {
-        Ord result = 0;
-        if (gt == HERMES_PLANAR)
-            for (int i = 0; i < n; i++)
-                result += wt[i] * v->dy[i];
-        else if (gt == HERMES_AXISYM_X)
-            for (int i = 0; i < n; i++)
-                result += wt[i] * v->dx[i];
-        else
-            for (int i = 0; i < n; i++)
-                result += wt[i] * e->x[i] * v->dy[i];
-
-        return result;
-    }
-
-    // This is to make the form usable in rk_time_step().
-   virtual WeakForm::VectorFormVol* clone() {
-        return new DefaultLinearThermoelasticityY(*this);
-    }
-
-private:
-    scalar lambda, mu, alpha, temp, temp_ref, vel_ang;
-    GeomType gt;
-};
 
 double prev_temp_set;  //TODO dat dovnitr, tady je to osklivy
 
@@ -398,7 +289,7 @@ class WeakFormMagnetic : public WeakForm
 public:
     WeakFormMagnetic(int neq) : WeakForm(neq) { }
 
-    void registerForms(Hermes::vector<int> labels, Solution *prev_mag_r_sln, Solution *prev_mag_i_sln, Filter *prev_temp_sln)
+    void registerForms(Hermes::vector<int> labels, Solution *prev_mag_r_sln, Filter *prev_temp_sln)
     {
         for(std::vector<int>::iterator it = labels.begin(); it != labels.end(); ++it) {
             double perm = magneticLabel[*it].permeability;
@@ -409,43 +300,49 @@ public:
             if (USE_NONLINEARITIES && (zelezoLabels.find_index(*it, false) != -1))
                 cond = NONLINEAR_PARAMETER;
 
-            add_magnetic_material(str_marker[*it], perm, cond, magneticLabel[*it].current_density_real, prev_mag_r_sln, prev_mag_i_sln, prev_temp_sln);
+            double omega = magneticLabel[*it].velocity_angular;
+            double reman = magneticLabel[*it].remanence;
+            double reman_angle = magneticLabel[*it].remanence_angle;
+
+            add_magnetic_material(str_marker[*it], perm, cond, magneticLabel[*it].current_density_real, prev_mag_r_sln, prev_temp_sln, reman, reman_angle, omega);
         }
         prev_temp_set = false;
     }
 
-    void add_magnetic_material(std::string marker, double permeability, double conductivity, double external_current_density, Solution *prev_mag_r_sln, Solution *prev_mag_i_sln, Filter *prev_temp_filter)
+    void add_magnetic_material(std::string marker, double permeability, double conductivity, double external_current_density, Solution *prev_mag_r_sln,
+                               Filter *prev_temp_filter, double remanence, double remanence_angle, double omega_velocity)
     {
         /// TODO PROC TO PADA, KDYZ DAM NASLEDUJICIM FORMAM HERMES_SYM ???????????
         /// TODO PROC TO PADA, KDYZ DAM NASLEDUJICIM FORMAM HERMES_SYM ???????????
         /// TODO PROC TO PADA, KDYZ DAM NASLEDUJICIM FORMAM HERMES_SYM ???????????
-//        // real part
-//        add_matrix_form(new WeakFormsMaxwell::VolumetricMatrixForms::DefaultLinearMagnetostatics(0, 0, marker, 1.0 / (permeability * MU0), HERMES_NONSYM, HERMES_AXISYM_Y));
-//        // imag part
-//        add_matrix_form(new WeakFormsMaxwell::VolumetricMatrixForms::DefaultLinearMagnetostatics(1, 1, marker, 1.0 / (permeability * MU0), HERMES_NONSYM, HERMES_AXISYM_Y));
 
         // real part
         CustomMatrixFormVol *mat_form_real = new CustomMatrixFormVol(0, 0, marker, permeability);
         mat_form_real->ext.push_back(prev_mag_r_sln);
-        mat_form_real->ext.push_back(prev_mag_i_sln);
+        // VK // mat_form_real->ext.push_back(prev_mag_i_sln);
         add_matrix_form(mat_form_real);
-        // imag part
-        CustomMatrixFormVol *mat_form_imag = new CustomMatrixFormVol(1, 1, marker, permeability);
-        mat_form_imag->ext.push_back(prev_mag_r_sln);
-        mat_form_imag->ext.push_back(prev_mag_i_sln);
-        add_matrix_form(mat_form_imag);
 
-        // conductivity
-        if (fabs(conductivity) > EPS_ZERO)
-        {
-//            add_matrix_form(new WeakFormsH1::VolumetricMatrixForms::DefaultLinearMass(0, 1, marker, - 2 * M_PI * frequency * conductivity, HERMES_NONSYM, HERMES_PLANAR));
-//            add_matrix_form(new WeakFormsH1::VolumetricMatrixForms::DefaultLinearMass(1, 0, marker,   2 * M_PI * frequency * conductivity, HERMES_NONSYM, HERMES_PLANAR));
-            add_matrix_form(new CustomMatrixFormCond(0, 1, marker, - 2 * M_PI * frequency, conductivity));
-            add_matrix_form(new CustomMatrixFormCond(1, 0, marker,   2 * M_PI * frequency, conductivity));
-        }
+        CustomMatrixFormVolVel *mat_form_vel = new CustomMatrixFormVolVel(0, 0, marker, conductivity, omega_velocity);
+        add_matrix_form(mat_form_vel);
+
+
+
+// VK       // conductivity pouze u harmonického pole
+//        if (fabs(conductivity) > EPS_ZERO)
+//        {
+////            add_matrix_form(new WeakFormsH1::VolumetricMatrixForms::DefaultLinearMass(0, 1, marker, - 2 * M_PI * frequency * conductivity, HERMES_NONSYM, HERMES_PLANAR));
+////            add_matrix_form(new WeakFormsH1::VolumetricMatrixForms::DefaultLinearMass(1, 0, marker,   2 * M_PI * frequency * conductivity, HERMES_NONSYM, HERMES_PLANAR));
+//            add_matrix_form(new CustomMatrixFormCond(0, 1, marker, - 2 * M_PI * frequency, conductivity));
+//            add_matrix_form(new CustomMatrixFormCond(1, 0, marker,   2 * M_PI * frequency, conductivity));
+// VK       }
+
         // external current density
         if (fabs(external_current_density) > EPS_ZERO)
             add_vector_form(new WeakFormsH1::VolumetricVectorForms::DefaultVectorFormConst(0, marker, external_current_density, HERMES_PLANAR));
+
+        CustomVectorFormVolReman *vec_form_reman = new CustomVectorFormVolReman(0, marker, permeability, remanence, remanence_angle);
+        add_vector_form(vec_form_reman);
+
     }
 
     void push_previous_temperature(Solution *prev_temp_sln)
@@ -472,23 +369,18 @@ private:
            // return matrix_form<double, scalar>(n, wt, u_ext, u, v, e, ext);
 
             Func<double>* sln_mag_r_prev = ext->fn[0];
-            Func<double>* sln_mag_i_prev = ext->fn[1];
-            Func<double>* sln_temp_prev = ext->fn[2];
-
-            //            if (sln_temp_prev == NULL)
-            //                info("sln temp je NULL");
+           //VK // Func<double>* sln_mag_i_prev = ext->fn[1];
+            Func<double>* sln_temp_prev = ext->fn[1];
 
             scalar result = 0;
             for (int i = 0; i < n; i++){
-                scalar B = sqrt(sqr(sln_mag_r_prev->dx[i]) + sqr(sln_mag_r_prev->dy[i]) + sqr(sln_mag_i_prev->dx[i]) + sqr(sln_mag_i_prev->dy[i]));
+                scalar B = sqrt(sqr(sln_mag_r_prev->dx[i]) + sqr(sln_mag_r_prev->dy[i]));
                 if(B>maxB) maxB = B;
                 scalar T = (prev_temp_set) ? sln_temp_prev->val[i] : TEMP_INIT;
                 scalar permeability = (permeability_const == NONLINEAR_PARAMETER) ? permeability_function(B,T) : permeability_const;
 
                 result += wt[i] / (MU0 * permeability) * (
-                            u->dx[i] * v->dx[i] + u->dy[i] * v->dy[i] +
-                            u->val[i] * v->dx[i] / e->x[i]); //TODO: pryc
-                     //     (e->x[i] > 0) ? u->val[i] * v->dx[i] / e->x[i] : 0.0);
+                            u->dx[i] * v->dx[i] + u->dy[i] * v->dy[i]);
             }
             return result;
 
@@ -503,13 +395,22 @@ private:
         double permeability_const;
     };
 
-    class CustomMatrixFormCond : public WeakForm::MatrixFormVol
+    // ******** Form for velocity (matrix volume) ***********
+private:
+    class CustomMatrixFormVolVel : public WeakForm::MatrixFormVol
     {
     public:
-        CustomMatrixFormCond(int i, int j, std::string marker, double coeff, double conductivity_const)
-            : WeakForm::MatrixFormVol(i, j, marker, HERMES_NONSYM), coeff(coeff), conductivity_const(conductivity_const) {};
+        CustomMatrixFormVolVel(int i, int j, std::string marker, double conductivity_const, double omega_velocity)
+            : WeakForm::MatrixFormVol(i, j, marker, HERMES_NONSYM), conductivity_const(conductivity_const), omega_velocity(omega_velocity) {}
+
+        template<typename Real, typename Scalar>
+        Scalar matrix_form(int n, double *wt, Func<Real> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
+
+        }
 
         virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *u, Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const {
+           // return matrix_form<double, scalar>(n, wt, u_ext, u, v, e, ext);
+
             Func<double>* sln_temp_prev = ext->fn[0];
 
             scalar result = 0;
@@ -518,9 +419,14 @@ private:
                 scalar conductivity = (conductivity_const == NONLINEAR_PARAMETER) ? electric_conductivity_fe.value(T) : conductivity_const;
                 if(conductivity > max_el_cond) max_el_cond = conductivity;
                 if(conductivity < min_el_cond) min_el_cond = conductivity;
-                result += wt[i] * conductivity * u->val[i] * v->val[i];
+
+                scalar vel_x = - omega_velocity * e->y[i];
+                scalar vel_y = omega_velocity * e->x[i];
+
+                result += wt[i] * conductivity * (
+                            u->val[i] * vel_x * v->dx[i] + u->val[i] * vel_y * v->dy[i]);
             }
-            return coeff * result;
+            return result;
 
         }
 
@@ -530,10 +436,61 @@ private:
         }
 
     private:
-        double coeff, conductivity_const;
+        double conductivity_const, omega_velocity;
     };
 
+
+    // ******** Form for remanence of magnets (vector volume) ****************
+private:
+    class CustomVectorFormVolReman : public WeakForm::VectorFormVol
+    {
+    public:
+        CustomVectorFormVolReman(int i, std::string marker, double permeability_const, double remanence, double remanence_angle)
+            :WeakForm::VectorFormVol(i, marker), permeability_const(permeability_const), remanence(remanence), remanence_angle(remanence_angle) {}
+
+        template<typename Real, typename Scalar>
+        Scalar vector_form(int n, double *wt, Func<Real> *u_ext[], Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
+
+        }
+
+
+        virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const {
+
+            Func<double>* sln_mag_r_prev = ext->fn[0];
+            Func<double>* sln_temp_prev = ext->fn[1];
+
+            scalar result = 0;
+            for (int i = 0; i < n; i++){
+                scalar B = sqrt(sqr(sln_mag_r_prev->dx[i]) + sqr(sln_mag_r_prev->dy[i]));
+                if(B>maxB) maxB = B;
+                scalar T = (prev_temp_set) ? sln_temp_prev->val[i] : TEMP_INIT;
+                scalar permeability = (permeability_const == NONLINEAR_PARAMETER) ? permeability_function(B,T) : permeability_const;
+
+                scalar reman_x = remanence * cos(remanence_angle);
+                scalar reman_y = remanence * sin(remanence_angle);
+
+                result += - wt[i] / (MU0 * permeability) * (
+                            reman_y * v->dx[i] - reman_x * v->dy[i]);
+            }
+            return result;
+
+        }
+
+        virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const {
+            //return matrix_form<Ord, Ord>(n, wt, u_ext, u, v, e, ext);
+            //return Ord(20);
+            return vector_form<Ord, Ord>(n, wt, u_ext, v, e, ext); //nevim proc mas nekde navrat a nekde Ord(20)
+        }
+
+    private:
+        double permeability_const, remanence, remanence_angle;
+    };
+
+
 };
+
+
+
 
 class WeakFormTemp : public WeakForm
 {
@@ -781,7 +738,7 @@ private:
              for (int i = 0; i < n; i++)
                  result += wt[i] * (3*lambda + 2*mu) * expansion * (
                             // temperature->dx[i] * v->val[i]
-                              (temperature->val[i] - TEMP_INIT) * (v->dx[i] + v->val[i]/1.0)
+                              (temperature->val[i] - TEMP_INIT) * v->dx[i] //  nejsem si jisty jestli ma byt i zbytek + v->val[i])
                              );
                  //result += wt[i] * (100000000) * e->x[i] * v->val[i];
                  //result += 0;

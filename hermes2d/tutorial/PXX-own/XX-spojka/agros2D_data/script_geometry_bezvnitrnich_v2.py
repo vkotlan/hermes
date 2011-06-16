@@ -64,6 +64,8 @@ addedge(-(mg_sirka/2-delta), r_vzduch_3+mg_vyska-delta, (mg_sirka/2-delta), r_vz
 addedge(-(mg_sirka/2-delta), r_vzduch_3+delta, -(mg_sirka/2-delta), r_vzduch_3+mg_vyska-delta, 0, "none")
 addedge((mg_sirka/2-delta), r_vzduch_3+delta, (mg_sirka/2-delta), r_vzduch_3+mg_vyska-delta, 0, "none")
 
+addedge((mg_sirka/2-delta), (r_vzduch_3+mg_vyska/2), A_x-dx_B+dx_C/2, A_y+dy_B+(dy_C-sqrt(2)*delta)/2.,0,"none")
+
 addedge((A_x-dx_B+sqrt(2)*delta), (A_y+dy_B), (A_x+dx_B), (A_y-dy_B+sqrt(2)*delta), 0, "none")
 addedge((A_x-dx_B+dx_C), (A_y+dy_B+dy_C-sqrt(2)*delta), (A_x+dx_B+dx_C-sqrt(2)*delta), (A_y-dy_B+dy_C), 0, "none")
 addedge((A_x-dx_B+sqrt(2)*delta), (A_y+dy_B), (A_x-dx_B+dx_C), (A_y+dy_B+dy_C-sqrt(2)*delta), 0, "none")
@@ -98,6 +100,9 @@ addedge(-(A_x-dx_B+sqrt(2)*delta), (A_y+dy_B), -(A_x+dx_B), (A_y-dy_B+sqrt(2)*de
 addedge(-(A_x-dx_B+dx_C), (A_y+dy_B+dy_C-sqrt(2)*delta), -(A_x+dx_B+dx_C-sqrt(2)*delta), (A_y-dy_B+dy_C), 0, "none")
 addedge(-(A_x-dx_B+sqrt(2)*delta), (A_y+dy_B), -(A_x-dx_B+dx_C), (A_y+dy_B+dy_C-sqrt(2)*delta), 0, "none")
 addedge(-(A_x+dx_B), (A_y-dy_B+sqrt(2)*delta), -(A_x+dx_B+dx_C-sqrt(2)*delta), (A_y-dy_B+dy_C), 0, "none")
+
+#stredy hran magnetu - spojnice - vymezeni oblasty mag.obvodu
+
 
 # labels
 addlabel(((r_vzduch_4-r_magnet_vnejsi_obal)/2+r_magnet_vnejsi_obal), 0, 0, 0, "vzduch")
