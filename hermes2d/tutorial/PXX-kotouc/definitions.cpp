@@ -445,7 +445,7 @@ public:
         }
         // external current density
         if (fabs(external_current_density) > EPS_ZERO)
-            add_vector_form(new WeakFormsH1::VolumetricVectorForms::DefaultVectorFormConst(0, marker, external_current_density, HERMES_AXISYM_Y));
+            add_vector_form(new WeakFormsH1::VolumetricVectorForms::DefaultVectorFormConst(0, marker, external_current_density, HERMES_PLANAR));
     }
 
     void push_previous_temperature(Solution *prev_temp_sln)
