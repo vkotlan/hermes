@@ -341,6 +341,7 @@ public:
             add_vector_form(new WeakFormsH1::VolumetricVectorForms::DefaultVectorFormConst(0, marker, external_current_density, HERMES_PLANAR));
 
         CustomVectorFormVolReman *vec_form_reman = new CustomVectorFormVolReman(0, marker, permeability, remanence, remanence_angle);
+        vec_form_reman->ext.push_back(prev_mag_r_sln);
         add_vector_form(vec_form_reman);
 
     }
