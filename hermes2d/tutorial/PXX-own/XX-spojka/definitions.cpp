@@ -220,7 +220,7 @@ public:
 
         for (int i = 0; i < np; i++)
         {
-                node->values[0][0][i] = x[i] * sqrt(sqr(dudx1[i]) + sqr(dudy1[i]));
+                node->values[0][0][i] = sqrt(sqr(dudx1[i]) + sqr(dudy1[i]));
         }
 
         if(nodes->present(order)) {

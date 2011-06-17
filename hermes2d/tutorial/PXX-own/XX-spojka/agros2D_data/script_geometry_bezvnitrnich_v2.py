@@ -4,7 +4,7 @@ r_Fe_rozt=0.03
 r_vzduch_2=0.0255
 r_Fe_nerozt=0.034
 r_vzduch_3=0.035
-r_magnet_vnejsi_obal=0.050
+r_magnet_vnejsi_obal=0.05
 r_vzduch_4=0.3
 # parametry magnety - geometrie
 n=8. 				# magnety tvori n-uhelnik
@@ -40,7 +40,8 @@ addboundary("hranice", "magnetic_vector_potential", 0, 0)
 addmaterial("vzduch", 0, 0, 1, 0, 0, 0, 0, 0, 0)
 addmaterial("Fe_rozt", 0, 0, 2000, sigma_Fe_rozt, 0, 0, 0, 0, omega)
 addmaterial("Fe_nerozt", 0, 0, 350, sigma_Fe_nerozt, 0, 0, 0, 0, 0)
-addmaterial("magnet_vnejsi_obal", 0, 0, 1, 0, 0, 0, 0, 0, 0)
+addmaterial("magnet_izolace", 0, 0, 1, 0, 0, 0, 0, 0, 0)
+addmaterial("magnet_obvod", 0, 0, 350, 0, 0, 0, 0, 0, 0)
 addmaterial("M_N", 0, 0, mur_mg, 0, Br, 270, 0, 0, 0)
 addmaterial("M_NW", 0, 0, mur_mg, 0, Br, 135, 0, 0, 0)
 addmaterial("M_W", 0, 0, mur_mg, 0, Br, 0, 0, 0, 0)
@@ -56,57 +57,71 @@ addcircle(0,0,r_Fe_rozt, "none")
 #addcircle(0,0,r_vzduch_2, "none")
 #addcircle(0,0,r_Fe_nerozt, "none")
 addcircle(0,0,r_vzduch_3, "none")
-addcircle(0,0,r_magnet_vnejsi_obal+0.01, "none")
+addcircle(0,0,r_magnet_vnejsi_obal+0.005, "none")
 addcircle(0,0,r_vzduch_4, "hranice")
 
+#mag_N
 addedge(-(mg_sirka/2-delta), r_vzduch_3+delta, (mg_sirka/2-delta), r_vzduch_3+delta, 0, "none")
 addedge(-(mg_sirka/2-delta), r_vzduch_3+mg_vyska-delta, (mg_sirka/2-delta), r_vzduch_3+mg_vyska-delta, 0, "none")
 addedge(-(mg_sirka/2-delta), r_vzduch_3+delta, -(mg_sirka/2-delta), r_vzduch_3+mg_vyska-delta, 0, "none")
 addedge((mg_sirka/2-delta), r_vzduch_3+delta, (mg_sirka/2-delta), r_vzduch_3+mg_vyska-delta, 0, "none")
-
-addedge((mg_sirka/2-delta), (r_vzduch_3+mg_vyska/2), A_x-dx_B+dx_C/2, A_y+dy_B+(dy_C-sqrt(2)*delta)/2.,0,"none")
-
+#mag_NE
 addedge((A_x-dx_B+sqrt(2)*delta), (A_y+dy_B), (A_x+dx_B), (A_y-dy_B+sqrt(2)*delta), 0, "none")
 addedge((A_x-dx_B+dx_C), (A_y+dy_B+dy_C-sqrt(2)*delta), (A_x+dx_B+dx_C-sqrt(2)*delta), (A_y-dy_B+dy_C), 0, "none")
 addedge((A_x-dx_B+sqrt(2)*delta), (A_y+dy_B), (A_x-dx_B+dx_C), (A_y+dy_B+dy_C-sqrt(2)*delta), 0, "none")
 addedge((A_x+dx_B), (A_y-dy_B+sqrt(2)*delta), (A_x+dx_B+dx_C-sqrt(2)*delta), (A_y-dy_B+dy_C), 0, "none")
-
+#spojnice N -> NE
+addedge((mg_sirka/2-delta), (r_vzduch_3+mg_vyska/2), A_x-dx_B+sqrt(2)*delta+(dx_C-sqrt(2)*delta)/2, A_y+dy_B+(dy_C-sqrt(2)*delta)/2, 0,"none")
+#mag E
 addedge(r_vzduch_3+delta, (mg_sirka/2-delta), r_vzduch_3+delta, -(mg_sirka/2-delta), 0, "none")
 addedge(r_vzduch_3+mg_vyska-delta, -(mg_sirka/2-delta), r_vzduch_3+mg_vyska-delta, (mg_sirka/2-delta), 0, "none")
 addedge(r_vzduch_3+delta, (mg_sirka/2-delta), r_vzduch_3+mg_vyska-delta, (mg_sirka/2-delta), 0, "none")
 addedge(r_vzduch_3+delta, -(mg_sirka/2-delta), r_vzduch_3+mg_vyska-delta, -(mg_sirka/2-delta), 0, "none")
-
+#spojnice NE -> E
+addedge(A_x+dx_B+(dx_C-sqrt(2)*delta)/2, A_y-dy_B+sqrt(2)*delta+(dy_C-sqrt(2)*delta)/2, (r_vzduch_3+mg_vyska/2), (mg_sirka/2-delta), 0,"none")
+#mag_SE
 addedge((A_x-dx_B+sqrt(2)*delta), -(A_y+dy_B), (A_x+dx_B), -(A_y-dy_B+sqrt(2)*delta), 0, "none")
 addedge((A_x-dx_B+dx_C), -(A_y+dy_B+dy_C-sqrt(2)*delta), (A_x+dx_B+dx_C-sqrt(2)*delta), -(A_y-dy_B+dy_C), 0, "none")
 addedge((A_x-dx_B+sqrt(2)*delta), -(A_y+dy_B), (A_x-dx_B+dx_C), -(A_y+dy_B+dy_C-sqrt(2)*delta), 0, "none")
 addedge((A_x+dx_B), -(A_y-dy_B+sqrt(2)*delta), (A_x+dx_B+dx_C-sqrt(2)*delta), -(A_y-dy_B+dy_C), 0, "none")
-
+#spojnice E -> SE
+addedge((r_vzduch_3+mg_vyska/2), -(mg_sirka/2-delta), A_x+dx_B+(dx_C-sqrt(2)*delta)/2, -(A_y-dy_B+sqrt(2)*delta+(dy_C-sqrt(2)*delta)/2), 0,"none")
+#mag_S
 addedge(-(mg_sirka/2-delta), -(r_vzduch_3+delta), (mg_sirka/2-delta), -(r_vzduch_3+delta), 0, "none")
 addedge(-(mg_sirka/2-delta), -(r_vzduch_3+mg_vyska-delta), (mg_sirka/2-delta), -(r_vzduch_3+mg_vyska-delta), 0, "none")
 addedge(-(mg_sirka/2-delta), -(r_vzduch_3+delta), -(mg_sirka/2-delta), -(r_vzduch_3+mg_vyska-delta), 0, "none")
 addedge((mg_sirka/2-delta), -(r_vzduch_3+delta), (mg_sirka/2-delta), -(r_vzduch_3+mg_vyska-delta), 0, "none")
-
+#spojnice SE -> S
+addedge(A_x-dx_B+sqrt(2)*delta+(dx_C-sqrt(2)*delta)/2, -(A_y+dy_B+(dy_C-sqrt(2)*delta)/2), (mg_sirka/2-delta), -(r_vzduch_3+mg_vyska/2),  0,"none")
+#mag_SW
 addedge(-(A_x-dx_B+sqrt(2)*delta), -(A_y+dy_B), -(A_x+dx_B), -(A_y-dy_B+sqrt(2)*delta), 0, "none")
 addedge(-(A_x-dx_B+dx_C), -(A_y+dy_B+dy_C-sqrt(2)*delta), -(A_x+dx_B+dx_C-sqrt(2)*delta), -(A_y-dy_B+dy_C), 0, "none")
 addedge(-(A_x-dx_B+sqrt(2)*delta), -(A_y+dy_B), -(A_x-dx_B+dx_C), -(A_y+dy_B+dy_C-sqrt(2)*delta), 0, "none")
 addedge(-(A_x+dx_B), -(A_y-dy_B+sqrt(2)*delta), -(A_x+dx_B+dx_C-sqrt(2)*delta), -(A_y-dy_B+dy_C), 0, "none")
-
+#spojnice S -> SW
+addedge(-(mg_sirka/2-delta), -(r_vzduch_3+mg_vyska/2), -(A_x-dx_B+sqrt(2)*delta+(dx_C-sqrt(2)*delta)/2), -(A_y+dy_B+(dy_C-sqrt(2)*delta)/2), 0,"none")
+#mag_W
 addedge(-(r_vzduch_3+delta), (mg_sirka/2-delta), -(r_vzduch_3+delta), -(mg_sirka/2-delta), 0, "none")
 addedge(-(r_vzduch_3+mg_vyska-delta), -(mg_sirka/2-delta), -(r_vzduch_3+mg_vyska-delta), (mg_sirka/2-delta), 0, "none")
 addedge(-(r_vzduch_3+delta), (mg_sirka/2-delta), -(r_vzduch_3+mg_vyska-delta), (mg_sirka/2-delta), 0, "none")
 addedge(-(r_vzduch_3+delta), -(mg_sirka/2-delta), -(r_vzduch_3+mg_vyska-delta), -(mg_sirka/2-delta), 0, "none")
-
+#spojnice SW -> W
+addedge(-(A_x+dx_B+(dx_C-sqrt(2)*delta)/2), -(A_y-dy_B+sqrt(2)*delta+(dy_C-sqrt(2)*delta)/2), -(r_vzduch_3+mg_vyska/2), -(mg_sirka/2-delta),  0,"none")
+#mag_NW
 addedge(-(A_x-dx_B+sqrt(2)*delta), (A_y+dy_B), -(A_x+dx_B), (A_y-dy_B+sqrt(2)*delta), 0, "none")
 addedge(-(A_x-dx_B+dx_C), (A_y+dy_B+dy_C-sqrt(2)*delta), -(A_x+dx_B+dx_C-sqrt(2)*delta), (A_y-dy_B+dy_C), 0, "none")
 addedge(-(A_x-dx_B+sqrt(2)*delta), (A_y+dy_B), -(A_x-dx_B+dx_C), (A_y+dy_B+dy_C-sqrt(2)*delta), 0, "none")
 addedge(-(A_x+dx_B), (A_y-dy_B+sqrt(2)*delta), -(A_x+dx_B+dx_C-sqrt(2)*delta), (A_y-dy_B+dy_C), 0, "none")
-
-#stredy hran magnetu - spojnice - vymezeni oblasty mag.obvodu
+#spojnice W -> NW
+addedge( -(r_vzduch_3+mg_vyska/2), (mg_sirka/2-delta), -(A_x+dx_B+(dx_C-sqrt(2)*delta)/2), (A_y-dy_B+sqrt(2)*delta+(dy_C-sqrt(2)*delta)/2), 0,"none")
+#spojnice NW -> N
+addedge(-(A_x-dx_B+sqrt(2)*delta+(dx_C-sqrt(2)*delta)/2), (A_y+dy_B+(dy_C-sqrt(2)*delta)/2), -(mg_sirka/2-delta), (r_vzduch_3+mg_vyska/2), 0,"none")
 
 
 # labels
 addlabel(((r_vzduch_4-r_magnet_vnejsi_obal)/2+r_magnet_vnejsi_obal), 0, 0, 0, "vzduch")
-addlabel((r_magnet_vnejsi_obal-3*delta), 0, 0, 0, "magnet_vnejsi_obal")
+addlabel((r_magnet_vnejsi_obal+0.005-3*delta), 0, 0, 0, "magnet_obvod")
+addlabel((r_vzduch_3+3*delta), mg_sirka/2+3*delta, 0, 0, "magnet_izolace")
 addlabel(((r_vzduch_3-r_Fe_nerozt)/2+r_Fe_nerozt), 0, 0, 0, "vzduch")
 #addlabel(((r_Fe_nerozt-r_vzduch_2)/2+r_vzduch_2), 0, 0, 0, "Fe_nerozt")
 #addlabel(((r_vzduch_2-r_Fe_rozt)/2+r_Fe_rozt), 0, 0, 0, "vzduch")
