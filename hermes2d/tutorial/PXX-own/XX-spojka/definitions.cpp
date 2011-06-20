@@ -152,12 +152,12 @@ public:
         int np = quad->get_num_points(order);
         Node* node = new_node(H2D_FN_DEFAULT, np);
 
-        double *dudx1, *dudy1;
-        double *value1;
+        double *dudx, *dudy;
+        double *value;
 
         sln[0]->set_quad_order(order, H2D_FN_VAL | H2D_FN_DX | H2D_FN_DY);
-        sln[0]->get_dx_dy_values(dudx1, dudy1);
-        value1 = sln[0]->get_fn_values();
+        sln[0]->get_dx_dy_values(dudx, dudy);
+        value = sln[0]->get_fn_values();
 
         update_refmap();
 
@@ -169,9 +169,12 @@ public:
         int marker = atoi(user_marker.c_str());
         for (int i = 0; i < np; i++)
         {
+            double vel_x = -magneticLabel[marker].velocity_angular * y[i];
+            double vel_y = magneticLabel[marker].velocity_angular * x[i];
+
             if(magneticLabel[marker].conductivity > 0.0){
-                node->values[0][0][i] = 0.5 / magneticLabel[marker].conductivity * (
-                    sqr(2 * M_PI * frequency * magneticLabel[marker].conductivity * value1[i]));
+                node->values[0][0][i] = 1.0 / magneticLabel[marker].conductivity * (
+                    sqr(std::abs(-magneticLabel[marker].conductivity * (vel_x * dudx + vel_y * dudy))));
             }
             else
                 node->values[0][0][i] = 0.0;
