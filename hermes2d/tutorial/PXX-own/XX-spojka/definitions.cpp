@@ -174,7 +174,7 @@ public:
 
             if(magneticLabel[marker].conductivity > 0.0){
                 node->values[0][0][i] = 1.0 / magneticLabel[marker].conductivity * (
-                    sqr(std::abs(-magneticLabel[marker].conductivity * (vel_x * dudx + vel_y * dudy))));
+                    sqr(std::abs(-magneticLabel[marker].conductivity * (vel_x * dudx[i] + vel_y * dudy[i]))));
             }
             else
                 node->values[0][0][i] = 0.0;
