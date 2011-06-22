@@ -1,8 +1,8 @@
 #include <hermes2d.h>
 #include "data_table.h"
 
-const int NUM_EDGES = 162;
-const int NUM_LABELS = 68;
+const int NUM_EDGES = 61;
+const int NUM_LABELS = 14;
 
 DataTable thermal_conductivity_fe;
 DataTable electric_conductivity_fe;
@@ -357,94 +357,57 @@ void initTables()
 
     // harmonic elmag. field
     magneticEdge = new MagneticEdge[NUM_EDGES];
-    set_magnetic_edge(Hermes::vector<MagneticEdge *>(&magneticEdge[150], &magneticEdge[155], &magneticEdge[144]), PhysicFieldBC_Magnetic_VectorPotential, 0.0, 0.0); //antisymetrie (osa rotace) nevim jakej je to typ, mam ted zase rozsekanej hermes
-    set_magnetic_edge(Hermes::vector<MagneticEdge *>(&magneticEdge[143]), PhysicFieldBC_Magnetic_VectorPotential, 0.0, 0.0); //nulovy potencial, melo by byt spravne
+    set_magnetic_edge(Hermes::vector<MagneticEdge *>(&magneticEdge[17], &magneticEdge[18], &magneticEdge[19], &magneticEdge[20]), PhysicFieldBC_Magnetic_VectorPotential, 0.0, 0.0); //nulovy potencial, melo by byt spravne
 
     magneticLabel = new MagneticLabel[NUM_LABELS];
-    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[5], &magneticLabel[67]), 0.0, 0.0, 2000.0, 5e6, 0.0, 0.0, 0.0, 0.0, 0.0); //vodive zelezo - kotouc
-    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[0]), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //teflon
-    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[3], &magneticLabel[1], &magneticLabel[2], &magneticLabel[4]), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vata
-    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[7], &magneticLabel[8], &magneticLabel[9], &magneticLabel[10], &magneticLabel[11], &magneticLabel[12],
-                                                       &magneticLabel[13], &magneticLabel[14], &magneticLabel[15], &magneticLabel[16], &magneticLabel[17], &magneticLabel[18],
-                                                       &magneticLabel[19]), 5*4.2441e6, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vodice
-    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[20], &magneticLabel[21], &magneticLabel[22], &magneticLabel[23], &magneticLabel[24],
-                                                       &magneticLabel[25], &magneticLabel[26], &magneticLabel[27], &magneticLabel[28], &magneticLabel[29], &magneticLabel[30],
-                                                       &magneticLabel[31], &magneticLabel[36], &magneticLabel[35], &magneticLabel[34], &magneticLabel[33],
-                                                       &magneticLabel[32]), 5.*4.2441e6, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vodice pokracovani
-    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[6]), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vzduch
-    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[37], &magneticLabel[38], &magneticLabel[39], &magneticLabel[40], &magneticLabel[41], &magneticLabel[42], &magneticLabel[43],
-                                                       &magneticLabel[44], &magneticLabel[45], &magneticLabel[46], &magneticLabel[47], &magneticLabel[48], &magneticLabel[49], &magneticLabel[50],
-                                                       &magneticLabel[51]), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //chladici voda
-    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[66], &magneticLabel[65], &magneticLabel[64], &magneticLabel[63], &magneticLabel[62], &magneticLabel[61],
-                                                       &magneticLabel[60], &magneticLabel[59], &magneticLabel[58], &magneticLabel[57], &magneticLabel[56], &magneticLabel[55], &magneticLabel[54],
-                                                       &magneticLabel[53], &magneticLabel[52]), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //chladici voda - pokracovani
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[4]), 0.0, 0.0, 2000.0, 6e6, 0.0, 0.0, 0.0, 0.0, 0.0); //vodive zelezo - roztazne
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[0], &magneticLabel[3], &magneticLabel[5]), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vzduch
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[2]), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vata - izolace
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[1]), 0.0, 0.0, 2000.0, 6e6, 0.0, 0.0, 0.0, 0.0, 0.0); //zelezo - magneticky obvod
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[6]), 0.0, 0.0, 1.11, 0.0, 1.28, 270, 0.0, 0.0, 0.0); //magnet - N
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[7]), 0.0, 0.0, 1.11, 0.0, 1.28, 135, 0.0, 0.0, 0.0); //magnet - NE
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[8]), 0.0, 0.0, 1.11, 0.0, 1.28, 0, 0.0, 0.0, 0.0); //magnet - E
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[9]), 0.0, 0.0, 1.11, 0.0, 1.28, 225, 0.0, 0.0, 0.0); //magnet - SE
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[10]), 0.0, 0.0, 1.11, 0.0, 1.28, 90, 0.0, 0.0, 0.0); //magnet - S
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[11]), 0.0, 0.0, 1.11, 0.0, 1.28, 315, 0.0, 0.0, 0.0); //magnet - SW
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[12]), 0.0, 0.0, 1.11, 0.0, 1.28, 180, 0.0, 0.0, 0.0); //magnet - W
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[13]), 0.0, 0.0, 1.11, 0.0, 1.28, 45, 0.0, 0.0, 0.0); //magnet - NW
 
     magneticLabels = Hermes::vector<int>();
-    for (unsigned int i = 0; i<68; i++)
+    for (unsigned int i = 0; i<14; i++)
     {
         magneticLabels.push_back(i);
     }
 
-    zelezoLabels = Hermes::vector<int>(5, 67);
+    zelezoLabels = Hermes::vector<int>(1, 4);
 
     // heat
     heatEdge = new HeatEdge[NUM_EDGES];
-    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[155]), PhysicFieldBC_None, 0.0, 0.0, 0.0, 0.0); //osa rotace ???
-
-    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[151], &heatEdge[132]), PhysicFieldBC_None, 0.0, 0.0, 0.0, 0.0); //spodni a horni hrana teflonove trubky - dlouha trubka
-
-    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[129], &heatEdge[137], &heatEdge[136], &heatEdge[134], &heatEdge[135],
-                                             &heatEdge[138], &heatEdge[139], &heatEdge[142], &heatEdge[14], &heatEdge[8], &heatEdge[126], &heatEdge[128],
-                                             &heatEdge[127]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 20.0, 30.0); //hranice
-
-    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[101], &heatEdge[102], &heatEdge[77], &heatEdge[78], &heatEdge[91], &heatEdge[92], &heatEdge[93], &heatEdge[94], &heatEdge[95], &heatEdge[96],
-                                             &heatEdge[86]), PhysicFieldBC_Heat_Temperature, 50.0, 0.0, 0.0, 0.0); //vnitrky vodicu - pevna teplot adana chladici vodou
-    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[85], &heatEdge[97], &heatEdge[98], &heatEdge[105], &heatEdge[116], &heatEdge[113], &heatEdge[112], &heatEdge[108], &heatEdge[106],
-                                             &heatEdge[117]), PhysicFieldBC_Heat_Temperature, 50.0, 0.0, 0.0, 0.0); //vnitrky vodicu - pevna teplot adana chladici vodou
-    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[118], &heatEdge[121], &heatEdge[122], &heatEdge[125], &heatEdge[71], &heatEdge[35], &heatEdge[32], &heatEdge[148], &heatEdge[147],
-                                             &heatEdge[67]), PhysicFieldBC_Heat_Temperature, 50.0, 0.0, 0.0, 0.0); //vnitrky vodicu - pevna teplot adana chladici vodou
-    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[65], &heatEdge[64], &heatEdge[63], &heatEdge[60], &heatEdge[59], &heatEdge[56], &heatEdge[55], &heatEdge[52], &heatEdge[51],
-                                             &heatEdge[22]), PhysicFieldBC_Heat_Temperature, 50.0, 0.0, 0.0, 0.0); //vnitrky vodicu - pevna teplot adana chladici vodou
-    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[24], &heatEdge[30], &heatEdge[33], &heatEdge[42], &heatEdge[21], &heatEdge[69], &heatEdge[68], &heatEdge[31], &heatEdge[34],
-                                             &heatEdge[50]), PhysicFieldBC_Heat_Temperature, 50.0, 0.0, 0.0, 0.0); //vnitrky vodicu - pevna teplot adana chladici vodou
-    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[49], &heatEdge[48], &heatEdge[47], &heatEdge[46], &heatEdge[45], &heatEdge[12], &heatEdge[11], &heatEdge[74],
-                                             &heatEdge[73]), PhysicFieldBC_Heat_Temperature, 50.0, 0.0, 0.0, 0.0); //vnitrky vodicu - pevna teplot adana chladici vodou
-
+    set_heat_edge(Hermes::vector<HeatEdge *>(&heatEdge[13], &heatEdge[14], &heatEdge[15], &heatEdge[16]), PhysicFieldBC_Heat_Flux, 0.0, 0.0, 20.0, 30.0); //hranice
 
     heatLabel = new HeatLabel[NUM_LABELS];
-    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[5], &heatLabel[67]), 50.0, 1.0, 7620.0, 550); //vodive zelezo - kotouc
-    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[0]), 0.24, 0.0, 2220.0, 1050); //teflon
-    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[3], &heatLabel[1], &heatLabel[2], &heatLabel[4]), 0.04, 0.0, 72.0, 670); //vata
-    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[7], &heatLabel[8], &heatLabel[9], &heatLabel[10], &heatLabel[11], &heatLabel[12],
-                                               &heatLabel[13], &heatLabel[14], &heatLabel[15], &heatLabel[16], &heatLabel[17], &heatLabel[18]), 395.0, 1.0, 8960.0, 390); //vodice
-    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[19], &heatLabel[20], &heatLabel[21], &heatLabel[22], &heatLabel[23], &heatLabel[24],
-                                               &heatLabel[25], &heatLabel[26], &heatLabel[27], &heatLabel[28], &heatLabel[29], &heatLabel[30],
-                                               &heatLabel[31], &heatLabel[36], &heatLabel[35], &heatLabel[34], &heatLabel[33],
-                                               &heatLabel[32]), 395.0, 1.0, 8960.0, 390); //vodice
-//    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[37], &heatLabel[38], &heatLabel[39], &heatLabel[40], &heatLabel[41], &heatLabel[42], &heatLabel[43],
-//                                                       &heatLabel[44], &heatLabel[45], &heatLabel[46], &heatLabel[47], &heatLabel[48], &heatLabel[49], &heatLabel[50],
-//                                                       &heatLabel[51], &heatLabel[66], &heatLabel[65], &heatLabel[64], &heatLabel[63], &heatLabel[62], &heatLabel[61],
-//                                                       &heatLabel[60], &heatLabel[59], &heatLabel[58], &heatLabel[57], &heatLabel[56], &heatLabel[55], &heatLabel[54],
-//                                                       &heatLabel[53], &heatLabel[52]), 50.0, 1.0, 7850.0, 469); //chladici voda - neni v teplotnim modelu
+    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[4], &heatLabel[1]), 50.0, 1.0, 7620.0, 550); //vodive zelezo - roztazna cast a mag obvod
+    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[2]), 0.04, 0.0, 72.0, 670); //izolace
+    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[3], &heatLabel[5]), 3e-3, 0.0, 1.29, 1); //vzduch
+    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[6], &heatLabel[7], &heatLabel[8], &heatLabel[9], &heatLabel[10], &heatLabel[11],
+                                               &heatLabel[12], &heatLabel[13]), 7.0, 0.0, 7500.0, 450); //magnety
 
-    heatLabels = Hermes::vector<int>(0,1,2,3,4,5);
-    for (unsigned int i=7; i<37; i++)
+    heatLabels = Hermes::vector<int>();
+    for (unsigned int i=1; i<14; i++)
     {
         heatLabels.push_back(i);
     }
-    heatLabels.push_back(67);
+
 
 
     // thermoelasticity
     elasticityEdge = new ElasticityEdge[NUM_EDGES];
-    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[152]), PhysicFieldBC_Elasticity_Free, PhysicFieldBC_Elasticity_Fixed, 0.0, 0.0);//stred kotouce - fixovan v Z
-    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[4], &elasticityEdge[154], &elasticityEdge[158], &elasticityEdge[153], &elasticityEdge[159], &elasticityEdge[5],
-                                                         &elasticityEdge[6], &elasticityEdge[3], &elasticityEdge[2], &elasticityEdge[161], &elasticityEdge[157], &elasticityEdge[160],
-                                                         &elasticityEdge[156], &elasticityEdge[1]), PhysicFieldBC_Elasticity_Free, PhysicFieldBC_Elasticity_Free, 0.0, 0.0);//free
+    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[1], &elasticityEdge[2], &elasticityEdge[3], &elasticityEdge[4], &elasticityEdge[5], &elasticityEdge[6],
+                                                         &elasticityEdge[7], &elasticityEdge[8]), PhysicFieldBC_Elasticity_Free, PhysicFieldBC_Elasticity_Free, 0.0, 0.0);//free
 
     elasticityLabel = new ElasticityLabel[NUM_LABELS];
-    set_elasticity_label(Hermes::vector<ElasticityLabel *>(&elasticityLabel[5],&elasticityLabel[67]), 1e11, 0.3, 0.0, 0.0, 1.25e-5);
+    set_elasticity_label(Hermes::vector<ElasticityLabel *>(&elasticityLabel[4]), 1e11, 0.3, 0.0, 0.0, 1.25e-5);
 
-   elasticityLabels = Hermes::vector<int>(5,67);
+   elasticityLabels = Hermes::vector<int>(4);
 }
 
