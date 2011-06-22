@@ -486,8 +486,8 @@ private:
 
         virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const {
             //return matrix_form<Ord, Ord>(n, wt, u_ext, u, v, e, ext);
-            //return Ord(20);
-            return vector_form<Ord, Ord>(n, wt, u_ext, v, e, ext); //nevim proc mas nekde navrat a nekde Ord(20)
+            return Ord(20);
+            //return vector_form<Ord, Ord>(n, wt, u_ext, v, e, ext); //nevim proc mas nekde navrat a nekde Ord(20)
         }
 
     private:

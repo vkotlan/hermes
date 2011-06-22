@@ -28,7 +28,7 @@ const bool VTK_VISUALIZATION = false;              // Set to "true" to enable VT
 const int P_MAG_INIT = 2;                             // Uniform polynomial degree of mesh elements.
 const int P_TEMP_INIT = 2;
 const int P_ELAST_INIT = 2;
-const int INIT_REF_NUM = 0;                       // Number of initial uniform mesh refinements.
+const int INIT_REF_NUM = 1;                       // Number of initial uniform mesh refinements.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
@@ -227,7 +227,7 @@ int main(int argc, char* argv[])
 //    mv_elast.show(&mesh_elast);
 //
 //    mv_elast.wait();
-
+    mesh_mag.refine_all_elements();
     // Perform initial mesh refinements (optional).
      for (int i=0; i < INIT_REF_NUM; i++){
          mesh_temp.refine_all_elements();
