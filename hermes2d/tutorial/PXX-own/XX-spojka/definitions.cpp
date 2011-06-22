@@ -354,6 +354,7 @@ public:
         for(std::vector<VectorFormVol *>::iterator it = vfvol.begin(); it != vfvol.end(); ++it) {
             (*it)->ext.push_back(prev_temp_sln);
         }
+
         for(std::vector<MatrixFormVol *>::iterator it = mfvol.begin(); it != mfvol.end(); ++it) {
             (*it)->ext.push_back(prev_temp_sln);
         }
