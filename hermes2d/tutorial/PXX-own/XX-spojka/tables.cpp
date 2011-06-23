@@ -360,18 +360,18 @@ void initTables()
     set_magnetic_edge(Hermes::vector<MagneticEdge *>(&magneticEdge[17], &magneticEdge[18], &magneticEdge[19], &magneticEdge[20]), PhysicFieldBC_Magnetic_VectorPotential, 0.0, 0.0); //nulovy potencial, melo by byt spravne
 
     magneticLabel = new MagneticLabel[NUM_LABELS];
-    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[4]), 0.0, 0.0, 1000.0, 6e6, 0.0, 0.0, 0.0, 0.0, 0.0); //vodive zelezo - roztazne
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[4]), 0.0, 0.0, 1000.0, 6e6, 0.0, 0.0, 0.0, 0.0, 314.0); //vodive zelezo - roztazne
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[0], &magneticLabel[3], &magneticLabel[5]), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vzduch
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[2]), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //vata - izolace
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[1]), 0.0, 0.0, 1000.0, 6e6, 0.0, 0.0, 0.0, 0.0, 0.0); //zelezo - magneticky obvod
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[6]), 0.0, 0.0, 1.11, 0.0, 1.28, 270, 0.0, 0.0, 0.0); //magnet - N
-    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[7]), 0.0, 0.0, 1.11, 0.0, 1.28, 135, 0.0, 0.0, 0.0); //magnet - NE
-    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[8]), 0.0, 0.0, 1.11, 0.0, 1.28, 0, 0.0, 0.0, 0.0); //magnet - E
-    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[9]), 0.0, 0.0, 1.11, 0.0, 1.28, 225, 0.0, 0.0, 0.0); //magnet - SE
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[7]), 0.0, 0.0, 1.11, 0.0, 1.28, 45, 0.0, 0.0, 0.0); //magnet - NE
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[8]), 0.0, 0.0, 1.11, 0.0, 1.28, 180, 0.0, 0.0, 0.0); //magnet - E
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[9]), 0.0, 0.0, 1.11, 0.0, 1.28, 315, 0.0, 0.0, 0.0); //magnet - SE
     set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[10]), 0.0, 0.0, 1.11, 0.0, 1.28, 90, 0.0, 0.0, 0.0); //magnet - S
-    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[11]), 0.0, 0.0, 1.11, 0.0, 1.28, 315, 0.0, 0.0, 0.0); //magnet - SW
-    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[12]), 0.0, 0.0, 1.11, 0.0, 1.28, 180, 0.0, 0.0, 0.0); //magnet - W
-    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[13]), 0.0, 0.0, 1.11, 0.0, 1.28, 45, 0.0, 0.0, 0.0); //magnet - NW
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[11]), 0.0, 0.0, 1.11, 0.0, 1.28, 225, 0.0, 0.0, 0.0); //magnet - SW
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[12]), 0.0, 0.0, 1.11, 0.0, 1.28, 0, 0.0, 0.0, 0.0); //magnet - W
+    set_magnetic_label(Hermes::vector<MagneticLabel *>(&magneticLabel[13]), 0.0, 0.0, 1.11, 0.0, 1.28, 135, 0.0, 0.0, 0.0); //magnet - NW
 
     magneticLabels = Hermes::vector<int>();
     for (unsigned int i = 0; i<14; i++)

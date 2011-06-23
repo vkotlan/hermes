@@ -79,7 +79,7 @@ set(WITH_H2D                  YES)
 	set(H2D_DEBUG             YES)
 	set(H2D_RELEASE           NO)
 	# Optional parts of the library.
-	set(H2D_WITH_EXAMPLES     YES)
+        set(H2D_WITH_EXAMPLES     NO)
         set(H2D_WITH_BENCHMARKS   NO)
         set(H2D_WITH_TESTS        NO)
 	set(H2D_WITH_TUTORIAL     YES)
