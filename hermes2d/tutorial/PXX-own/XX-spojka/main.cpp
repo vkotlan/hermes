@@ -362,9 +362,9 @@ int main(int argc, char* argv[])
     solver_elast->set_factorization_scheme(HERMES_REUSE_FACTORIZATION_COMPLETELY);
 
     // Initialize views.
-    ScalarView view_elast_r("Elasticity r", new WinGeom(400, 0, 450, 600));
+    ScalarView view_elast_r("Elasticity x", new WinGeom(400, 0, 450, 600));
     view_elast_r.show(&sln_elast_r);
-    ScalarView view_elast_z("Elasticity z", new WinGeom(800, 0, 450, 600));
+    ScalarView view_elast_z("Elasticity y", new WinGeom(800, 0, 450, 600));
     view_elast_z.show(&sln_elast_z);
     // Visualize the solution.
 //    WinGeom* stress_win_geom = new WinGeom(0, 0, 800, 400);
@@ -409,7 +409,7 @@ int main(int argc, char* argv[])
       view_a.show(&afilter, HERMES_EPS_NORMAL);
 
       view_b.show(&bfilter, HERMES_EPS_NORMAL);
-//      view_wj.show(&wjfilter, HERMES_EPS_NORMAL);
+      view_wj.show(&wjfilter, HERMES_EPS_NORMAL);
 
 
       info("Assembling the temperature stiffness matrix and right-hand side vector.");
