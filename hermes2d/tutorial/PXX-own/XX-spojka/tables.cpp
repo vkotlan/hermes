@@ -402,11 +402,11 @@ void initTables()
 
     // thermoelasticity
     elasticityEdge = new ElasticityEdge[NUM_EDGES];
-    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[1], &elasticityEdge[2], &elasticityEdge[3], &elasticityEdge[4], &elasticityEdge[5], &elasticityEdge[6],
-                                                         &elasticityEdge[7], &elasticityEdge[8]), PhysicFieldBC_Elasticity_Free, PhysicFieldBC_Elasticity_Free, 0.0, 0.0);//free
+    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[1], &elasticityEdge[2], &elasticityEdge[3], &elasticityEdge[4]), PhysicFieldBC_Elasticity_Fixed, PhysicFieldBC_Elasticity_Fixed, 0.0, 0.0);//fixed
+    set_elasticity_edge(Hermes::vector<ElasticityEdge *>(&elasticityEdge[5], &elasticityEdge[6], &elasticityEdge[7], &elasticityEdge[8]), PhysicFieldBC_Elasticity_Free, PhysicFieldBC_Elasticity_Free, 0.0, 0.0);//free
 
     elasticityLabel = new ElasticityLabel[NUM_LABELS];
-    set_elasticity_label(Hermes::vector<ElasticityLabel *>(&elasticityLabel[4]), 1e11, 0.3, 0.0, 0.0, 1.25e-5);
+    set_elasticity_label(Hermes::vector<ElasticityLabel *>(&elasticityLabel[4]), 2.1e11, 0.3, 0.0, 0.0, 1.25e-5);
 
    elasticityLabels = Hermes::vector<int>(4);
 }
