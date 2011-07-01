@@ -28,7 +28,7 @@ const bool VTK_VISUALIZATION = false;              // Set to "true" to enable VT
 const int P_MAG_INIT = 2;                             // Uniform polynomial degree of mesh elements.
 const int P_TEMP_INIT = 2;
 const int P_ELAST_INIT = 2;
-const int INIT_REF_NUM = 2;                       // Number of initial uniform mesh refinements.
+const int INIT_REF_NUM = 1;                       // Number of initial uniform mesh refinements.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
@@ -37,8 +37,8 @@ const double A_INIT = 0.0;
 const double TEMP_INIT = 30.0;
 const double DK_INIT = 0.0;
 
-const double TIME_STEP = 0.2;
-const double TIME_FINAL = 60.0;
+const double TIME_STEP = 0.5;
+const double TIME_FINAL = 10.0;
 
 const double frequency = 50;
 
@@ -219,14 +219,14 @@ int main(int argc, char* argv[])
     mloader.load("spojka_mesh_temp.mesh", &mesh_temp);
     mloader.load("spojka_mesh_elast.mesh", &mesh_elast);
 
-    /*
+
     MeshView mv_mag;
     mv_mag.show(&mesh_mag);
     MeshView mv_temp;
     mv_temp.show(&mesh_temp);
     MeshView mv_elast;
     mv_elast.show(&mesh_elast);
-    */
+
 
 
     // Perform initial mesh refinements (optional).
@@ -236,8 +236,8 @@ int main(int argc, char* argv[])
          mesh_elast.refine_all_elements();
      }
 //     mesh_mag.refine_all_elements();
-     mesh_temp.refine_all_elements();
-     mesh_elast.refine_all_elements();
+     //mesh_temp.refine_all_elements();
+     //mesh_elast.refine_all_elements();
      /*
      MeshView mv_mag_ref;
      mv_mag_ref.show(&mesh_mag);

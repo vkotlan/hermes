@@ -5,18 +5,18 @@ Created on Tue Apr 26 15:48:28 2011
 @author: vasek
 """
 import re 
-vstupniSoubor = 'mesh_file_curves.mesh'
+vstupniSoubor = 'mesh_file.mesh'
 ProblemNazev = 'spojka'
 Pole=['mag','temp','elast']
 """ definice hranic, ktere maji zustat pro jednotliva pole """
 Boundaries=range(len(Pole))
-Boundaries[Pole.index('mag')]=[17,18,19,20]
-Boundaries[Pole.index('temp')]=[13,14,15,16]
-Boundaries[Pole.index('elast')]=[1,2,3,4,5,6,7,8]
+Boundaries[Pole.index('mag')]=[21,22,23,24]
+Boundaries[Pole.index('temp')]=[17,18,19,20]
+Boundaries[Pole.index('elast')]=[5,6,7,8,9,10,11,12]
 """ definice oblasti, ktere maji zustat pro jednotliva pole """
 Elements=range(len(Pole))
-Elements[Pole.index('mag')]=[0,1,2,3,4,5,6,7,8,9,10,11,12,13]
-Elements[Pole.index('temp')]=[1,2,3,4,5,6,7,8,9,10,11,12,13]
+Elements[Pole.index('mag')]=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
+Elements[Pole.index('temp')]=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
 Elements[Pole.index('elast')]=[4]
 
 
@@ -187,9 +187,9 @@ for p in range(0,len(Pole)):
     print "\tpocet curves: {0:d}".format(pocetCurves)
     
     
-    print "Vypis Bodu:"
-    for i in range(0,len(PoleEdgesBody)): 
-        print PoleEdgesBody[i]
+#    print "Vypis Bodu:"
+#    for i in range(0,len(PoleEdgesBody)): 
+#        print PoleEdgesBody[i]
 
 
 
