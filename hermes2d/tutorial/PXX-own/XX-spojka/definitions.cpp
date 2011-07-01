@@ -431,7 +431,7 @@ private:
                 scalar vel_x = - omega_velocity * e->y[i];
                 scalar vel_y = omega_velocity * e->x[i];
 
-                result += - wt[i] * conductivity * (
+                result +=  wt[i] * conductivity * (
                             u->val[i] * vel_x * v->dx[i] + u->val[i] * vel_y * v->dy[i]);
             }
             return result;
