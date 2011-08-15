@@ -37,8 +37,8 @@ const double A_INIT = 0.0;
 const double TEMP_INIT = 20.0;
 const double DK_INIT = 0.0;
 
-const double TIME_STEP = 1.0;
-const double TIME_FINAL = 60.0;
+const double TIME_STEP = 10.0;
+const double TIME_FINAL =900.0;
 
 const double frequency = 50;
 

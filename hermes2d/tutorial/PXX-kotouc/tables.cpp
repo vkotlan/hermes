@@ -414,7 +414,7 @@ void initTables()
     heatLabel = new HeatLabel[NUM_LABELS];
     set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[5], &heatLabel[67]), 50.0, 1.0, 7620.0, 550); //vodive zelezo - kotouc
     set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[0]), 0.24, 0.0, 2220.0, 1050); //teflon
-    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[3], &heatLabel[1], &heatLabel[2], &heatLabel[4]), 0.04, 0.0, 72.0, 670); //vata
+    set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[3], &heatLabel[1], &heatLabel[2], &heatLabel[4]), 0.04e-3, 0.0, 72.0, 670); //vata
     set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[7], &heatLabel[8], &heatLabel[9], &heatLabel[10], &heatLabel[11], &heatLabel[12],
                                                &heatLabel[13], &heatLabel[14], &heatLabel[15], &heatLabel[16], &heatLabel[17], &heatLabel[18]), 395.0, 1.0, 8960.0, 390); //vodice
     set_heat_label(Hermes::vector<HeatLabel *>(&heatLabel[19], &heatLabel[20], &heatLabel[21], &heatLabel[22], &heatLabel[23], &heatLabel[24],
